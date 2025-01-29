@@ -3590,59 +3590,6 @@ function loadCytoStyle(cy) {
     console.info('The user prefers:', colorScheme);
     console.log("multiLayerViewPortState", multiLayerViewPortState);
 
-    // // Load and apply Cytoscape styles from cy-style.json using fetch
-    // if (colorScheme == "light") {
-
-    // 	// fetch("css/cy-style-dark.json")
-    // 	fetch(window.jsonFileUrlDataCytoStyleDark)
-
-
-
-    // 		.then((response) => response.json())
-    // 		.then((styles) => {
-    // 			cy.style().fromJson(styles).update();
-    // 			if (multiLayerViewPortState) {
-    // 				// Initialize Cytoscape (assuming cy is already created)
-    // 				parentNodeSvgBackground(cy, svgString);
-    // 			}
-    // 		})
-    // 		.catch((error) => {
-    // 			console.error(
-    // 				"Oops, we hit a snag! Couldnt load the cyto styles, bro.",
-    // 				error,
-    // 			);
-    // 			appendMessage(
-    // 				`Oops, we hit a snag! Couldnt load the cyto styles, bro.: ${error}`,
-    // 			);
-    // 		});
-
-    // } else if (colorScheme == "dark") {
-    // 	// fetch("css/cy-style-dark.json")
-    // 	fetch(window.jsonFileUrlDataCytoStyleDark)
-
-    // 		.then((response) => response.json())
-    // 		.then((styles) => {
-
-    // 			console.log("isGeoMapInitialized", isGeoMapInitialized);
-    // 			cy.style().fromJson(styles).update();
-    // 			if (multiLayerViewPortState) {
-    // 				// Initialize Cytoscape (assuming cy is already created)
-    // 				parentNodeSvgBackground(cy, svgString);
-    // 			}
-    // 		})
-    // 		.catch((error) => {
-    // 			console.error(
-    // 				"Oops, we hit a snag! Couldnt load the cyto styles, bro.",
-    // 				error,
-    // 			);
-    // 			appendMessage(
-    // 				`Oops, we hit a snag! Couldnt load the cyto styles, bro.: ${error}`,
-    // 			);
-    // 		});
-    // }
-    // Determine the JSON file URL based on color scheme
-
-
     // VS-CODE start 
     let jsonFileUrl;
 
@@ -3651,6 +3598,188 @@ function loadCytoStyle(cy) {
     } else {
         jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
     }
+
+
+    // // Your SVG string
+    // const svgNodeStringRouter = `
+    //    <svg
+    //         xmlns:xlink="http://www.w3.org/1999/xlink"
+    //         xmlns="http://www.w3.org/2000/svg"
+    //         xml:space="preserve"
+    //         style="enable-background:new 0 0 120 120;"
+    //         viewBox="0 0 120 120"
+    //         y="0px"
+    //         x="0px"
+    //         id="Layer_1"
+    //         version="1.1"
+    //         width="120px"
+    //         height="120px"
+    //         fill="none"
+    //     >
+    //         <style type="text/css">
+    //             .st0 { fill: #001135; }
+    //             .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
+    //         </style>
+    //         <rect height="120" width="120" class="st0" />
+    //         <g>
+    //             <g>
+    //                 <path d="M71.7,19.7V48h28" class="st1" />
+    //                 <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
+    //             </g>
+    //             <g>
+    //                 <path d="M20,47.8h28.4v-28" class="st1" />
+    //                 <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
+    //             </g>
+    //             <g>
+    //                 <path d="M48,100.3V72H20" class="st1" />
+    //                 <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
+    //             </g>
+    //             <g>
+    //                 <path d="M100,71.9H71.6v28" class="st1" />
+    //                 <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
+    //             </g>
+    //         </g>
+    //     </svg>
+    // `;
+
+    // // // Encode SVG for Cytoscape background-image
+    // // const encodedSVGRouter = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgNodeStringRouter);
+
+    // function generateEncodedSVG(nodeType, fillColor) {
+    //     let svgString = "";
+    
+    //     switch (nodeType) {
+    //         case "pe":  // Provider Edge Router
+    //             svgString = `
+    //             <svg
+    //                     xmlns:xlink="http://www.w3.org/1999/xlink"
+    //                     xmlns="http://www.w3.org/2000/svg"
+    //                     xml:space="preserve"
+    //                     style="enable-background:new 0 0 120 120;"
+    //                     viewBox="0 0 120 120"
+    //                     y="0px"
+    //                     x="0px"
+    //                     id="Layer_1"
+    //                     version="1.1"
+    //                     width="120px"
+    //                     height="120px"
+    //                     fill="none"
+    //                 >
+    //                     <style type="text/css">
+    //                         .st0 { fill: ${fillColor}; }
+    //                         .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
+    //                     </style>
+    //                     <rect height="120" width="120" class="st0" />
+    //                     <g>
+    //                         <g>
+    //                             <path d="M71.7,19.7V48h28" class="st1" />
+    //                             <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
+    //                         </g>
+    //                         <g>
+    //                             <path d="M20,47.8h28.4v-28" class="st1" />
+    //                             <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
+    //                         </g>
+    //                         <g>
+    //                             <path d="M48,100.3V72H20" class="st1" />
+    //                             <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
+    //                         </g>
+    //                         <g>
+    //                             <path d="M100,71.9H71.6v28" class="st1" />
+    //                             <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
+    //                         </g>
+    //                     </g>
+    //                 </svg>`
+    //             break;
+    
+    //         case "leaf":  // Leaf Node
+    //             svgString = `
+    //             <svg
+    //                     xmlns:xlink="http://www.w3.org/1999/xlink"
+    //                     xmlns="http://www.w3.org/2000/svg"
+    //                     xml:space="preserve"
+    //                     style="enable-background:new 0 0 120 120;"
+    //                     viewBox="0 0 120 120"
+    //                     y="0px"
+    //                     x="0px"
+    //                     id="Layer_1"
+    //                     version="1.1"
+    //                     width="120px"
+    //                     height="120px"
+    //                     fill="none"
+    //                 >
+    //                     <style type="text/css">
+    //                         .st0 { fill: ${fillColor}; }
+    //                         .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
+    //                     </style>
+    //                     <rect height="120" width="120" class="st0" />
+    //                     <g>
+    //                         <g>
+    //                             <path d="M71.7,19.7V48h28" class="st1" />
+    //                             <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
+    //                         </g>
+    //                         <g>
+    //                             <path d="M20,47.8h28.4v-28" class="st1" />
+    //                             <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
+    //                         </g>
+    //                         <g>
+    //                             <path d="M48,100.3V72H20" class="st1" />
+    //                             <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
+    //                         </g>
+    //                         <g>
+    //                             <path d="M100,71.9H71.6v28" class="st1" />
+    //                             <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
+    //                         </g>
+    //                     </g>
+    //                 </svg>`;
+    //             break;
+    
+    //         default:
+    //             console.warn(`Unknown nodeType: ${nodeType}, using default PE SVG.`);
+    //             svgString = `
+    //             <svg
+    //                     xmlns:xlink="http://www.w3.org/1999/xlink"
+    //                     xmlns="http://www.w3.org/2000/svg"
+    //                     xml:space="preserve"
+    //                     style="enable-background:new 0 0 120 120;"
+    //                     viewBox="0 0 120 120"
+    //                     y="0px"
+    //                     x="0px"
+    //                     id="Layer_1"
+    //                     version="1.1"
+    //                     width="120px"
+    //                     height="120px"
+    //                     fill="none"
+    //                 >
+    //                     <style type="text/css">
+    //                         .st0 { fill: ${fillColor}; }
+    //                         .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
+    //                     </style>
+    //                     <rect height="120" width="120" class="st0" />
+    //                     <g>
+    //                         <g>
+    //                             <path d="M71.7,19.7V48h28" class="st1" />
+    //                             <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
+    //                         </g>
+    //                         <g>
+    //                             <path d="M20,47.8h28.4v-28" class="st1" />
+    //                             <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
+    //                         </g>
+    //                         <g>
+    //                             <path d="M48,100.3V72H20" class="st1" />
+    //                             <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
+    //                         </g>
+    //                         <g>
+    //                             <path d="M100,71.9H71.6v28" class="st1" />
+    //                             <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
+    //                         </g>
+    //                     </g>
+    //                 </svg>`;
+    //     }
+    
+    //     // Encode the final selected SVG for Cytoscape.js
+    //     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
+    // }
+    
 
     const cytoscapeStylesForVscode = [
         {
@@ -3758,7 +3887,17 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "14",
                 "height": "14",
-                "background-image": `${window.imagesUrl}/clab-pe-light-blue.png`,
+                "background-image": `${ generateEncodedSVG("pe","#001135")}`,
+                "background-fit": "cover",
+                "background-clip": "none"
+            }
+        },
+        {
+            "selector": "node[topoViewerRole=\"default\"]",
+            "style": {
+                "width": "14",
+                "height": "14",
+                "background-image": `${ generateEncodedSVG("pe","#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3767,7 +3906,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "14",
                 "height": "14",
-                "background-image": `${window.imagesUrl}/clab-pe-light-blue.png`,
+                "background-image": `${ generateEncodedSVG("pe","#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3776,7 +3915,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "14",
                 "height": "14",
-                "background-image": `${window.imagesUrl}/clab-pe-dark-blue.png`,
+                "background-image": `${ generateEncodedSVG("pe","#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3785,7 +3924,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "14",
                 "height": "14",
-                "background-image": `${window.imagesUrl}/clab-controller-light-blue.png`,
+                "background-image": `${ generateEncodedSVG("controller","#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3794,7 +3933,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${window.imagesUrl}/clab-pon-dark-blue.png`,
+                "background-image": `${ generateEncodedSVG("pon","#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3803,28 +3942,25 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${window.imagesUrl}/clab-dcgw-light-blue.png`,
+                "background-image": `${ generateEncodedSVG("dcgw","#001135")}`,
                 "background-fit": "cover"
             }
         },
         {
             "selector": "node[topoViewerRole=\"leaf\"]",
             "style": {
-                "background-image": `${window.imagesUrl}/clab-leaf-light-blue.png`,
-                "background-fit": "cover"
-            }
-        },
-        {
-            "selector": "node[topoViewerRole=\"leaf-svg\"]",
-            "style": {
-                "background-image": "data:image/svg+xml;base64,PHN2ZyB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWw6c3BhY2U9InByZXNlcnZlIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxMjAgMTIwOyIgdmlld0JveD0iMCAwIDEyMCAxMjAiIHk9IjBweCIgeD0iMHB4IiBpZD0iTGF5ZXJfMSIgdmVyc2lvbj0iMS4xIj4mI3hhOzxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+LnN0MCB7IGZpbGw6IHJnYigwLCA5MCwgMjU1KTsgfSAuc3QxIHsgZmlsbDogbm9uZTsgc3Ryb2tlOiByZ2IoMjU1LCAyNTUsIDI1NSk7IHN0cm9rZS13aWR0aDogNDsgc3Ryb2tlLWxpbmVjYXA6IHJvdW5kOyBzdHJva2UtbGluZWpvaW46IHJvdW5kOyBzdHJva2UtbWl0ZXJsaW1pdDogMTA7IH0gLnN0MiB7IGZpbGw6IHJnYigyNTUsIDI1NSwgMjU1KTsgfSAuc3QzIHsgZmlsbDogbm9uZTsgc3Ryb2tlOiByZ2IoMjU1LCAyNTUsIDI1NSk7IHN0cm9rZS13aWR0aDogNDsgc3Ryb2tlLW1pdGVybGltaXQ6IDEwOyB9IC5zdDQgeyBmaWxsOiBub25lOyBzdHJva2U6IHJnYigyNTUsIDI1NSwgMjU1KTsgc3Ryb2tlLXdpZHRoOiA0OyBzdHJva2UtbGluZWNhcDogcm91bmQ7IHN0cm9rZS1saW5lam9pbjogcm91bmQ7IH0gLnN0NSB7IGZpbGw6IHJnYigyNTUsIDI1NSwgMjU1KTsgc3Ryb2tlOiByZ2IoMjU1LCAyNTUsIDI1NSk7IHN0cm9rZS13aWR0aDogNDsgc3Ryb2tlLWxpbmVjYXA6IHJvdW5kOyBzdHJva2UtbGluZWpvaW46IHJvdW5kOyBzdHJva2UtbWl0ZXJsaW1pdDogMTA7IH0gLnN0NiB7IGZpbGw6IG5vbmU7IHN0cm9rZTogcmdiKDI1NSwgMjU1LCAyNTUpOyBzdHJva2Utd2lkdGg6IDQuMjMzMzsgc3Ryb2tlLWxpbmVjYXA6IHJvdW5kOyBzdHJva2UtbGluZWpvaW46IHJvdW5kOyBzdHJva2UtbWl0ZXJsaW1pdDogMTA7IH0gLnN0NyB7IGZpbGw6IG5vbmU7IHN0cm9rZTogcmdiKDI1NSwgMjU1LCAyNTUpOyBzdHJva2Utd2lkdGg6IDQ7IHN0cm9rZS1saW5lY2FwOiByb3VuZDsgc3Ryb2tlLW1pdGVybGltaXQ6IDEwOyB9IC5zdDggeyBmaWxsOiByZ2IoMjU1LCAyNTUsIDI1NSk7IHN0cm9rZTogcmdiKDI1NSwgMjU1LCAyNTUpOyBzdHJva2Utd2lkdGg6IDQ7IHN0cm9rZS1taXRlcmxpbWl0OiAxMDsgfSAuc3Q5IHsgZmlsbDogcmdiKDI1NSwgMjU1LCAyNTUpOyBzdHJva2U6IHJnYigyNTUsIDI1NSwgMjU1KTsgc3Ryb2tlLXdpZHRoOiA0OyB9IC5zdDEwIHsgZmlsbDogbm9uZTsgc3Ryb2tlOiByZ2IoMjU1LCAyNTUsIDI1NSk7IHN0cm9rZS13aWR0aDogNDsgfSAuc3QxMSB7IGZpbGw6IHJnYigzOCwgMzgsIDM4KTsgc3Ryb2tlOiByZ2IoMjU1LCAyNTUsIDI1NSk7IHN0cm9rZS13aWR0aDogNC4yMzMzOyB9IC5zdDEyIHsgZmlsbC1ydWxlOiBldmVub2RkOyBjbGlwLXJ1bGU6IGV2ZW5vZGQ7IGZpbGw6IG5vbmU7IHN0cm9rZTogcmdiKDI1NSwgMjU1LCAyNTUpOyBzdHJva2Utd2lkdGg6IDQ7IHN0cm9rZS1taXRlcmxpbWl0OiAxMDsgfSAuc3QxMyB7IGZpbGwtcnVsZTogZXZlbm9kZDsgY2xpcC1ydWxlOiBldmVub2RkOyBmaWxsOiByZ2IoMjU1LCAyNTUsIDI1NSk7IHN0cm9rZTogcmdiKDI1NSwgMjU1LCAyNTUpOyBzdHJva2Utd2lkdGg6IDQ7IH0gLnN0MTQgeyBmaWxsOiBub25lOyBzdHJva2U6IHJnYigyNTUsIDI1NSwgMjU1KTsgc3Ryb2tlLXdpZHRoOiA0LjIzMzM7IHN0cm9rZS1saW5lY2FwOiByb3VuZDsgc3Ryb2tlLWxpbmVqb2luOiByb3VuZDsgfSAuc3QxNSB7IGZpbGw6IG5vbmU7IHN0cm9rZTogcmdiKDI1NSwgMjU1LCAyNTUpOyBzdHJva2Utd2lkdGg6IDQ7IHN0cm9rZS1saW5lY2FwOiByb3VuZDsgfSAuc3QxNiB7IGZpbGw6IHJnYigyNTUsIDI1NSwgMjU1KTsgc3Ryb2tlOiByZ2IoMjU1LCAyNTUsIDI1NSk7IHN0cm9rZS1taXRlcmxpbWl0OiAxMDsgfSAuc3QxNyB7IGZpbGw6IHJnYigzOCwgMzgsIDM4KTsgc3Ryb2tlOiByZ2IoMjU1LCAyNTUsIDI1NSk7IHN0cm9rZS13aWR0aDogNDsgc3Ryb2tlLW1pdGVybGltaXQ6IDEwOyB9IC5zdDE4IHsgZmlsbDogcmdiKDI1NSwgMjU1LCAyNTUpOyBzdHJva2U6IHJnYigyNTUsIDI1NSwgMjU1KTsgc3Ryb2tlLXdpZHRoOiA0OyBzdHJva2UtbGluZWNhcDogcm91bmQ7IHN0cm9rZS1saW5lam9pbjogcm91bmQ7IH0gPC9zdHlsZT4mI3hhOzxyZWN0IGhlaWdodD0iMTIwIiB3aWR0aD0iMTIwIiBjbGFzcz0ic3QwIi8+JiN4YTs8Zz4mI3hhOwk8cGF0aCBkPSJNOTEuNSwyNy4zbDcuNiw3LjZjMS4zLDEuMywxLjMsMy4xLDAsNC4zbC03LjYsNy43IiBjbGFzcz0ic3QxIi8+JiN4YTsJPHBhdGggZD0iTTI4LjUsNDYuOWwtNy42LTcuNmMtMS4zLTEuMy0xLjMtMy4xLDAtNC4zbDcuNi03LjciIGNsYXNzPSJzdDEiLz4mI3hhOwk8cGF0aCBkPSJNOTEuNSw3My4xbDcuNiw3LjZjMS4zLDEuMywxLjMsMy4xLDAsNC4zbC03LjYsNy43IiBjbGFzcz0ic3QxIi8+JiN4YTsJPHBhdGggZD0iTTI4LjUsOTIuN2wtNy42LTcuNmMtMS4zLTEuMy0xLjMtMy4xLDAtNC4zbDcuNi03LjciIGNsYXNzPSJzdDEiLz4mI3hhOwk8Zz4mI3hhOwkJPHBhdGggZD0iTTk2LjYsMzYuOEg2Ny45bC0xNiw0NS45SDIzLjIiIGNsYXNzPSJzdDEiLz4mI3hhOwkJPHBhdGggZD0iTTk2LjYsODIuN0g2Ny45bC0xNi00NS45SDIzLjIiIGNsYXNzPSJzdDEiLz4mI3hhOwk8L2c+JiN4YTs8L2c+JiN4YTs8L3N2Zz4=",
+                "width": "12",
+                "height": "12",
+                "background-image": `${ generateEncodedSVG("leaf","#001135")}`,
                 "background-fit": "cover"
             }
         },
         {
             "selector": "node[topoViewerRole=\"rgw\"]",
             "style": {
-                "background-image": `${window.imagesUrl}/clab-rgw-light-blue.png`,
+                "width": "12",
+                "height": "12",
+                "background-image": `${ generateEncodedSVG("rgw","#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3833,7 +3969,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${window.imagesUrl}/clab-spine-dark-blue.png`,
+                "background-image": `${ generateEncodedSVG("super-spine","#005AFF")}`,
                 "background-fit": "cover"
             }
         },
@@ -3842,7 +3978,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${window.imagesUrl}/clab-spine-light-blue.png`,
+                "background-image": `${ generateEncodedSVG("spine","#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3851,7 +3987,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${window.imagesUrl}/clab-server-dark-blue.png`,
+                "background-image": `${ generateEncodedSVG("server","#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3860,7 +3996,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "8",
                 "height": "8",
-                "background-image": `${window.imagesUrl}/clab-bridge-light-grey.png`,
+                "background-image": `${ generateEncodedSVG("bridge","#001135")}`,
                 "background-fit": "cover"
             }
         },
