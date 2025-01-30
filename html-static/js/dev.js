@@ -674,12 +674,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 updatedElements = assignMissingLatLng(elements);
             }
 
-            // deploymentType != vs-code
-            // const updatedElements = assignMissingLatLng(elements);
-
-            // deploymentType == vs-code
-            // const updatedElements = (elements);
-
 
             // Now, you can use updatedElements as needed
             // For example, logging them to the console
@@ -1933,11 +1927,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     function createModal(modalId, modalContent) {
         // Create the modal
         const htmlContent = `
-                                                        <div id="${modalId}" class="modal">
-                                                            <div id="${modalId}-modalBackgroundId" class="modal-background"></div>
-                                                                ${modalContent}
-                                                        </div>
-                                                        `;
+                            <div id="${modalId}" class="modal">
+                                <div id="${modalId}-modalBackgroundId" class="modal-background"></div>
+                                    ${modalContent}
+                            </div>
+                            `;
 
         const modalDiv = document.createElement("div");
         modalDiv.innerHTML = htmlContent;
@@ -1956,41 +1950,41 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     function showModalCaptureViewport(modalId) {
         const modalContentSaveViewport = ` 	
-                                                                <div class="modal-content" style="max-width:300px;">
-                                                                    <div class="box px-1 pb-1">
-                                                                        <div class="column is-flex is-justify-content-center ">
-                                                                                <i class="icon fas fa-camera  is-large"></i>
-                                                                        </div>
-                                                                        <div class="column">
-                                                                            <div class="content py-0 px-5">
-                                                                                <p class="has-text-centered is-size-6 has-text-weight-bold py-0 mb-2">Select file type</p>
-                                                                                <p class="has-text-centered is-size-7 has-text-weight-normal">Choose one or multiple types you want to export</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="column px-5">
-                                                                            <div class="control is-flex is-flex-direction-column">
-                                                                                <div class="column py-2">
-                                                                                    <label class="checkbox is-size-7">
-                                                                                    <input type="checkbox"  name="checkboxSaveViewPort" value="option01">
-                                                                                    PNG
-                                                                                    </label>
-                                                                                </div>
-                                                                                <div class="column py-2">
-                                                                                    <label class="checkbox is-size-7">
-                                                                                    <input type="checkbox" name="checkboxSaveViewPort" value="option02">
-                                                                                    Draw.IO
-                                                                                    </label>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="column p-0 pb-3 is-flex is-flex-direction-column is-flex-grow-3" >
-                                                                            <div class="column" style="background-color: white">
-                                                                                <button id="performActionButton" class="button button-modal is-small is-link is-fullwidth">Continue</button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                `;
+                                        <div class="modal-content" style="max-width:300px;">
+                                            <div class="box px-1 pb-1">
+                                                <div class="column is-flex is-justify-content-center ">
+                                                        <i class="icon fas fa-camera  is-large"></i>
+                                                </div>
+                                                <div class="column">
+                                                    <div class="content py-0 px-5">
+                                                        <p class="has-text-centered is-size-6 has-text-weight-bold py-0 mb-2">Select file type</p>
+                                                        <p class="has-text-centered is-size-7 has-text-weight-normal">Choose one or multiple types you want to export</p>
+                                                    </div>
+                                                </div>
+                                                <div class="column px-5">
+                                                    <div class="control is-flex is-flex-direction-column">
+                                                        <div class="column py-2">
+                                                            <label class="checkbox is-size-7">
+                                                            <input type="checkbox"  name="checkboxSaveViewPort" value="option01">
+                                                            PNG
+                                                            </label>
+                                                        </div>
+                                                        <div class="column py-2">
+                                                            <label class="checkbox is-size-7">
+                                                            <input type="checkbox" name="checkboxSaveViewPort" value="option02">
+                                                            Draw.IO
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="column p-0 pb-3 is-flex is-flex-direction-column is-flex-grow-3" >
+                                                    <div class="column" style="background-color: white">
+                                                        <button id="performActionButton" class="button button-modal is-small is-link is-fullwidth">Continue</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        `;
 
         // Instantiate modal
         createModal("modalSaveViewport", modalContentSaveViewport);
