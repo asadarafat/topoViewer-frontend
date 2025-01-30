@@ -265,9 +265,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     initializeDropdownTopoViewerRoleListeners();
     initializeDropdownListeners();
     initViewportDrawerClabEditoCheckboxToggle()
-    initViewportDrawerGeoMapCheckboxToggle()
+    // initViewportDrawerGeoMapCheckboxToggle()
 
-    insertAndColorSvg("nokia-logo", "white")
+    // insertAndColorSvg("nokia-logo", "white")
 
     // Reusable function to initialize a WebSocket connection
     function initializeWebSocket(url, onMessageCallback) {
@@ -351,7 +351,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("initializeWebSocket - labName", environments["clab-name"])
 
         const string01 = "Containerlab Topology: " + labName;
-        const string02 = " ::: Uptime: " + "msgUptime.data";
+        // const string02 = " ::: Uptime: " + "msgUptime.data";
+        const string02 = "";
+
 
         const ClabSubtitle = document.getElementById("ClabSubtitle");
         const messageBody = string01 + string02;
@@ -665,7 +667,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             // Process the data to assign missing lat and lng
             var updatedElements
             if (isVscodeDeployment) {
-                updatedElements = (elements);
+                // updatedElements = (elements);
+                updatedElements = assignMissingLatLng(elements);
+
             } else {
                 updatedElements = assignMissingLatLng(elements);
             }
@@ -1112,9 +1116,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             document.getElementById("panel-link-name").textContent = `${clickedEdge.data("source")} --- ${clickedEdge.data("target")}`
             document.getElementById("panel-link-endpoint-a-name").textContent = `${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")}`
-            document.getElementById("panel-link-endpoint-a-mac-address").textContent = "getting the MAC address"
+            // document.getElementById("panel-link-endpoint-a-mac-address").textContent = "getting the MAC address"
             document.getElementById("panel-link-endpoint-b-name").textContent = `${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
-            document.getElementById("panel-link-endpoint-b-mac-address").textContent = "getting the MAC address"
+            // document.getElementById("panel-link-endpoint-b-mac-address").textContent = "getting the MAC address"
 
 
 
@@ -2781,11 +2785,14 @@ async function layoutAlgoChange(event) {
             viewportDrawerGeoMapContent01 = document.getElementById("viewport-drawer-geo-map-content-01")
             viewportDrawerGeoMapContent01.style.display = "block"
 
-            viewportDrawerGeoMapResetStart = document.getElementById("viewport-drawer-geo-map-reset-start")
-            viewportDrawerGeoMapResetStart.style.display = "block"
+            // aarafat-tag: old Enable tick box
+            // viewportDrawerGeoMapResetStart = document.getElementById("viewport-drawer-geo-map-reset-start")
+            // viewportDrawerGeoMapResetStart.style.display = "block"
 
-            console.info(document.getElementById("viewport-drawer-geo-map"))
-            console.info(document.getElementById("viewport-drawer-geo-map-reset-start"))
+            // console.info(document.getElementById("viewport-drawer-geo-map"))
+            // console.info(document.getElementById("viewport-drawer-geo-map-reset-start"))
+
+            viewportDrawerLayoutGeoMap()
         }
 
     } catch (error) {
@@ -2882,355 +2889,293 @@ function viewportButtonContainerStatusVisibility() {
 
 
 
-function viewportDrawerLayoutForceDirected() {
-    const edgeLengthSlider = document.getElementById("force-directed-slider-link-lenght");
-    const nodeGapSlider = document.getElementById("force-directed-slider-node-gap");
+// function viewportDrawerLayoutForceDirectedRadial() {
 
-    const edgeLengthValue = parseFloat(edgeLengthSlider.value);
-    const nodeGapValue = parseFloat(nodeGapSlider.value);
+//     // Disable GeoMap, in case it is active
+//     viewportDrawerDisableGeoMap()
 
-    console.info("edgeLengthValue", edgeLengthValue);
-    console.info("nodeGapValue", nodeGapValue);
+//     edgeLengthSlider = document.getElementById("force-directed-radial-slider-link-lenght");
+//     const edgeLengthValue = parseFloat(edgeLengthSlider.value);
+//     console.info("edgeLengthValue", edgeLengthValue);
 
-    // Calculate the layout for the optic layer (Layer-1)
-    cy.layout({
-        name: "cola",
-        nodeSpacing: function (node) {
-            return nodeGapValue;
-        },
-        edgeLength: function (edge) {
-            return edgeLengthValue * 100 / edge.data("weight");
-        },
-        animate: true,
-        randomize: false,
-        maxSimulationTime: 1500
-    }).run();
+//     nodeGapSlider = document.getElementById("force-directed-radial-slider-node-gap");
+//     const nodeGapValue = parseFloat(nodeGapSlider.value);
+//     console.info("edgeLengthValue", nodeGapValue);
 
-    // Get the bounding box of Layer-1 optic nodes
-    const opticLayerNodes = cy.nodes('[parent="layer1"]');
-    const opticBBox = opticLayerNodes.boundingBox();
+//     // Map TopoViewerGroupLevel to weights (lower levels = higher weight)	
+//     const nodeWeights = {};
+//     cy.nodes().forEach((node) => {
+//         const level = node.data('extraData')?.labels?.TopoViewerGroupLevel ?
+//             parseInt(node.data('extraData').labels.TopoViewerGroupLevel) :
+//             1; // Default level to 1 if missing
+//         nodeWeights[node.id()] = 1 / level; // Higher weight for lower levels
+//     });
 
-    // Set layer offsets
-    const layerOffsets = {
-        layer2: opticBBox.y2 + 100, // L2 nodes below Optic layer
-        layer3: opticBBox.y2 + 300, // IP/MPLS nodes below L2 layer
-        layer4: opticBBox.y2 + 500 // VPN nodes below IP/MPLS layer
-    };
+//     // Adjust edge styles to avoid overlaps
+//     cy.edges().forEach((edge) => {
+//         edge.style({
+//             'curve-style': 'bezier', // Use curved edges
+//             'control-point-step-size': 20, // Distance for control points
+//         });
+//     });
 
-    // Position the nodes for each layer while preserving x-coordinates
-    ["layer2", "layer3", "layer4"].forEach((layer, index) => {
-        const layerNodes = cy.nodes(`[parent="${layer}"]`);
-        const offsetY = layerOffsets[layer];
+//     // Apply Cola layout with weights and better edge handling
+//     cy.layout({
+//         name: 'cola',
+//         fit: true, // Automatically fit the layout to the viewport
+//         nodeSpacing: nodeGapValue, // Gap between nodes
+//         edgeLength: (edge) => {
+//             const sourceWeight = nodeWeights[edge.source().id()] || 1;
+//             const targetWeight = nodeWeights[edge.target().id()] || 1;
+//             return (1 * edgeLengthValue) / (sourceWeight + targetWeight); // Shorter edges for higher-weight nodes
+//         },
+//         edgeSymDiffLength: 10, // Symmetrical edge separation to reduce overlaps
+//         nodeDimensionsIncludeLabels: true, // Adjust layout considering node labels
+//         animate: true,
+//         maxSimulationTime: 2000,
+//         avoidOverlap: true, // Prevents node overlaps
+//     }).run();
 
-        layerNodes.positions((node, i) => {
-            return {
-                x: opticLayerNodes[i % opticLayerNodes.length].position("x"), // Align x with Layer-1
-                y: opticLayerNodes[i % opticLayerNodes.length].position("y") + offsetY
-            };
-        });
-    });
+//     var cyExpandCollapse = cy.expandCollapse({
+//         layoutBy: null,
+//         undoable: false,
+//         fisheye: true,
+//         animationDuration: 10, // when animate is true, the duration in milliseconds of the animation
+//         animate: true
+//     });
 
-    // Optionally, apply animations for expanding and collapsing nodes
-    const cyExpandCollapse = cy.expandCollapse({
-        layoutBy: null, // Use existing layout
-        undoable: false,
-        fisheye: false,
-        animationDuration: 10, // Duration of animation
-        animate: true
-    });
-    // Example collapse/expand after some delay
-    // Make sure the '#parent' node exists in your loaded elements
-    setTimeout(function () {
-        var parent = cy.$('#parent'); // Ensure that '#parent' is actually present in dataCytoMarshall.json
-        cyExpandCollapse.collapse(parent);
+//     // Example collapse/expand after some time:
+//     setTimeout(function () {
+//         var parent = cy.$('#parent');
+//         cyExpandCollapse.collapse(parent);
 
-        setTimeout(function () {
-            cyExpandCollapse.expand(parent);
-        }, 2000);
-    }, 2000);
-}
+//         setTimeout(function () {
+//             cyExpandCollapse.expand(parent);
+//         }, 2000);
+//     }, 2000);
+// }
 
-function viewportDrawerLayoutForceDirectedRadial() {
+// function viewportDrawerLayoutVertical() {
 
-    edgeLengthSlider = document.getElementById("force-directed-radial-slider-link-lenght");
-    const edgeLengthValue = parseFloat(edgeLengthSlider.value);
-    console.info("edgeLengthValue", edgeLengthValue);
+//     // Disable GeoMap, in case it is active
+//     viewportDrawerDisableGeoMap()
 
-    nodeGapSlider = document.getElementById("force-directed-radial-slider-node-gap");
-    const nodeGapValue = parseFloat(nodeGapSlider.value);
-    console.info("edgeLengthValue", nodeGapValue);
+//     // Retrieve the sliders for node and group vertical gaps
+//     const nodevGap = document.getElementById("vertical-layout-slider-node-v-gap");
+//     const groupvGap = document.getElementById("vertical-layout-slider-group-v-gap");
 
-    // Map TopoViewerGroupLevel to weights (lower levels = higher weight)	
-    const nodeWeights = {};
-    cy.nodes().forEach((node) => {
-        const level = node.data('extraData')?.labels?.TopoViewerGroupLevel ?
-            parseInt(node.data('extraData').labels.TopoViewerGroupLevel) :
-            1; // Default level to 1 if missing
-        nodeWeights[node.id()] = 1 / level; // Higher weight for lower levels
-    });
+//     // Parse the slider values for horizontal and vertical gaps
+//     const nodevGapValue = parseFloat(nodevGap.value); // Gap between child nodes within a parent
+//     const groupvGapValue = parseFloat(groupvGap.value); // Gap between parent nodes
 
-    // Adjust edge styles to avoid overlaps
-    cy.edges().forEach((edge) => {
-        edge.style({
-            'curve-style': 'bezier', // Use curved edges
-            'control-point-step-size': 20, // Distance for control points
-        });
-    });
+//     const delay = 100; // Delay to ensure layout updates after rendering
 
-    // Apply Cola layout with weights and better edge handling
-    cy.layout({
-        name: 'cola',
-        fit: true, // Automatically fit the layout to the viewport
-        nodeSpacing: nodeGapValue, // Gap between nodes
-        edgeLength: (edge) => {
-            const sourceWeight = nodeWeights[edge.source().id()] || 1;
-            const targetWeight = nodeWeights[edge.target().id()] || 1;
-            return (1 * edgeLengthValue) / (sourceWeight + targetWeight); // Shorter edges for higher-weight nodes
-        },
-        edgeSymDiffLength: 10, // Symmetrical edge separation to reduce overlaps
-        nodeDimensionsIncludeLabels: true, // Adjust layout considering node labels
-        animate: true,
-        maxSimulationTime: 2000,
-        avoidOverlap: true, // Prevents node overlaps
-    }).run();
+//     setTimeout(() => {
+//         // Step 1: Position child nodes within their respective parents
+//         cy.nodes().forEach(function (node) {
+//             if (node.isParent()) {
+//                 const children = node.children(); // Get the children of the current parent node
+//                 const cellWidth = node.width() / children.length; // Calculate the width for each child node
 
-    var cyExpandCollapse = cy.expandCollapse({
-        layoutBy: null,
-        undoable: false,
-        fisheye: true,
-        animationDuration: 10, // when animate is true, the duration in milliseconds of the animation
-        animate: true
-    });
+//                 // Position child nodes evenly spaced within the parent node
+//                 children.forEach(function (child, index) {
+//                     const xPos = index * (cellWidth + nodevGapValue); // Horizontal position for the child
+//                     const yPos = 0; // Keep child nodes on the same vertical level
 
-    // Example collapse/expand after some time:
-    setTimeout(function () {
-        var parent = cy.$('#parent');
-        cyExpandCollapse.collapse(parent);
+//                     child.position({
+//                         x: xPos,
+//                         y: yPos
+//                     });
+//                 });
+//             }
+//         });
 
-        setTimeout(function () {
-            cyExpandCollapse.expand(parent);
-        }, 2000);
-    }, 2000);
-}
+//         // Step 2: Sort parent nodes by their group level and ID for vertical stacking
+//         const sortedParents = cy.nodes()
+//             .filter(node => node.isParent()) // Only process parent nodes
+//             .sort((a, b) => {
+//                 // Extract group levels for primary sorting
+//                 const groupLevelA = parseInt(a.data('extraData')?.topoViewerGroupLevel || 0, 10);
+//                 const groupLevelB = parseInt(b.data('extraData')?.topoViewerGroupLevel || 0, 10);
 
-function viewportDrawerLayoutVertical() {
-    // Retrieve the sliders for node and group vertical gaps
-    const nodevGap = document.getElementById("vertical-layout-slider-node-v-gap");
-    const groupvGap = document.getElementById("vertical-layout-slider-group-v-gap");
+//                 if (groupLevelA !== groupLevelB) {
+//                     return groupLevelA - groupLevelB; // Sort by group level in ascending order
+//                 }
+//                 // Secondary sorting by node ID (alphabetical order)
+//                 return a.data('id').localeCompare(b.data('id'));
+//             });
 
-    // Parse the slider values for horizontal and vertical gaps
-    const nodevGapValue = parseFloat(nodevGap.value); // Gap between child nodes within a parent
-    const groupvGapValue = parseFloat(groupvGap.value); // Gap between parent nodes
+//         let yPos = 0; // Starting vertical position for parent nodes
+//         let maxWidth = 0; // Initialize variable to store the maximum parent width
+//         const centerX = 0; // Define the horizontal center reference
 
-    const delay = 100; // Delay to ensure layout updates after rendering
+//         // Step 3: Find the widest parent node
+//         cy.nodes().forEach(function (node) {
+//             if (node.isParent()) {
+//                 const width = node.width();
+//                 if (width > maxWidth) {
+//                     maxWidth = width; // Update maxWidth with the widest parent node's width
+//                     console.info("ParentMaxWidth: ", maxWidth);
+//                 }
+//             }
+//         });
 
-    setTimeout(() => {
-        // Step 1: Position child nodes within their respective parents
-        cy.nodes().forEach(function (node) {
-            if (node.isParent()) {
-                const children = node.children(); // Get the children of the current parent node
-                const cellWidth = node.width() / children.length; // Calculate the width for each child node
+//         // Calculate division factor for aligning parent nodes
+//         const divisionFactor = maxWidth / 2;
+//         console.info("Division Factor: ", divisionFactor);
 
-                // Position child nodes evenly spaced within the parent node
-                children.forEach(function (child, index) {
-                    const xPos = index * (cellWidth + nodevGapValue); // Horizontal position for the child
-                    const yPos = 0; // Keep child nodes on the same vertical level
+//         // Step 4: Position parent nodes vertically and align them relative to the widest parent node
+//         sortedParents.forEach(function (parentNode) {
+//             const parentWidth = parentNode.width();
 
-                    child.position({
-                        x: xPos,
-                        y: yPos
-                    });
-                });
-            }
-        });
+//             // Calculate horizontal position relative to the widest parent
+//             const xPos = centerX - parentWidth / divisionFactor;
 
-        // Step 2: Sort parent nodes by their group level and ID for vertical stacking
-        const sortedParents = cy.nodes()
-            .filter(node => node.isParent()) // Only process parent nodes
-            .sort((a, b) => {
-                // Extract group levels for primary sorting
-                const groupLevelA = parseInt(a.data('extraData')?.topoViewerGroupLevel || 0, 10);
-                const groupLevelB = parseInt(b.data('extraData')?.topoViewerGroupLevel || 0, 10);
+//             // Position the parent node
+//             parentNode.position({
+//                 x: xPos,
+//                 y: yPos
+//             });
 
-                if (groupLevelA !== groupLevelB) {
-                    return groupLevelA - groupLevelB; // Sort by group level in ascending order
-                }
-                // Secondary sorting by node ID (alphabetical order)
-                return a.data('id').localeCompare(b.data('id'));
-            });
+//             console.info(`Parent Node '${parentNode.id()}' positioned at x: ${xPos}, y: ${yPos}`);
 
-        let yPos = 0; // Starting vertical position for parent nodes
-        let maxWidth = 0; // Initialize variable to store the maximum parent width
-        const centerX = 0; // Define the horizontal center reference
+//             // Increment vertical position for the next parent
+//             yPos += groupvGapValue;
+//         });
 
-        // Step 3: Find the widest parent node
-        cy.nodes().forEach(function (node) {
-            if (node.isParent()) {
-                const width = node.width();
-                if (width > maxWidth) {
-                    maxWidth = width; // Update maxWidth with the widest parent node's width
-                    console.info("ParentMaxWidth: ", maxWidth);
-                }
-            }
-        });
+//         // Step 5: Adjust the viewport to fit the updated layout
+//         cy.fit();
 
-        // Calculate division factor for aligning parent nodes
-        const divisionFactor = maxWidth / 2;
-        console.info("Division Factor: ", divisionFactor);
+//     }, delay);
 
-        // Step 4: Position parent nodes vertically and align them relative to the widest parent node
-        sortedParents.forEach(function (parentNode) {
-            const parentWidth = parentNode.width();
+//     // Step 6: Expand/collapse functionality for parent nodes (optional)
+//     const cyExpandCollapse = cy.expandCollapse({
+//         layoutBy: null, // Use the existing layout
+//         undoable: false, // Disable undo functionality
+//         fisheye: false, // Disable fisheye view for expanded/collapsed nodes
+//         animationDuration: 10, // Duration of animations in milliseconds
+//         animate: true // Enable animation for expand/collapse
+//     });
 
-            // Calculate horizontal position relative to the widest parent
-            const xPos = centerX - parentWidth / divisionFactor;
+//     // Example: Demonstrate expand/collapse behavior with a specific parent node
+//     setTimeout(function () {
+//         const parent = cy.$('#parent'); // Replace '#parent' with the actual parent node ID if needed
+//         cyExpandCollapse.collapse(parent); // Collapse the parent node
 
-            // Position the parent node
-            parentNode.position({
-                x: xPos,
-                y: yPos
-            });
+//         setTimeout(function () {
+//             cyExpandCollapse.expand(parent); // Re-expand the parent node after a delay
+//         }, 2000); // Wait 2 seconds before expanding
+//     }, 2000);
+// }
 
-            console.info(`Parent Node '${parentNode.id()}' positioned at x: ${xPos}, y: ${yPos}`);
+// function viewportDrawerLayoutHorizontal() {
+//     // Retrieve the sliders for node and group horizontal gaps
+//     const nodehGap = document.getElementById("horizontal-layout-slider-node-h-gap");
+//     const grouphGap = document.getElementById("horizontal-layout-slider-group-h-gap");
 
-            // Increment vertical position for the next parent
-            yPos += groupvGapValue;
-        });
+//     // Parse the slider values for horizontal and vertical gaps
+//     const nodehGapValue = parseFloat(nodehGap.value) * 10; // Gap between child nodes within a parent
+//     const grouphGapValue = parseFloat(grouphGap.value); // Gap between parent nodes
 
-        // Step 5: Adjust the viewport to fit the updated layout
-        cy.fit();
+//     const delay = 100; // Delay to ensure layout updates after rendering
 
-    }, delay);
+//     setTimeout(() => {
+//         // Step 1: Position child nodes within their respective parents
+//         cy.nodes().forEach(function (node) {
+//             if (node.isParent()) {
+//                 const children = node.children(); // Get the children of the current parent node
+//                 const cellHeight = node.height() / children.length; // Calculate the height for each child node
 
-    // Step 6: Expand/collapse functionality for parent nodes (optional)
-    const cyExpandCollapse = cy.expandCollapse({
-        layoutBy: null, // Use the existing layout
-        undoable: false, // Disable undo functionality
-        fisheye: false, // Disable fisheye view for expanded/collapsed nodes
-        animationDuration: 10, // Duration of animations in milliseconds
-        animate: true // Enable animation for expand/collapse
-    });
+//                 // Position child nodes evenly spaced within the parent node
+//                 children.forEach(function (child, index) {
+//                     const xPos = 0; // Keep child nodes on the same horizontal level
+//                     const yPos = index * (cellHeight + nodehGapValue); // Vertical position for the child
 
-    // Example: Demonstrate expand/collapse behavior with a specific parent node
-    setTimeout(function () {
-        const parent = cy.$('#parent'); // Replace '#parent' with the actual parent node ID if needed
-        cyExpandCollapse.collapse(parent); // Collapse the parent node
+//                     child.position({
+//                         x: xPos,
+//                         y: yPos
+//                     });
+//                 });
+//             }
+//         });
 
-        setTimeout(function () {
-            cyExpandCollapse.expand(parent); // Re-expand the parent node after a delay
-        }, 2000); // Wait 2 seconds before expanding
-    }, 2000);
-}
+//         // Step 2: Sort parent nodes by their group level and ID for horizontal stacking
+//         const sortedParents = cy.nodes()
+//             .filter(node => node.isParent()) // Only process parent nodes
+//             .sort((a, b) => {
+//                 // Extract group levels for primary sorting
+//                 const groupLevelA = parseInt(a.data('extraData')?.topoViewerGroupLevel || 0, 10);
+//                 const groupLevelB = parseInt(b.data('extraData')?.topoViewerGroupLevel || 0, 10);
 
+//                 if (groupLevelA !== groupLevelB) {
+//                     return groupLevelA - groupLevelB; // Sort by group level in ascending order
+//                 }
+//                 // Secondary sorting by node ID (alphabetical order)
+//                 return a.data('id').localeCompare(b.data('id'));
+//             });
 
-function viewportDrawerLayoutHorizontal() {
-    // Retrieve the sliders for node and group horizontal gaps
-    const nodehGap = document.getElementById("horizontal-layout-slider-node-h-gap");
-    const grouphGap = document.getElementById("horizontal-layout-slider-group-h-gap");
+//         let xPos = 0; // Starting horizontal position for parent nodes
+//         let maxHeight = 0; // Initialize variable to store the maximum parent height
+//         const centerY = 0; // Define the vertical center reference
 
-    // Parse the slider values for horizontal and vertical gaps
-    const nodehGapValue = parseFloat(nodehGap.value) * 10; // Gap between child nodes within a parent
-    const grouphGapValue = parseFloat(grouphGap.value); // Gap between parent nodes
+//         // Step 3: Find the tallest parent node
+//         cy.nodes().forEach(function (node) {
+//             if (node.isParent()) {
+//                 const height = node.height();
+//                 if (height > maxHeight) {
+//                     maxHeight = height; // Update maxHeight with the tallest parent node's height
+//                     console.info("ParentMaxHeight: ", maxHeight);
+//                 }
+//             }
+//         });
 
-    const delay = 100; // Delay to ensure layout updates after rendering
+//         // Calculate division factor for aligning parent nodes
+//         const divisionFactor = maxHeight / 2;
+//         console.info("Division Factor: ", divisionFactor);
 
-    setTimeout(() => {
-        // Step 1: Position child nodes within their respective parents
-        cy.nodes().forEach(function (node) {
-            if (node.isParent()) {
-                const children = node.children(); // Get the children of the current parent node
-                const cellHeight = node.height() / children.length; // Calculate the height for each child node
+//         // Step 4: Position parent nodes horizontally and align them relative to the tallest parent node
+//         sortedParents.forEach(function (parentNode) {
+//             const parentHeight = parentNode.height();
 
-                // Position child nodes evenly spaced within the parent node
-                children.forEach(function (child, index) {
-                    const xPos = 0; // Keep child nodes on the same horizontal level
-                    const yPos = index * (cellHeight + nodehGapValue); // Vertical position for the child
+//             // Calculate vertical position relative to the tallest parent
+//             const yPos = centerY - parentHeight / divisionFactor;
 
-                    child.position({
-                        x: xPos,
-                        y: yPos
-                    });
-                });
-            }
-        });
+//             // Position the parent node
+//             parentNode.position({
+//                 x: xPos,
+//                 y: yPos
+//             });
 
-        // Step 2: Sort parent nodes by their group level and ID for horizontal stacking
-        const sortedParents = cy.nodes()
-            .filter(node => node.isParent()) // Only process parent nodes
-            .sort((a, b) => {
-                // Extract group levels for primary sorting
-                const groupLevelA = parseInt(a.data('extraData')?.topoViewerGroupLevel || 0, 10);
-                const groupLevelB = parseInt(b.data('extraData')?.topoViewerGroupLevel || 0, 10);
+//             console.info(`Parent Node '${parentNode.id()}' positioned at x: ${xPos}, y: ${yPos}`);
 
-                if (groupLevelA !== groupLevelB) {
-                    return groupLevelA - groupLevelB; // Sort by group level in ascending order
-                }
-                // Secondary sorting by node ID (alphabetical order)
-                return a.data('id').localeCompare(b.data('id'));
-            });
+//             // Increment horizontal position for the next parent
+//             xPos += grouphGapValue;
+//         });
 
-        let xPos = 0; // Starting horizontal position for parent nodes
-        let maxHeight = 0; // Initialize variable to store the maximum parent height
-        const centerY = 0; // Define the vertical center reference
+//         // Step 5: Adjust the viewport to fit the updated layout
+//         cy.fit();
 
-        // Step 3: Find the tallest parent node
-        cy.nodes().forEach(function (node) {
-            if (node.isParent()) {
-                const height = node.height();
-                if (height > maxHeight) {
-                    maxHeight = height; // Update maxHeight with the tallest parent node's height
-                    console.info("ParentMaxHeight: ", maxHeight);
-                }
-            }
-        });
+//     }, delay);
 
-        // Calculate division factor for aligning parent nodes
-        const divisionFactor = maxHeight / 2;
-        console.info("Division Factor: ", divisionFactor);
+//     // Step 6: Expand/collapse functionality for parent nodes (optional)
+//     const cyExpandCollapse = cy.expandCollapse({
+//         layoutBy: null, // Use the existing layout
+//         undoable: false, // Disable undo functionality
+//         fisheye: false, // Disable fisheye view for expanded/collapsed nodes
+//         animationDuration: 10, // Duration of animations in milliseconds
+//         animate: true // Enable animation for expand/collapse
+//     });
 
-        // Step 4: Position parent nodes horizontally and align them relative to the tallest parent node
-        sortedParents.forEach(function (parentNode) {
-            const parentHeight = parentNode.height();
+//     // Example: Demonstrate expand/collapse behavior with a specific parent node
+//     setTimeout(function () {
+//         const parent = cy.$('#parent'); // Replace '#parent' with the actual parent node ID if needed
+//         cyExpandCollapse.collapse(parent); // Collapse the parent node
 
-            // Calculate vertical position relative to the tallest parent
-            const yPos = centerY - parentHeight / divisionFactor;
-
-            // Position the parent node
-            parentNode.position({
-                x: xPos,
-                y: yPos
-            });
-
-            console.info(`Parent Node '${parentNode.id()}' positioned at x: ${xPos}, y: ${yPos}`);
-
-            // Increment horizontal position for the next parent
-            xPos += grouphGapValue;
-        });
-
-        // Step 5: Adjust the viewport to fit the updated layout
-        cy.fit();
-
-    }, delay);
-
-    // Step 6: Expand/collapse functionality for parent nodes (optional)
-    const cyExpandCollapse = cy.expandCollapse({
-        layoutBy: null, // Use the existing layout
-        undoable: false, // Disable undo functionality
-        fisheye: false, // Disable fisheye view for expanded/collapsed nodes
-        animationDuration: 10, // Duration of animations in milliseconds
-        animate: true // Enable animation for expand/collapse
-    });
-
-    // Example: Demonstrate expand/collapse behavior with a specific parent node
-    setTimeout(function () {
-        const parent = cy.$('#parent'); // Replace '#parent' with the actual parent node ID if needed
-        cyExpandCollapse.collapse(parent); // Collapse the parent node
-
-        setTimeout(function () {
-            cyExpandCollapse.expand(parent); // Re-expand the parent node after a delay
-        }, 2000); // Wait 2 seconds before expanding
-    }, 2000);
-}
+//         setTimeout(function () {
+//             cyExpandCollapse.expand(parent); // Re-expand the parent node after a delay
+//         }, 2000); // Wait 2 seconds before expanding
+//     }, 2000);
+// }
 
 function viewportDrawerCaptureFunc() {
     console.info("viewportDrawerCaptureButton() - clicked")
@@ -3483,11 +3428,54 @@ function initViewportDrawerGeoMapCheckboxToggle() {
     });
 }
 
-/**
- * Dynamically inserts an inline SVG and modifies its color.
- * @param {string} containerId - The ID of the container where the SVG will be added.
- * @param {string} color - The color to apply to the SVG's `fill` attribute.
- */
+// /**
+//  * Dynamically inserts an inline SVG and modifies its color.
+//  * @param {string} containerId - The ID of the container where the SVG will be added.
+//  * @param {string} color - The color to apply to the SVG's `fill` attribute.
+//  */
+// function insertAndColorSvg(containerId, color) {
+//     const container = document.getElementById(containerId);
+
+//     if (!container) {
+//         console.error(`Container with ID ${containerId} not found.`);
+//         return;
+//     }
+
+//     // 	<svg width="110" height="25" viewBox="0 0 170 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+//     // 	<path d="M117.514 1.21646L117.514 38.7835H123.148L123.148 1.21646H117.514ZM57.3221 0.57473C46.3463 0.574681 37.8303 8.56332 37.8303 20C37.8303 31.9517 46.3463 39.4255 57.3221 39.4253C68.2979 39.4251 76.8314 31.9517 76.8139 20C76.798 9.16418 68.2979 0.574779 57.3221 0.57473ZM71.1901 20C71.1901 28.4666 64.9812 34.0774 57.3221 34.0774C49.663 34.0774 43.4541 28.4666 43.4541 20C43.4541 11.687 49.663 5.92265 57.3221 5.92265C64.9812 5.92265 71.1901 11.687 71.1901 20ZM0 3.39001e-06V38.7835H5.74992L5.74992 13.1531L35.6298 40V31.9591L0 3.39001e-06ZM81.0513 20L101.961 38.7836H110.345L89.4038 20L110.345 1.21644H101.961L81.0513 20ZM170 38.7835H163.802L159.27 30.4644H138.742L134.209 38.7835H128.011L135.517 24.9176H156.322L145.948 5.64789L149.006 0L149.006 3.76291e-05L149.006 0L170 38.7835Z" fill="#005AFF"/>
+//     // </svg>
+
+//     // // Define the SVG content
+//     // const svgContent = `
+// 	// 	<svg width="110" height="25" viewBox="0 0 170 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+// 	// 		<path d="M117.514 1.21646L117.514 38.7835H123.148L123.148 1.21646H117.514ZM57.3221 0.57473C46.3463 0.574681 37.8303 8.56332 37.8303 20C37.8303 31.9517 46.3463 39.4255 57.3221 39.4253C68.2979 39.4251 76.8314 31.9517 76.8139 20C76.798 9.16418 68.2979 0.574779 57.3221 0.57473ZM71.1901 20C71.1901 28.4666 64.9812 34.0774 57.3221 34.0774C49.663 34.0774 43.4541 28.4666 43.4541 20C43.4541 11.687 49.663 5.92265 57.3221 5.92265C64.9812 5.92265 71.1901 11.687 71.1901 20ZM0 3.39001e-06V38.7835H5.74992L5.74992 13.1531L35.6298 40V31.9591L0 3.39001e-06ZM81.0513 20L101.961 38.7836H110.345L89.4038 20L110.345 1.21644H101.961L81.0513 20ZM170 38.7835H163.802L159.27 30.4644H138.742L134.209 38.7835H128.011L135.517 24.9176H156.322L145.948 5.64789L149.006 0L149.006 3.76291e-05L149.006 0L170 38.7835Z" fill="#005AFF"/>
+// 	// 	</svg>
+// 	// `;
+//     const svgContent = `
+//         <?xml version="1.0" encoding="utf-8"?>
+//             <svg viewBox="220.222 137.943 81.8 87.413" xmlns="http://www.w3.org/2000/svg">
+//             <path id="containerlab_export_white_ink-liquid" data-name="containerlab export white ink-liquid" class="cls-3" d="M 253.422 189.556 C 253.022 189.756 252.122 190.256 251.422 190.756 C 250.222 191.656 248.722 191.956 246.822 191.456 C 245.522 191.156 245.422 191.456 246.322 193.556 C 252.022 205.956 269.422 206.456 275.522 194.356 C 276.922 191.656 276.722 191.156 274.822 191.656 C 273.222 192.056 272.122 191.856 270.522 190.656 C 268.422 189.056 265.622 189.056 264.122 190.656 C 262.622 192.256 259.522 192.156 257.722 190.456 C 256.722 189.456 254.622 189.056 253.422 189.556" style="stroke-width: 0px; fill: rgb(255, 255, 255); stroke: rgb(255, 255, 255);" transform="matrix(1, 0, 0, 1, 0, -2.842170943040401e-14)"/>
+//             <path class="cls-5" d="M 297.122 153.156 L 289.322 148.756 L 271.922 138.656 C 270.222 137.656 268.322 137.756 266.622 138.656 C 265.022 139.656 264.022 141.356 264.022 143.256 L 264.322 159.656 L 264.322 164.256 C 264.322 164.256 264.322 166.256 264.322 166.256 C 264.322 166.956 264.822 167.656 265.522 167.856 C 274.022 170.056 280.222 177.956 280.222 186.456 C 280.222 194.956 271.622 205.656 261.022 205.656 C 250.422 205.656 241.822 197.056 241.822 186.456 C 241.822 175.856 247.222 170.656 255.222 168.156 L 256.822 167.756 C 257.622 167.656 258.222 166.956 258.222 166.156 L 258.222 163.356 C 258.222 163.356 258.222 161.156 258.222 161.156 L 258.222 143.156 C 258.222 141.256 257.222 139.556 255.622 138.656 C 254.022 137.756 252.022 137.756 250.422 138.656 L 242.822 143.056 L 225.122 153.256 C 222.122 155.056 220.222 158.256 220.222 161.756 L 220.222 197.656 C 220.222 201.156 222.122 204.456 225.122 206.156 L 256.222 224.056 C 257.722 224.956 259.422 225.356 261.122 225.356 C 262.822 225.356 264.522 224.956 266.022 224.056 L 297.122 206.156 C 300.122 204.356 302.022 201.156 302.022 197.656 L 302.022 161.756 C 302.022 158.256 300.122 154.956 297.122 153.256 L 297.122 153.156 Z M 298.822 197.656 C 298.822 199.956 297.522 202.156 295.522 203.356 L 264.422 221.256 C 262.422 222.456 259.822 222.456 257.822 221.256 L 226.722 203.356 C 224.722 202.156 223.422 199.956 223.422 197.656 L 223.422 161.756 C 223.422 159.456 224.722 157.256 226.722 156.056 L 239.722 148.556 L 251.922 141.456 C 252.822 140.956 253.622 141.256 253.922 141.456 C 254.222 141.656 254.922 142.156 254.922 143.156 L 254.922 164.756 C 254.922 164.756 254.422 164.856 254.422 164.956 C 245.022 167.856 238.622 176.556 238.622 186.456 C 238.622 196.356 248.722 208.956 261.122 208.956 C 273.522 208.956 283.622 198.856 283.622 186.456 C 283.622 174.056 277.122 168.056 267.722 165.056 L 267.722 159.656 C 267.722 159.656 267.422 143.256 267.422 143.256 C 267.422 142.256 268.122 141.756 268.422 141.556 C 268.722 141.356 269.522 141.056 270.422 141.556 L 287.822 151.656 L 295.622 156.056 C 297.622 157.256 298.922 159.456 298.922 161.756 L 298.922 197.656 L 298.822 197.656 Z" style="stroke-width: 0px; fill: rgb(255, 255, 255);" transform="matrix(1, 0, 0, 1, 0, -2.842170943040401e-14)"/>
+//             <circle class="cls-1" cx="262.922" cy="186.156" r="1.7" style="stroke-miterlimit: 10; stroke-width: 0.8px; fill: rgb(255, 255, 255); stroke: rgb(255, 255, 255);" transform="matrix(1, 0, 0, 1, 0, -2.842170943040401e-14)"/>
+//             <circle class="cls-1" cx="255.322" cy="182.256" r="2.4" style="stroke-miterlimit: 10; stroke-width: 0.8px; fill: rgb(255, 255, 255); stroke: rgb(255, 255, 255);" transform="matrix(1, 0, 0, 1, 0, -2.842170943040401e-14)"/>
+//             <circle class="cls-1" cx="260.122" cy="173.956" r="3.4" style="stroke-miterlimit: 10; stroke-width: 0.8px; fill: rgb(255, 255, 255); stroke: rgb(255, 255, 255);" transform="matrix(1, 0, 0, 1, 0, -2.842170943040401e-14)"/>
+//         </svg>
+// 	`;
+
+
+//     // Parse the SVG string into a DOM element
+//     const parser = new DOMParser();
+//     const svgElement = parser.parseFromString(svgContent, 'image/svg+xml').documentElement;
+
+//     // Modify the fill color of the SVG
+//     svgElement.querySelector('path').setAttribute('fill', color);
+
+//     // Append the SVG to the container
+//     container.innerHTML = '';
+//     container.appendChild(svgElement);
+// }
+
+
 function insertAndColorSvg(containerId, color) {
     const container = document.getElementById(containerId);
 
@@ -3496,29 +3484,36 @@ function insertAndColorSvg(containerId, color) {
         return;
     }
 
-    // Define the SVG content
     const svgContent = `
-		<svg width="110" height="25" viewBox="0 0 170 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path d="M117.514 1.21646L117.514 38.7835H123.148L123.148 1.21646H117.514ZM57.3221 0.57473C46.3463 0.574681 37.8303 8.56332 37.8303 20C37.8303 31.9517 46.3463 39.4255 57.3221 39.4253C68.2979 39.4251 76.8314 31.9517 76.8139 20C76.798 9.16418 68.2979 0.574779 57.3221 0.57473ZM71.1901 20C71.1901 28.4666 64.9812 34.0774 57.3221 34.0774C49.663 34.0774 43.4541 28.4666 43.4541 20C43.4541 11.687 49.663 5.92265 57.3221 5.92265C64.9812 5.92265 71.1901 11.687 71.1901 20ZM0 3.39001e-06V38.7835H5.74992L5.74992 13.1531L35.6298 40V31.9591L0 3.39001e-06ZM81.0513 20L101.961 38.7836H110.345L89.4038 20L110.345 1.21644H101.961L81.0513 20ZM170 38.7835H163.802L159.27 30.4644H138.742L134.209 38.7835H128.011L135.517 24.9176H156.322L145.948 5.64789L149.006 0L149.006 3.76291e-05L149.006 0L170 38.7835Z" fill="#005AFF"/>
-		</svg>
-	`;
+        <svg viewBox="220.222 137.943 81.8 87.413" xmlns="http://www.w3.org/2000/svg">
+            <path class="cls-3" d="M 253.422 189.556 ..." fill="white"/>
+            <path class="cls-5" d="M 297.122 153.156 ..." fill="white"/>
+            <circle class="cls-1" cx="262.922" cy="186.156" r="1.7" fill="white"/>
+        </svg>
+    `;
 
     // Parse the SVG string into a DOM element
     const parser = new DOMParser();
     const svgElement = parser.parseFromString(svgContent, 'image/svg+xml').documentElement;
 
-    // Modify the fill color of the SVG
-    svgElement.querySelector('path').setAttribute('fill', color);
+    // Modify the fill color of all <path> elements
+    const paths = svgElement.querySelectorAll('path');
+    if (paths.length > 0) {
+        paths.forEach(path => path.setAttribute('fill', color));
+    } else {
+        console.error('No <path> elements found in the parsed SVG.');
+    }
 
     // Append the SVG to the container
     container.innerHTML = '';
     container.appendChild(svgElement);
 }
 
-// Call the function during initialization
-document.addEventListener('DOMContentLoaded', () => {
-    insertAndColorSvg('nokia-logo', 'white');
-});
+
+// // Call the function during initialization
+// document.addEventListener('DOMContentLoaded', () => {
+//     insertAndColorSvg('nokia-logo', 'white');
+// });
 
 
 function avoidEdgeLabelOverlap(cy) {
@@ -3647,7 +3642,7 @@ function loadCytoStyle(cy) {
 
     // function generateEncodedSVG(nodeType, fillColor) {
     //     let svgString = "";
-    
+
     //     switch (nodeType) {
     //         case "pe":  // Provider Edge Router
     //             svgString = `
@@ -3690,7 +3685,7 @@ function loadCytoStyle(cy) {
     //                     </g>
     //                 </svg>`
     //             break;
-    
+
     //         case "leaf":  // Leaf Node
     //             svgString = `
     //             <svg
@@ -3732,7 +3727,7 @@ function loadCytoStyle(cy) {
     //                     </g>
     //                 </svg>`;
     //             break;
-    
+
     //         default:
     //             console.warn(`Unknown nodeType: ${nodeType}, using default PE SVG.`);
     //             svgString = `
@@ -3775,11 +3770,11 @@ function loadCytoStyle(cy) {
     //                     </g>
     //                 </svg>`;
     //     }
-    
+
     //     // Encode the final selected SVG for Cytoscape.js
     //     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
     // }
-    
+
 
     const cytoscapeStylesForVscode = [
         {
@@ -3887,7 +3882,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "14",
                 "height": "14",
-                "background-image": `${ generateEncodedSVG("pe","#001135")}`,
+                "background-image": `${generateEncodedSVG("pe", "#001135")}`,
                 "background-fit": "cover",
                 "background-clip": "none"
             }
@@ -3897,7 +3892,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "14",
                 "height": "14",
-                "background-image": `${ generateEncodedSVG("pe","#001135")}`,
+                "background-image": `${generateEncodedSVG("pe", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3906,7 +3901,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "14",
                 "height": "14",
-                "background-image": `${ generateEncodedSVG("pe","#001135")}`,
+                "background-image": `${generateEncodedSVG("pe", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3915,7 +3910,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "14",
                 "height": "14",
-                "background-image": `${ generateEncodedSVG("pe","#001135")}`,
+                "background-image": `${generateEncodedSVG("pe", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3924,7 +3919,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "14",
                 "height": "14",
-                "background-image": `${ generateEncodedSVG("controller","#001135")}`,
+                "background-image": `${generateEncodedSVG("controller", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3933,7 +3928,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${ generateEncodedSVG("pon","#001135")}`,
+                "background-image": `${generateEncodedSVG("pon", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3942,7 +3937,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${ generateEncodedSVG("dcgw","#001135")}`,
+                "background-image": `${generateEncodedSVG("dcgw", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3951,7 +3946,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${ generateEncodedSVG("leaf","#001135")}`,
+                "background-image": `${generateEncodedSVG("leaf", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3960,7 +3955,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${ generateEncodedSVG("rgw","#001135")}`,
+                "background-image": `${generateEncodedSVG("rgw", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3969,7 +3964,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${ generateEncodedSVG("super-spine","#005AFF")}`,
+                "background-image": `${generateEncodedSVG("super-spine", "#005AFF")}`,
                 "background-fit": "cover"
             }
         },
@@ -3978,7 +3973,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${ generateEncodedSVG("spine","#001135")}`,
+                "background-image": `${generateEncodedSVG("spine", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3987,7 +3982,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "12",
                 "height": "12",
-                "background-image": `${ generateEncodedSVG("server","#001135")}`,
+                "background-image": `${generateEncodedSVG("server", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -3996,7 +3991,7 @@ function loadCytoStyle(cy) {
             "style": {
                 "width": "8",
                 "height": "8",
-                "background-image": `${ generateEncodedSVG("bridge","#001135")}`,
+                "background-image": `${generateEncodedSVG("bridge", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -4443,21 +4438,88 @@ function viewportButtonsMultiLayerViewPortToggle() {
     }
 }
 
-// Function to process the data
+// // Function to process the data
+// function assignMissingLatLng(dataArray) {
+//     // Arrays to store existing lat and lng values
+//     const existingLats = [];
+//     const existingLngs = [];
+
+//     // First pass: Collect existing lat and lng values
+//     dataArray.forEach(item => {
+//         const data = item.data;
+//         if (data.lat && data.lat.trim() !== "") {
+//             const lat = parseFloat(data.lat);
+//             if (!isNaN(lat)) {
+//                 existingLats.push(lat);
+//             }
+//         }
+//         if (data.lng && data.lng.trim() !== "") {
+//             const lng = parseFloat(data.lng);
+//             if (!isNaN(lng)) {
+//                 existingLngs.push(lng);
+//             }
+//         }
+//     });
+
+//     // Compute the average (mean) of existing lat and lng
+//     const averageLat = existingLats.length > 0 ? existingLats.reduce((a, b) => a + b, 0) / existingLats.length : 0;
+//     const averageLng = existingLngs.length > 0 ? existingLngs.reduce((a, b) => a + b, 0) / existingLngs.length : 0;
+
+//     // Second pass: Assign missing lat and lng
+//     dataArray.forEach(item => {
+//         const data = item.data;
+
+//         // Check and assign missing latitude
+//         if (!data.lat || data.lat.trim() === "") {
+//             // Assign normalized lat + random value between 0 and 0.1
+//             const newLat = averageLat + Math.random() * 0.9;
+//             data.lat = newLat.toFixed(15).toString(); // Convert back to string with precision
+//             console.log(`Assigned new lat for ID ${data.id}: ${data.lat}`);
+//         } else {
+//             // Optionally, normalize existing lat
+//             const normalizedLat = parseFloat(data.lat);
+//             data.lat = normalizedLat.toFixed(15).toString();
+//         }
+
+//         // Check and assign missing longitude
+//         if (!data.lng || data.lng.trim() === "") {
+//             // Assign normalized lng + random value between 0 and 0.1
+//             const newLng = averageLng + Math.random() * 0.9;
+//             data.lng = newLng.toFixed(15).toString(); // Convert back to string with precision
+//             console.log(`Assigned new lng for ID ${data.id}: ${data.lng}`);
+//         } else {
+//             // Optionally, normalize existing lng
+//             const normalizedLng = parseFloat(data.lng);
+//             data.lng = normalizedLng.toFixed(15).toString();
+//         }
+//     });
+
+//     return dataArray;
+// }
+
+// Enhanced Function to Process the Data
 function assignMissingLatLng(dataArray) {
+    // Constants for default average latitude and longitude
+    const DEFAULT_AVERAGE_LAT = 48.684826888402256;
+    const DEFAULT_AVERAGE_LNG = 9.007895390625677;
+
     // Arrays to store existing lat and lng values
     const existingLats = [];
     const existingLngs = [];
 
     // First pass: Collect existing lat and lng values
     dataArray.forEach(item => {
-        const data = item.data;
+        const { data } = item;
+
+        // Collect and parse latitude
         if (data.lat && data.lat.trim() !== "") {
             const lat = parseFloat(data.lat);
             if (!isNaN(lat)) {
                 existingLats.push(lat);
             }
         }
+
+        // Collect and parse longitude
         if (data.lng && data.lng.trim() !== "") {
             const lng = parseFloat(data.lng);
             if (!isNaN(lng)) {
@@ -4466,38 +4528,73 @@ function assignMissingLatLng(dataArray) {
         }
     });
 
-    // Compute the average (mean) of existing lat and lng
-    const averageLat = existingLats.length > 0 ? existingLats.reduce((a, b) => a + b, 0) / existingLats.length : 0;
-    const averageLng = existingLngs.length > 0 ? existingLngs.reduce((a, b) => a + b, 0) / existingLngs.length : 0;
+    // Determine average latitude
+    let averageLat = 0;
+    if (existingLats.length > 0) {
+        averageLat = existingLats.reduce((a, b) => a + b, 0) / existingLats.length;
+    }
+
+    // Determine average longitude
+    let averageLng = 0;
+    if (existingLngs.length > 0) {
+        averageLng = existingLngs.reduce((a, b) => a + b, 0) / existingLngs.length;
+    }
+
+    // Check if either average is missing and assign default values if necessary
+    const useDefaultLat = existingLats.length === 0;
+    const useDefaultLng = existingLngs.length === 0;
+
+    if (useDefaultLat || useDefaultLng) {
+        console.warn("Existing latitudes or longitudes are missing. Using default average values.");
+        averageLat = useDefaultLat ? DEFAULT_AVERAGE_LAT : averageLat;
+        averageLng = useDefaultLng ? DEFAULT_AVERAGE_LNG : averageLng;
+    }
 
     // Second pass: Assign missing lat and lng
     dataArray.forEach(item => {
-        const data = item.data;
+        const { data } = item;
+        const id = data.id || 'Unknown ID';
 
-        // Check and assign missing latitude
+        // Assign missing latitude
         if (!data.lat || data.lat.trim() === "") {
-            // Assign normalized lat + random value between 0 and 0.1
-            const newLat = averageLat + Math.random() * 0.9;
-            data.lat = newLat.toFixed(15).toString(); // Convert back to string with precision
-            console.log(`Assigned new lat for ID ${data.id}: ${data.lat}`);
+            const randomOffset = Math.random() * 0.9; // Random value between 0 and 0.9
+            const newLat = averageLat + randomOffset;
+            data.lat = newLat.toFixed(15); // Ensure precision and convert to string
+            console.log(`Assigned new lat for ID ${id}: ${data.lat}`);
         } else {
-            // Optionally, normalize existing lat
+            // Normalize existing latitude
             const normalizedLat = parseFloat(data.lat);
-            data.lat = normalizedLat.toFixed(15).toString();
+            if (!isNaN(normalizedLat)) {
+                data.lat = normalizedLat.toFixed(15);
+            } else {
+                // Handle invalid latitude format
+                const newLat = useDefaultLat ? DEFAULT_AVERAGE_LAT + Math.random() * 0.9 : averageLat + Math.random() * 0.9;
+                data.lat = newLat.toFixed(15);
+                console.warn(`Invalid lat for ID ${id}. Assigned new lat: ${data.lat}`);
+            }
         }
 
-        // Check and assign missing longitude
+        // Assign missing longitude
         if (!data.lng || data.lng.trim() === "") {
-            // Assign normalized lng + random value between 0 and 0.1
-            const newLng = averageLng + Math.random() * 0.9;
-            data.lng = newLng.toFixed(15).toString(); // Convert back to string with precision
-            console.log(`Assigned new lng for ID ${data.id}: ${data.lng}`);
+            const randomOffset = Math.random() * 0.9; // Random value between 0 and 0.9
+            const newLng = averageLng + randomOffset;
+            data.lng = newLng.toFixed(15); // Ensure precision and convert to string
+            console.log(`Assigned new lng for ID ${id}: ${data.lng}`);
         } else {
-            // Optionally, normalize existing lng
+            // Normalize existing longitude
             const normalizedLng = parseFloat(data.lng);
-            data.lng = normalizedLng.toFixed(15).toString();
+            if (!isNaN(normalizedLng)) {
+                data.lng = normalizedLng.toFixed(15);
+            } else {
+                // Handle invalid longitude format
+                const newLng = useDefaultLng ? DEFAULT_AVERAGE_LNG + Math.random() * 0.9 : averageLng + Math.random() * 0.9;
+                data.lng = newLng.toFixed(15);
+                console.warn(`Invalid lng for ID ${id}. Assigned new lng: ${data.lng}`);
+            }
         }
     });
+
+    console.log("########### dataArray updates ", dataArray)
 
     return dataArray;
 }

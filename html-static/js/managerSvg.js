@@ -1,13 +1,13 @@
-    // // Encode SVG for Cytoscape background-image
-    // const encodedSVGRouter = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgNodeStringRouter);
+// // Encode SVG for Cytoscape background-image
+// const encodedSVGRouter = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgNodeStringRouter);
 
-    function generateEncodedSVG(nodeType, fillColor) {
-        let svgString = "";
-    
-        switch (nodeType) {
+function generateEncodedSVG(nodeType, fillColor) {
+    let svgString = "";
 
-            case "pe":  // Provider Edge Router
-                svgString = `
+    switch (nodeType) {
+
+        case "pe":  // Provider Edge Router
+            svgString = `
                 <svg
                         xmlns:xlink="http://www.w3.org/1999/xlink"
                         xmlns="http://www.w3.org/2000/svg"
@@ -46,9 +46,9 @@
                             </g>
                         </g>
                     </svg>`
-                break;
+            break;
 
-            case "dcgw":  // Leaf Node
+        case "dcgw":  // Leaf Node
             svgString = `
                 <svg
                     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -96,8 +96,8 @@
             `;
             break;
 
-            case "leaf":  // Leaf Node
-                svgString = `
+        case "leaf":  // Leaf Node
+            svgString = `
                     <svg
                         xmlns:xlink="http://www.w3.org/1999/xlink"
                         xmlns="http://www.w3.org/2000/svg"
@@ -134,10 +134,10 @@
                     </svg>
 
                 `;
-                break;
+            break;
 
-            case "spine":  // Spine Node
-                svgString = `
+        case "spine":  // Spine Node
+            svgString = `
                     <svg
                         xmlns:xlink="http://www.w3.org/1999/xlink"
                         xmlns="http://www.w3.org/2000/svg"
@@ -178,10 +178,10 @@
                         </g>
                     </svg>
                 `;
-                break;
+            break;
 
-                case "super-spine":  // Super Spine Router
-                    svgString = `
+        case "super-spine":  // Super Spine Router
+            svgString = `
                         <svg
                             xmlns:xlink="http://www.w3.org/1999/xlink"
                             xmlns="http://www.w3.org/2000/svg"
@@ -221,11 +221,11 @@
                                 </g>
                             </g>
                         </svg>
-                    `;  
-                break;
+                    `;
+            break;
 
-                case "server":  // Server
-                    svgString = `
+        case "server":  // Server
+            svgString = `
                         <svg
                             xmlns:xlink="http://www.w3.org/1999/xlink"
                             xmlns="http://www.w3.org/2000/svg"
@@ -255,10 +255,10 @@
                         </svg>
 
                     `;
-                break;
+            break;
 
-                case "pon":  // Pon
-                    svgString = `
+        case "pon":  // Pon
+            svgString = `
                         <svg
                             xmlns:xlink="http://www.w3.org/1999/xlink"
                             xmlns="http://www.w3.org/2000/svg"
@@ -288,10 +288,10 @@
 
 
                     `;
-                break;
+            break;
 
-                case "controller":  // controller
-                    svgString = `
+        case "controller":  // controller
+            svgString = `
                         <svg
                             xmlns:xlink="http://www.w3.org/1999/xlink"
                             xmlns="http://www.w3.org/2000/svg"
@@ -331,9 +331,10 @@
                         </svg>
 
                     `;
-                break;
-                case "rgw":  // Resindential Gateway
-                    svgString = `
+            break;
+            
+        case "rgw":  // Resindential Gateway
+            svgString = `
                         <svg
                             xmlns:xlink="http://www.w3.org/1999/xlink"
                             xmlns="http://www.w3.org/2000/svg"
@@ -365,11 +366,11 @@
                         </svg>
 
                     `;
-                break;
+            break;
 
-            default:
-                console.warn(`Unknown nodeType: ${nodeType}, using default PE SVG.`);
-                svgString = `
+        default:
+            console.warn(`Unknown nodeType: ${nodeType}, using default PE SVG.`);
+            svgString = `
                 <svg
                         xmlns:xlink="http://www.w3.org/1999/xlink"
                         xmlns="http://www.w3.org/2000/svg"
@@ -408,8 +409,8 @@
                             </g>
                         </g>
                     </svg>`;
-        }
-    
-        // Encode the final selected SVG for Cytoscape.js
-        return 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
     }
+
+    // Encode the final selected SVG for Cytoscape.js
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
+}

@@ -209,6 +209,16 @@ body {
   z-index: 9;
 }
 
+.logo-image {
+  height: 40px;
+  /* Set the desired height */
+  width: auto;
+  /* Automatically adjust the width to maintain aspect ratio */
+  display: block;
+  /* Ensure the image is displayed as a block-level element */
+}
+
+
 .viewport-drawer {
   top: 75px;
   left: 90px;
