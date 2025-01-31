@@ -306,7 +306,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.info("initializeWebSocket - getEnvironments", environments)
             console.info("initializeWebSocket - labName", environments["clab-name"])
 
-            const string01 = "Containerlab Topology: " + labName;
+            const string01 = "containerlab: " + labName;
             const string02 = " ::: Uptime: " + msgUptime.data;
 
             const ClabSubtitle = document.getElementById("ClabSubtitle");
@@ -350,7 +350,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("initializeWebSocket - getEnvironments", environments)
         console.info("initializeWebSocket - labName", environments["clab-name"])
 
-        const string01 = "Containerlab Topology: " + labName;
+        const string01 = "topology: " + labName;
         // const string02 = " ::: Uptime: " + "msgUptime.data";
         const string02 = "";
 
