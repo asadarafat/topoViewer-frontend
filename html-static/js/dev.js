@@ -30,7 +30,7 @@ async function reloadViewport() {
             sleep(1000)
             // Re-Init load data.
             fetchAndLoadData()
-    
+
         } catch (err) {
             console.error("############### Backend call failed:", err);
         }
@@ -805,6 +805,20 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
+    // Listen for the custom 'dblclick' event.
+    cy.on("dblclick", 'node', function (event) {
+        var node = event.target;
+        
+        globalSelectedNode = node.data("extraData").longname;
+
+
+        console.log('Double-clicked on node:', node.id());
+        // For demonstration, change the node's color on double-click.
+        node.style('border-color', 'AD0000');
+
+        sshWebBased(event)
+    });
+
     // Click event listener for nodes
     cy.on("click", "node", async function (event) {
 
@@ -834,6 +848,29 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
         const node = event.target;
+
+
+
+        const currentTime = Date.now();
+        // Check if the current tap is on the same node and within the threshold.
+        if (globalDblclickLastClick.id === node.id() && (currentTime - globalDblclickLastClick.time < globalDblClickThreshold)) {
+            // Trigger a custom 'dblclick' event on the node.
+            node.trigger("dblclick", event);
+            // Reset globalDblclickLastClick so that triple-clicks don't trigger extra dblclick events.
+            globalDblclickLastClick.time = 0;
+            globalDblclickLastClick.id = null;
+
+            console.log(" ########### dblclick true")
+
+        } else {
+            // Update globalDblclickLastClick with the current tap info.
+            globalDblclickLastClick.time = currentTime;
+            globalDblclickLastClick.id = node.id();
+
+            console.log(" ########### dblclick false")
+
+        }
+
 
 
 
@@ -908,23 +945,23 @@ document.addEventListener("DOMContentLoaded", async function () {
                 appendMessage(`"nodeClicked: " ${nodeClicked}`);
 
 
-                ///
-                if (document.getElementById("data-display-panel-node").style.display === "none") {
-                    document.getElementById("data-display-panel-node").style.display = "block";
-                } else {
-                    document.getElementById("data-display-panel-node").style.display = "none";
-                }
+                // ///
+                // if (document.getElementById("data-display-panel-node").style.display === "none") {
+                //     document.getElementById("data-display-panel-node").style.display = "block";
+                // } else {
+                //     document.getElementById("data-display-panel-node").style.display = "none";
+                // }
 
-                document.getElementById("data-display-panel-node-name").textContent = node.data("extraData").longname;
-                // arafat-tag: vs-code
-                // document.getElementById("data-display-panel-node-status").textContent = node.data("containerDockerExtraAttribute").status;
-                document.getElementById("data-display-panel-node-kind").textContent = node.data("extraData").kind;
-                document.getElementById("data-display-panel-node-image").textContent = node.data("extraData").image;
-                document.getElementById("data-display-panel-node-mgmtipv4").textContent = node.data("extraData").mgmtIpv4Addresss;
-                document.getElementById("data-display-panel-node-mgmtipv6").textContent = node.data("extraData").mgmtIpv6Address;
-                document.getElementById("data-display-panel-node-fqdn").textContent = node.data("extraData").fqdn;
-                document.getElementById("data-display-panel-node-group").textContent = node.data("extraData").group;
-                document.getElementById("data-display-panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
+                // document.getElementById("data-display-panel-node-name").textContent = node.data("extraData").longname;
+                // // arafat-tag: vs-code
+                // // document.getElementById("data-display-panel-node-status").textContent = node.data("containerDockerExtraAttribute").status;
+                // document.getElementById("data-display-panel-node-kind").textContent = node.data("extraData").kind;
+                // document.getElementById("data-display-panel-node-image").textContent = node.data("extraData").image;
+                // document.getElementById("data-display-panel-node-mgmtipv4").textContent = node.data("extraData").mgmtIpv4Addresss;
+                // document.getElementById("data-display-panel-node-mgmtipv6").textContent = node.data("extraData").mgmtIpv6Address;
+                // document.getElementById("data-display-panel-node-fqdn").textContent = node.data("extraData").fqdn;
+                // document.getElementById("data-display-panel-node-group").textContent = node.data("extraData").group;
+                // document.getElementById("data-display-panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
 
                 // Set selected node-long-name to global variable
                 globalSelectedNode = node.data("extraData").longname;
@@ -2000,12 +2037,12 @@ async function sshWebBased(event) {
         try {
             const response = await sendMessageToVscodeEndpointPost("ssh-to-node", routerName);
             console.log("############### response from backend:", response);
-    
+
         } catch (err) {
             console.error("############### Backend call failed:", err);
         }
 
-      
+
     } else {
         try {
             environments = await getEnvironments(event);

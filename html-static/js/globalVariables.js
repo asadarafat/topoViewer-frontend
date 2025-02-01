@@ -29,3 +29,11 @@ var isVscodeDeployment = Boolean(window.isVscodeDeployment);
 var vsCode
 
 var jsonFileUrlDataCytoMarshall
+
+// dblclick variables
+var globalDblclickLastClick = { // Variables to keep track of the last click event.
+    time: 0,
+    id: null
+};
+
+var globalDblClickThreshold = 300; // Set the double-click threshold (in milliseconds)
