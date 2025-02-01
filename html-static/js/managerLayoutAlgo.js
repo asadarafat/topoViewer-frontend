@@ -1,9 +1,4 @@
-// cytoscape-leaflet variables
-var isGeoMapInitialized = false;
-var cytoscapeLeafletMap;
-var cytoscapeLeafletLeaf;
-
-
+// Check globalVariables.js for initiation
 
 
 // Function to initialize Leaflet map and apply GeoMap layout
@@ -11,7 +6,7 @@ function viewportDrawerLayoutGeoMap() {
 
     viewportDrawerDisableGeoMap()
 
-    if (!isGeoMapInitialized) {
+    if (!globalIsGeoMapInitialized) {
         // Show Leaflet container
         var leafletContainer = document.getElementById('cy-leaflet');
         if (leafletContainer) {
@@ -19,23 +14,23 @@ function viewportDrawerLayoutGeoMap() {
         }
 
         // Initialize Cytoscape-Leaflet
-        cytoscapeLeafletLeaf = cy.leaflet({
+        globalCytoscapeLeafletLeaf = cy.leaflet({
             container: leafletContainer
         });
 
         // Remove default tile layer
-        cytoscapeLeafletLeaf.map.removeLayer(cytoscapeLeafletLeaf.defaultTileLayer);
+        globalCytoscapeLeafletLeaf.map.removeLayer(globalCytoscapeLeafletLeaf.defaultTileLayer);
 
         // Assign map reference
-        cytoscapeLeafletMap = cytoscapeLeafletLeaf.map;
+        globalCytoscapeLeafletMap = globalCytoscapeLeafletLeaf.map;
 
         // Add custom tile layer
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 19
-        }).addTo(cytoscapeLeafletMap);
-        isGeoMapInitialized = true;
+        }).addTo(globalCytoscapeLeafletMap);
+        globalIsGeoMapInitialized = true;
     }
 
     loadCytoStyle(cy); // Reapply the Cytoscape stylesheet
@@ -52,7 +47,7 @@ function viewportDrawerLayoutGeoMap() {
             console.log("data.lat, data.lng", data.lat, data.lng)
             console.log("Number(data.lat), Number(data.lng)", Number(data.lat), Number(data.lng))
 
-            const point = cytoscapeLeafletMap.latLngToContainerPoint([Number(data.lat), Number(data.lng)]);
+            const point = globalCytoscapeLeafletMap.latLngToContainerPoint([Number(data.lat), Number(data.lng)]);
             console.log("point: ", point.x, point.y)
 
             return { x: point.x, y: point.y };
@@ -60,9 +55,9 @@ function viewportDrawerLayoutGeoMap() {
         }
     }).run();
 
-    // cytoscapeLeafletLeaf instance map to fit nodes
-    cytoscapeLeafletLeaf.fit();
-    console.log("cytoscapeLeafletLeaf.fit()")
+    // globalCytoscapeLeafletLeaf instance map to fit nodes
+    globalCytoscapeLeafletLeaf.fit();
+    console.log("globalCytoscapeLeafletLeaf.fit()")
 
     // Show GeoMap buttons
     var viewportDrawerGeoMapElements = document.getElementsByClassName("viewport-geo-map");
@@ -79,7 +74,7 @@ function viewportDrawerLayoutGeoMap() {
 // Function to disable GeoMap and revert to default layout
 function viewportDrawerDisableGeoMap() {
 
-    if (!isGeoMapInitialized) {
+    if (!globalIsGeoMapInitialized) {
         console.log("GeoMap is not initialized.");
         return;
     }
@@ -90,8 +85,8 @@ function viewportDrawerDisableGeoMap() {
         leafletContainer.style.display = 'none';
     }
 
-    // destroy cytoscapeLeafletLeaf instance
-    cytoscapeLeafletLeaf.destroy();
+    // destroy globalCytoscapeLeafletLeaf instance
+    globalCytoscapeLeafletLeaf.destroy();
 
     // Revert to default Cytoscape layout
     const layout = cy.layout({
@@ -139,7 +134,7 @@ function viewportDrawerDisableGeoMap() {
     // For example:
     // disableGeoMapNodeEditing();
 
-    isGeoMapInitialized = false;
+    globalIsGeoMapInitialized = false;
 
     loadCytoStyle(cy); // Reapply the Cytoscape stylesheet
 

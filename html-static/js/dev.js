@@ -1,35 +1,5 @@
-// Initialize a state variable to track the element's presence
-var isPanel01Cy = false;
-var nodeClicked = false;
-var edgeClicked = false;
+// Check globalVariables.js for initiation
 
-var cy
-
-var globalSelectedNode
-var globalSelectedEdge
-
-var linkEndpointVisibility = true;
-var nodeContainerStatusVisibility = false;
-
-var globalShellUrl = "/js/cloudshell"
-
-var labName
-
-var multiLayerViewPortState = false;
-
-// cytoscape-leaflet variables
-var isGeoMapInitialized = false;
-var cytoscapeLeafletMap;
-var cytoscapeLeafletLeaf;
-
-var isVscodeDeployment = Boolean(window.isVscodeDeployment);
-// If window.isVscodeDeployment is undefined:
-// Boolean(undefined) evaluates to false.
-
-var vsCode
-
-
-/// VS-CODE BackEnd messaging handler
 
 require.config({
     paths: {
@@ -49,79 +19,34 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-if (isVscodeDeployment) {
-    // Acquire the VS Code API handle
-    vsCode = acquireVsCodeApi();
-}
 
 
 
-// Keep track of pending requests in a Map (requestId -> {resolve, reject})
-const pendingRequests = new Map();
-let requestCounter = 0;
-
-/**
- * sendMessageToVscodeEndpointGet(functionName, payload)
- *
- * Sends a message to the VS Code extension requesting
- * that the specified backend function be invoked with `payload`.
- * Returns a Promise that resolves with the result from the extension.
- */
-function sendMessageToVscodeEndpointGet(functionName, payload) {
-    return new Promise((resolve, reject) => {
-        // Create a unique requestId
-        const requestId = `req_${Date.now()}_${++requestCounter}`;
-
-        // Store resolve/reject so we can resolve the Promise when the backend responds
-        pendingRequests.set(requestId, { resolve, reject });
-
-        // Send a message to the extension
-        vsCode.postMessage({
-            type: 'Get',
-            requestId: requestId,
-            functionName: functionName,
-            payload: JSON.stringify(payload) // Explicit serialization
-        });
-    });
-}
-
-window.addEventListener('message', (event) => {
-    const msg = event.data; // The data sent from the extension
-
-    if (msg && msg.type === 'backendGetResponse') {
-        const { requestId, result, error } = msg;
-        // Look up the pending request
-        const pending = pendingRequests.get(requestId);
-        if (!pending) {
-            console.warn("Got response for unknown requestId:", requestId);
-            return;
-        }
-
-        // Clean up
-        pendingRequests.delete(requestId);
-
-        // If the extension signaled an error, reject, else resolve
-        if (error) {
-            pending.reject(new Error(error));
-        } else {
-            pending.resolve(result);
+async function reloadViewport() {
+    if (isVscodeDeployment) {
+        try {
+            const response = await sendMessageToVscodeEndpointPost("reload-viewport", "Empty Payload");
+            console.log("############### response from backend:", response);
+            sleep(1000)
+            // Re-Init load data.
+            fetchAndLoadData()
+    
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
         }
     }
-});
 
-// using backendGt
-async function runMyBackendCall(payloadData) {
-    try {
-        const response = await sendMessageToVscodeEndpointGet("backendFuncBB", { foo: "bar" });
-        console.log("############### Success from backend:", response);
-    } catch (err) {
-        console.error("############### Backend call failed:", err);
-    }
 }
 
+
+// /// VS-CODE BackEnd messaging handler
+// /// VS-CODE BackEnd messaging handler
+// /// VS-CODE BackEnd messaging handler
+// /// VS-CODE BackEnd messaging handler
+// /// VS-CODE BackEnd messaging handler
+// /// VS-CODE BackEnd messaging handler
 
 document.addEventListener("DOMContentLoaded", async function () {
-
     // vertical layout
     function initializeResizingLogic() {
         // Get elements with checks
@@ -254,7 +179,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (isVscodeDeployment) {
         // aarafat-tag: vs-code
         initUptime();
-        // runMyBackendCall()
     }
 
     // Call the function during initialization
@@ -300,13 +224,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         // WebSocket for uptime
         const socketUptime = initializeWebSocket("/uptime", async (msgUptime) => {
             environments = await getEnvironments();
-            labName = environments["clab-name"]
+            globalLabName = environments["clab-name"]
             deploymentType = environments["deploymentType"]
 
             console.info("initializeWebSocket - getEnvironments", environments)
-            console.info("initializeWebSocket - labName", environments["clab-name"])
+            console.info("initializeWebSocket - globalLabName", environments["clab-name"])
 
-            const string01 = "containerlab: " + labName;
+            const string01 = "containerlab: " + globalLabName;
             const string02 = " ::: Uptime: " + msgUptime.data;
 
             const ClabSubtitle = document.getElementById("ClabSubtitle");
@@ -344,13 +268,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     // deploymenType vs-code
     async function initUptime() {
         environments = await getEnvironments();
-        labName = environments["clab-name"]
+        globalLabName = environments["clab-name"]
         deploymentType = environments["deploymentType"]
 
         console.info("initializeWebSocket - getEnvironments", environments)
-        console.info("initializeWebSocket - labName", environments["clab-name"])
+        console.info("initializeWebSocket - globalLabName", environments["clab-name"])
 
-        const string01 = "topology: " + labName;
+        const string01 = "topology: " + globalLabName;
         // const string02 = " ::: Uptime: " + "msgUptime.data";
         const string02 = "";
 
@@ -410,7 +334,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         },],
         boxSelectionEnabled: true,
         selectionType: 'additive' // Allow additive selection
-
     });
 
 
@@ -645,86 +568,88 @@ document.addEventListener("DOMContentLoaded", async function () {
         parentSpacing: -1
     });
 
-    var jsonFileUrlDataCytoMarshall
-
-    if (isVscodeDeployment) {
-        jsonFileUrlDataCytoMarshall = window.jsonFileUrlDataCytoMarshall
-    } else {
-        jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json"
-    }
-
-    // Fetch and load element data from a JSON file , jsonFileUrl absolut path of dataCytoMarshall.json
-    // Main Version EDITOR 
-    console.log(`deployment-type: ${isVscodeDeployment}`)
-    console.log(`jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`)
 
 
-    fetch(jsonFileUrlDataCytoMarshall)
-
-        .then((response) => response.json())
-        .then((elements) => {
-
-            // Process the data to assign missing lat and lng
-            var updatedElements
-            if (isVscodeDeployment) {
-                // updatedElements = (elements);
-                updatedElements = assignMissingLatLng(elements);
-
-            } else {
-                updatedElements = assignMissingLatLng(elements);
-            }
 
 
-            // Now, you can use updatedElements as needed
-            // For example, logging them to the console
-            console.log("Updated Elements:", updatedElements);
+    // if (isVscodeDeployment) {
+    //     jsonFileUrlDataCytoMarshall = window.jsonFileUrlDataCytoMarshall
+    // } else {
+    //     jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json"
+    // }
 
-            // Add the elements to the Cytoscape instance
-            cy.add(updatedElements);
-            // run layout
-            const layout = cy.layout({
-                name: "cola",
-                nodeGap: 5,
-                edgeLength: 100,
-                animate: true,
-                randomize: false,
-                maxSimulationTime: 1500,
-            });
-            layout.run();
+    // // Fetch and load element data from a JSON file , jsonFileUrl absolut path of dataCytoMarshall.json
+    // // Main Version EDITOR 
+    // console.log(`deployment-type: ${isVscodeDeployment}`)
+    // console.log(`jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`)
 
-            // remove node topoviewer
-            topoViewerNode = cy.filter('node[name = "topoviewer"]');
-            topoViewerNode.remove();
+    // fetch(jsonFileUrlDataCytoMarshall)
 
-            // remove node TopoViewerParentNode
-            topoViewerParentNode = cy.filter('node[name = "TopoViewer:1"]');
-            topoViewerParentNode.remove();
+    //     .then((response) => response.json())
+    //     .then((elements) => {
 
-            var cyExpandCollapse = cy.expandCollapse({
-                layoutBy: null, // null means use existing layout
-                undoable: false,
-                fisheye: false,
-                animationDuration: 10, // when animate is true, the duration in milliseconds of the animation
-                animate: true
-            });
+    //         // Process the data to assign missing lat and lng
+    //         var updatedElements
+    //         if (isVscodeDeployment) {
+    //             // updatedElements = (elements);
+    //             updatedElements = assignMissingLatLng(elements);
 
-            // Example collapse/expand after some delay
-            // Make sure the '#parent' node exists in your loaded elements
-            setTimeout(function () {
-                var parent = cy.$('#parent'); // Ensure that '#parent' is actually present in dataCytoMarshall.json
-                cyExpandCollapse.collapse(parent);
+    //         } else {
+    //             updatedElements = assignMissingLatLng(elements);
+    //         }
 
-                setTimeout(function () {
-                    cyExpandCollapse.expand(parent);
-                }, 2000);
-            }, 2000);
+    //         // Now, you can use updatedElements as needed
+    //         // For example, logging them to the console
+    //         console.log("Updated Elements:", updatedElements);
 
-        })
-        .catch((error) => {
-            console.error("Error loading graph data:", error);
-        });
+    //         // Add the elements to the Cytoscape instance
+    //         cy.add(updatedElements);
+    //         // run layout
+    //         const layout = cy.layout({
+    //             name: "cola",
+    //             nodeGap: 5,
+    //             edgeLength: 100,
+    //             animate: true,
+    //             randomize: false,
+    //             maxSimulationTime: 1500,
+    //         });
+    //         layout.run();
+
+    //         // remove node topoviewer
+    //         topoViewerNode = cy.filter('node[name = "topoviewer"]');
+    //         topoViewerNode.remove();
+
+    //         // remove node TopoViewerParentNode
+    //         topoViewerParentNode = cy.filter('node[name = "TopoViewer:1"]');
+    //         topoViewerParentNode.remove();
+
+    //         var cyExpandCollapse = cy.expandCollapse({
+    //             layoutBy: null, // null means use existing layout
+    //             undoable: false,
+    //             fisheye: false,
+    //             animationDuration: 10, // when animate is true, the duration in milliseconds of the animation
+    //             animate: true
+    //         });
+
+    //         // Example collapse/expand after some delay
+    //         // Make sure the '#parent' node exists in your loaded elements
+    //         setTimeout(function () {
+    //             var parent = cy.$('#parent'); // Ensure that '#parent' is actually present in dataCytoMarshall.json
+    //             cyExpandCollapse.collapse(parent);
+
+    //             setTimeout(function () {
+    //                 cyExpandCollapse.expand(parent);
+    //             }, 2000);
+    //         }, 2000);
+
+    //     })
+    //     .catch((error) => {
+    //         console.error("Error loading graph data:", error);
+    //     });
 
 
+    // Initially load data.
+    fetchAndLoadData()
 
     // Instantiate hover text element
     const hoverText = document.createElement("box");
@@ -1816,8 +1741,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 y: nodePosition.y + offset.y,
             };
 
-            // Check if the nodeContainerStatusVisibility is true
-            if (nodeContainerStatusVisibility) {
+            // Check if the globalNodeContainerStatusVisibility is true
+            if (globalNodeContainerStatusVisibility) {
                 // Check if the containerNodeName includes nodeId and containerNodeStatus includes 'healthy'
                 if (
                     containerNodeName.includes(nodeId) &&
@@ -1827,7 +1752,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     statusGreenNode.show();
                     statusRedNode.hide();
                     console.info(
-                        "nodeContainerStatusVisibility: " + nodeContainerStatusVisibility,
+                        "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
                     );
                 } else if (
                     containerNodeName.includes(nodeId) &&
@@ -2050,38 +1975,53 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 async function initEnv() {
     environments = await getEnvironments();
-    labName = await environments["clab-name"]
+    globalLabName = await environments["clab-name"]
     deploymentType = await environments["deployment-type"]
 
-    console.info("Lab-Name: ", labName)
+    console.info("Lab-Name: ", globalLabName)
     console.info("DeploymentType: ", deploymentType)
-    return environments, labName
+    return environments, globalLabName
 }
 
 async function changeTitle() {
     environments = await getEnvironments();
-    labName = await environments["clab-name"]
+    globalLabName = await environments["clab-name"]
 
-    console.info("changeTitle() - labName: ", labName)
-    document.title = `TopoViewer::${labName}`;
+    console.info("changeTitle() - globalLabName: ", globalLabName)
+    document.title = `TopoViewer::${globalLabName}`;
 }
 
 async function sshWebBased(event) {
     console.info("sshWebBased: ", globalSelectedNode)
     var routerName = globalSelectedNode
-    try {
-        environments = await getEnvironments(event);
-        console.info("sshWebBased - environments: ", environments)
-        cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
-        routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
 
-        console.info("sshWebBased: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
+    if (isVscodeDeployment) {
 
-        window.open(`${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`);
+        try {
+            const response = await sendMessageToVscodeEndpointPost("ssh-to-node", routerName);
+            console.log("############### response from backend:", response);
+    
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
 
-    } catch (error) {
-        console.error('Error executing restore configuration:', error);
+      
+    } else {
+        try {
+            environments = await getEnvironments(event);
+            console.info("sshWebBased - environments: ", environments)
+            cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
+            routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
+
+            console.info("sshWebBased: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
+
+            window.open(`${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`);
+        } catch (error) {
+            console.error('Error executing restore configuration:', error);
+        }
     }
+
+
 }
 
 async function sshCliCommandCopy(event) {
@@ -2623,9 +2563,9 @@ function viewportButtonsZoomToFit() {
     appendMessage(`And now the zoom level is "${currentZoom}".`);
     console.info(`And now the zoom level is "${currentZoom}".`);
 
-    // cytoscapeLeafletLeaf instance map to fit nodes
-    cytoscapeLeafletLeaf.fit();
-    console.log("cytoscapeLeafletLeaf.fit()")
+    // globalCytoscapeLeafletLeaf instance map to fit nodes
+    globalCytoscapeLeafletLeaf.fit();
+    console.log("globalCytoscapeLeafletLeaf.fit()")
 
 }
 
@@ -2831,30 +2771,30 @@ function viewportButtonsTopologyCapture() {
 }
 
 function viewportButtonsLabelEndpoint() {
-    if (linkEndpointVisibility) {
+    if (globalLinkEndpointVisibility) {
         cy.edges().forEach(function (edge) {
             edge.style("text-opacity", 0);
             edge.style("text-background-opacity", 0);
-            linkEndpointVisibility = false;
+            globalLinkEndpointVisibility = false;
         });
 
     } else {
         cy.edges().forEach(function (edge) {
             edge.style("text-opacity", 1);
             edge.style("text-background-opacity", 0.7);
-            linkEndpointVisibility = true;
+            globalLinkEndpointVisibility = true;
         });
     }
 }
 
 function viewportButtonContainerStatusVisibility() {
-    if (nodeContainerStatusVisibility) {
-        nodeContainerStatusVisibility = false;
+    if (globalNodeContainerStatusVisibility) {
+        globalNodeContainerStatusVisibility = false;
         console.info(
-            "nodeContainerStatusVisibility: " + nodeContainerStatusVisibility,
+            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
         );
         appendMessage(
-            "nodeContainerStatusVisibility: " + nodeContainerStatusVisibility,
+            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
         );
         bulmaToast.toast({
             message: `Alright, mission control, we're standing down. 🛑🔍 Container status probing aborted. Stay chill, folks. 😎👨‍💻`,
@@ -2864,12 +2804,12 @@ function viewportButtonContainerStatusVisibility() {
             closeOnClick: true,
         });
     } else {
-        nodeContainerStatusVisibility = true;
+        globalNodeContainerStatusVisibility = true;
         console.info(
-            "nodeContainerStatusVisibility: " + nodeContainerStatusVisibility,
+            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
         );
         appendMessage(
-            "nodeContainerStatusVisibility: " + nodeContainerStatusVisibility,
+            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
         );
         bulmaToast.toast({
             message: `🕵️‍♂️ Bro, we're currently on a mission to probe that container status! Stay tuned for the results. 🔍🚀👨‍💻`,
@@ -3355,20 +3295,20 @@ function viewportButtonsClabEditor() {
 
 function viewportButtonsGeoMapPan() {
     console.log("viewportButtonsGeoMapEdit clicked..")
-    console.log("cytoscapeLeafletMap", cytoscapeLeafletMap)
+    console.log("globalCytoscapeLeafletMap", globalCytoscapeLeafletMap)
 
-    cytoscapeLeafletLeaf.cy.container().style.pointerEvents = 'none';
-    cytoscapeLeafletLeaf.setZoomControlOpacity("");
-    cytoscapeLeafletLeaf.map.dragging.enable();
+    globalCytoscapeLeafletLeaf.cy.container().style.pointerEvents = 'none';
+    globalCytoscapeLeafletLeaf.setZoomControlOpacity("");
+    globalCytoscapeLeafletLeaf.map.dragging.enable();
 }
 
 function viewportButtonsGeoMapEdit() {
     console.log("viewportButtonsGeoMapEdit clicked..")
-    console.log("cytoscapeLeafletMap", cytoscapeLeafletMap)
+    console.log("globalCytoscapeLeafletMap", globalCytoscapeLeafletMap)
 
-    cytoscapeLeafletLeaf.cy.container().style.pointerEvents = '';
-    cytoscapeLeafletLeaf.setZoomControlOpacity(0.5);
-    cytoscapeLeafletLeaf.map.dragging.disable();
+    globalCytoscapeLeafletLeaf.cy.container().style.pointerEvents = '';
+    globalCytoscapeLeafletLeaf.setZoomControlOpacity(0.5);
+    globalCytoscapeLeafletLeaf.map.dragging.disable();
 }
 
 
@@ -4273,7 +4213,7 @@ function loadCytoStyle(cy) {
                 .then((response) => response.json())
                 .then((styles) => {
 
-                    console.log("isGeoMapInitialized", isGeoMapInitialized);
+                    console.log("globalIsGeoMapInitialized", globalIsGeoMapInitialized);
                     cy.style().fromJson(styles).update();
                     if (multiLayerViewPortState) {
                         // Initialize Cytoscape (assuming cy is already created)
@@ -4296,7 +4236,7 @@ function loadCytoStyle(cy) {
 
     avoidEdgeLabelOverlap(cy);
 
-    if (!linkEndpointVisibility) { // doing this because default is true and text-opacity is 1 and text-background-opacity is 0.7
+    if (!globalLinkEndpointVisibility) { // doing this because default is true and text-opacity is 1 and text-background-opacity is 0.7
         cy.edges().forEach(function (edge) {
             edge.style("text-opacity", 0);
             edge.style("text-background-opacity", 0);
@@ -4349,7 +4289,7 @@ function loadCytoStyle(cy) {
     }
 
     // if GeoMap is initialized, then apply the multipliers to style
-    if (isGeoMapInitialized) {
+    if (globalIsGeoMapInitialized) {
         // Define a JSON object for styles and multipliers
         const nodeStyleMultipliers = {
             'width': 4,
@@ -4593,6 +4533,98 @@ function assignMissingLatLng(dataArray) {
     return dataArray;
 }
 
+
+
+
+/**
+ * Fetches data from the JSON file, processes it, and loads it into the Cytoscape instance.
+ * This integrated function appends a timestamp to bypass caching, fetches the JSON data,
+ * processes the data with `assignMissingLatLng()`, clears existing elements, adds the new ones,
+ * applies the "cola" layout, removes specific nodes, and sets up expand/collapse functionality.
+ *
+ * @returns {void}
+ */
+function fetchAndLoadData() {
+
+    if (isVscodeDeployment) {
+        jsonFileUrlDataCytoMarshall = window.jsonFileUrlDataCytoMarshall
+    } else {
+        jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json"
+    }
+
+
+    console.log(`fetchAndLoadData() called`)
+    console.log(`jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`)
+    // Append a timestamp to avoid caching.
+    //var fetchUrl = jsonFileUrlDataCytoMarshall + '?t=' + new Date().getTime();
+
+    var fetchUrl = jsonFileUrlDataCytoMarshall;
+
+
+    fetch(fetchUrl)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok: " + response.statusText);
+            }
+            return response.json();
+        })
+        .then((elements) => {
+            // Process the data (assign missing lat/lng values).
+            var updatedElements = assignMissingLatLng(elements);
+            console.log("Updated Elements:", updatedElements);
+
+            // Clear current Cytoscape elements.
+            // cy.elements().remove();
+            cy.json({ elements: [] });
+
+
+            // Determine whether data is wrapped in an object with an "elements" property or is directly an array.
+            var elementsToAdd = (updatedElements.elements && Array.isArray(updatedElements.elements))
+                ? updatedElements.elements
+                : updatedElements;
+
+            // Add new elements.
+            cy.add(elementsToAdd);
+
+            // Run the layout.
+            const layout = cy.layout({
+                name: "cola",
+                nodeGap: 5,
+                edgeLength: 100,
+                animate: true,
+                randomize: false,
+                maxSimulationTime: 1500
+            });
+            layout.run();
+
+            // Remove specific nodes by name if they exist.
+            cy.filter('node[name = "topoviewer"]').remove();
+            cy.filter('node[name = "TopoViewer:1"]').remove();
+
+            // Setup expand/collapse functionality using the extension.
+            var cyExpandCollapse = cy.expandCollapse({
+                layoutBy: null,      // null uses the current layout
+                undoable: false,
+                fisheye: false,
+                animationDuration: 10, // duration in milliseconds
+                animate: true
+            });
+
+            // Example collapse/expand for a node with id 'parent'.
+            setTimeout(function () {
+                var parent = cy.$('#parent'); // Adjust based on your data
+                if (parent.nonempty()) {
+                    cyExpandCollapse.collapse(parent);
+                    setTimeout(function () {
+                        cyExpandCollapse.expand(parent);
+                    }, 2000);
+                }
+            }, 2000);
+        })
+        .catch((error) => {
+            console.error("Error loading graph data:", error);
+        });
+}
 
 // aarafat-tag:
 //// REFACTOR END
