@@ -39,12 +39,7 @@ async function reloadViewport() {
 }
 
 
-// /// VS-CODE BackEnd messaging handler
-// /// VS-CODE BackEnd messaging handler
-// /// VS-CODE BackEnd messaging handler
-// /// VS-CODE BackEnd messaging handler
-// /// VS-CODE BackEnd messaging handler
-// /// VS-CODE BackEnd messaging handler
+
 
 document.addEventListener("DOMContentLoaded", async function () {
     // vertical layout
@@ -808,7 +803,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Listen for the custom 'dblclick' event.
     cy.on("dblclick", 'node', function (event) {
         var node = event.target;
-        
+
         globalSelectedNode = node.data("extraData").longname;
 
 
@@ -821,7 +816,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Click event listener for nodes
     cy.on("click", "node", async function (event) {
-
 
         console.info("node clicked init");
         console.info("isPanel01Cy: ", isPanel01Cy);
@@ -851,6 +845,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
 
+        // aarafat-tag: 
+        // protoype double click node to trigger Connect to SSH, but still mixed up with single clice to trigger show Panel-Node
         const currentTime = Date.now();
         // Check if the current tap is on the same node and within the threshold.
         if (globalDblclickLastClick.id === node.id() && (currentTime - globalDblclickLastClick.time < globalDblClickThreshold)) {
@@ -866,9 +862,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             // Update globalDblclickLastClick with the current tap info.
             globalDblclickLastClick.time = currentTime;
             globalDblclickLastClick.id = node.id();
-
             console.log(" ########### dblclick false")
-
         }
 
 
@@ -908,8 +902,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.info("deleted Node: ", node.data("extraData").longname);
                 deleteNodeToEditorToFile(node)
             }
+
             if ((node.data("editor") === "true")) {
                 showPanelNodeEditor(node)
+                
             } else {
                 // Remove all Overlayed Panel
                 const panelOverlays = document.getElementsByClassName("panel-overlay");
