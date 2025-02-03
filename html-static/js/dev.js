@@ -871,101 +871,112 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("editor Node: ", node.data("editor"));
 
         if (!node.isParent()) {
-            // Usage: Initialize the listener and get a live checker function
-            const isViewportDrawerClabEditorCheckboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
+            // Initialize the checkbox listener and store its state.
+            const checkboxSelector = '#viewport-drawer-clab-editor-content-01 .checkbox-input';
+            // const isCheckboxActive = setupCheckboxListener(checkboxSelector);
+            const isEditorCheckboxActive = setupCheckboxListener(checkboxSelector);
 
-            // Check if Shift + Alt is pressed and the node is a child
-            if (event.originalEvent.ctrlKey && node.isChild() && isViewportDrawerClabEditorCheckboxChecked) {
-                console.info(`Orphaning node: ${node.id()} from parent: ${node.parent().id()}`);
 
-                // Make the node orphan
-                node.move({
-                    parent: null
-                });
-                console.info(`${node.id()} is now an orphan`);
+            // Cache modifier keys and node properties.
+            const { ctrlKey, shiftKey, altKey, metaKey } = event.originalEvent;
+            const isChild = node.isChild();
+            // const isEditor = node.data("editor") === "true";
+            const isEditorNode = node.data("editor") === "true";
+
+
+            // Early exits based on active checkbox and key modifiers.
+            if (isEditorCheckboxActive) {
+                if (ctrlKey && isChild) {
+                    console.info(`Orphaning node: ${node.id()} from parent: ${node.parent().id()}`);
+                    node.move({ parent: null });
+                    console.info(`${node.id()} is now an orphan`);
+                    return;
+                }
+                if (shiftKey) {
+                    console.info("Shift + Click");
+                    console.info("edgeHandler Node:", node.data("extraData").longname);
+                    isEdgeHandlerActive = true;
+                    eh.start(node);
+                    console.info("Node is an editor node");
+                    showPanelNodeEditor(node);
+                    return;
+                }
+                if (altKey && isEditorNode) {
+                    console.info("Alt + Click is enabled");
+                    console.info("deleted Node:", node.data("extraData").longname);
+                    deleteNodeToEditorToFile(node);
+                    return;
+                }
             }
 
-            if (event.originalEvent.shiftKey && isViewportDrawerClabEditorCheckboxChecked) { // Start edge creation on Shift and the isViewportDrawerClabEditorCheckboxChecked 
-                console.info("Shift + Click");
-                console.info("edgeHandler Node: ", node.data("extraData").longname);
+            // Fallback: if the node is marked as an editor, show node its panel(node editor panel).
+            if (isEditorNode) {
+                showPanelNodeEditor(node);
 
-                // Set the edge handler flag
-                isEdgeHandlerActive = true;
-                // Start the edge handler from the clicked node
-                eh.start(node);
-
-                console.info("Node is an editor node");
-                showPanelNodeEditor(node) // after this cy.on('ehcomplete') is called, the 'ehcomplete' event will be triggered
-            }
-            if (event.originalEvent.altKey && isViewportDrawerClabEditorCheckboxChecked && (node.data("editor") === "true")) { // node deletion on Alt and the isViewportDrawerClabEditorCheckboxChecked 
-                console.info("Alt + Click is enabled");
-                console.info("deleted Node: ", node.data("extraData").longname);
-                deleteNodeToEditorToFile(node)
-            }
-
-            if ((node.data("editor") === "true")) {
-                showPanelNodeEditor(node)
-                
             } else {
-                // Remove all Overlayed Panel
-                const panelOverlays = document.getElementsByClassName("panel-overlay");
-                for (let i = 0; i < panelOverlays.length; i++) {
-                    panelOverlays[i].style.display = "none";
-                }
-                console.info(node);
-                // arafat-tag: vs-code
-                // console.info(node.data("containerDockerExtraAttribute").status); aarafat-tag: vs-code
-                console.info(node.data("extraData"));
-                if (document.getElementById("panel-node").style.display === "none") {
-                    document.getElementById("panel-node").style.display = "block";
+                // If not an editor, update the display panels.
+                // Hide all overlays.
+
+                if (ctrlKey) {
+                    console.info(`${node.id()} is calling for Connect to SSH`);
+                    return;
+
                 } else {
-                    document.getElementById("panel-node").style.display = "none";
+
+                    const panelOverlays = document.getElementsByClassName("panel-overlay");
+                    for (let i = 0; i < panelOverlays.length; i++) {
+                        panelOverlays[i].style.display = "none";
+                    }
+                    console.info(node);
+                    console.info(node.data("extraData"));
+
+                    // Helper to toggle the display of a panel by element ID.
+                    const togglePanelDisplay = (panelId) => {
+                        const panel = document.getElementById(panelId);
+                        panel.style.display = (panel.style.display === "none") ? "block" : "none";
+                    };
+
+                    // Toggle the main panel.
+                    togglePanelDisplay("panel-node");
+
+                    // Update main panel details.
+                    const extraData = node.data("extraData");
+                    document.getElementById("panel-node-name").textContent = extraData.longname;
+                    document.getElementById("panel-node-kind").textContent = extraData.kind;
+                    document.getElementById("panel-node-image").textContent = extraData.image;
+                    document.getElementById("panel-node-mgmtipv4").textContent = extraData.mgmtIpv4Addresss;
+                    document.getElementById("panel-node-mgmtipv6").textContent = extraData.mgmtIpv6Address;
+                    document.getElementById("panel-node-fqdn").textContent = extraData.fqdn;
+                    document.getElementById("panel-node-group").textContent = extraData.group;
+                    document.getElementById("panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
+
+                    // Set the global selection.
+                    globalSelectedNode = extraData.longname;
+                    console.info("internal:", globalSelectedNode);
+
+                    appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
+                    appendMessage(`"nodeClicked: " ${nodeClicked}`);
+
+                    // Toggle the secondary data display panel.
+                    togglePanelDisplay("data-display-panel-node");
+
+                    // Update data display panel details.
+                    document.getElementById("data-display-panel-node-name").textContent = extraData.longname;
+                    document.getElementById("data-display-panel-node-kind").textContent = extraData.kind;
+                    document.getElementById("data-display-panel-node-image").textContent = extraData.image;
+                    document.getElementById("data-display-panel-node-mgmtipv4").textContent = extraData.mgmtIpv4Addresss;
+                    document.getElementById("data-display-panel-node-mgmtipv6").textContent = extraData.mgmtIpv6Address;
+                    document.getElementById("data-display-panel-node-fqdn").textContent = extraData.fqdn;
+                    document.getElementById("data-display-panel-node-group").textContent = extraData.group;
+                    document.getElementById("data-display-panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
+
+                    // Again update global selection (if needed).
+                    globalSelectedNode = extraData.longname;
+                    console.info("internal:", globalSelectedNode);
+
+                    appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
+                    appendMessage(`"nodeClicked: " ${nodeClicked}`);
                 }
-
-                document.getElementById("panel-node-name").textContent = node.data("extraData").longname;
-                // arafat-tag: vs-code
-                // document.getElementById("panel-node-status").textContent = node.data("containerDockerExtraAttribute").status;
-                document.getElementById("panel-node-kind").textContent = node.data("extraData").kind;
-                document.getElementById("panel-node-image").textContent = node.data("extraData").image;
-                document.getElementById("panel-node-mgmtipv4").textContent = node.data("extraData").mgmtIpv4Addresss;
-                document.getElementById("panel-node-mgmtipv6").textContent = node.data("extraData").mgmtIpv6Address;
-                document.getElementById("panel-node-fqdn").textContent = node.data("extraData").fqdn;
-                document.getElementById("panel-node-group").textContent = node.data("extraData").group;
-                document.getElementById("panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
-
-                // Set selected node-long-name to global variable
-                globalSelectedNode = node.data("extraData").longname;
-                console.info("internal: ", globalSelectedNode);
-
-                appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
-                appendMessage(`"nodeClicked: " ${nodeClicked}`);
-
-
-                // ///
-                // if (document.getElementById("data-display-panel-node").style.display === "none") {
-                //     document.getElementById("data-display-panel-node").style.display = "block";
-                // } else {
-                //     document.getElementById("data-display-panel-node").style.display = "none";
-                // }
-
-                // document.getElementById("data-display-panel-node-name").textContent = node.data("extraData").longname;
-                // // arafat-tag: vs-code
-                // // document.getElementById("data-display-panel-node-status").textContent = node.data("containerDockerExtraAttribute").status;
-                // document.getElementById("data-display-panel-node-kind").textContent = node.data("extraData").kind;
-                // document.getElementById("data-display-panel-node-image").textContent = node.data("extraData").image;
-                // document.getElementById("data-display-panel-node-mgmtipv4").textContent = node.data("extraData").mgmtIpv4Addresss;
-                // document.getElementById("data-display-panel-node-mgmtipv6").textContent = node.data("extraData").mgmtIpv6Address;
-                // document.getElementById("data-display-panel-node-fqdn").textContent = node.data("extraData").fqdn;
-                // document.getElementById("data-display-panel-node-group").textContent = node.data("extraData").group;
-                // document.getElementById("data-display-panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
-
-                // Set selected node-long-name to global variable
-                globalSelectedNode = node.data("extraData").longname;
-                console.info("internal: ", globalSelectedNode);
-
-                appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
-                appendMessage(`"nodeClicked: " ${nodeClicked}`);
-                ///
             }
         }
     });
