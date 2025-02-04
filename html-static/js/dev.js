@@ -1,6 +1,5 @@
 // Check globalVariables.js for initiation
 
-
 require.config({
     paths: {
         'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/min/vs'
@@ -35,7 +34,6 @@ async function reloadViewport() {
             console.error("############### Backend call failed:", err);
         }
     }
-
 }
 
 
@@ -249,7 +247,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                     const IPAddress = JSON.parse(msgContainerNodeStatus.data).Networks.Networks.clab.IPAddress;
                     const GlobalIPv6Address = JSON.parse(msgContainerNodeStatus.data).Networks.Networks.clab.GlobalIPv6Address
-
 
                     setNodeDataWithContainerAttribute(Names, Status, State, IPAddress, GlobalIPv6Address);
 
@@ -564,85 +561,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
 
-
-
-
-    // if (isVscodeDeployment) {
-    //     jsonFileUrlDataCytoMarshall = window.jsonFileUrlDataCytoMarshall
-    // } else {
-    //     jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json"
-    // }
-
-    // // Fetch and load element data from a JSON file , jsonFileUrl absolut path of dataCytoMarshall.json
-    // // Main Version EDITOR 
-    // console.log(`deployment-type: ${isVscodeDeployment}`)
-    // console.log(`jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`)
-
-    // fetch(jsonFileUrlDataCytoMarshall)
-
-    //     .then((response) => response.json())
-    //     .then((elements) => {
-
-    //         // Process the data to assign missing lat and lng
-    //         var updatedElements
-    //         if (isVscodeDeployment) {
-    //             // updatedElements = (elements);
-    //             updatedElements = assignMissingLatLng(elements);
-
-    //         } else {
-    //             updatedElements = assignMissingLatLng(elements);
-    //         }
-
-    //         // Now, you can use updatedElements as needed
-    //         // For example, logging them to the console
-    //         console.log("Updated Elements:", updatedElements);
-
-    //         // Add the elements to the Cytoscape instance
-    //         cy.add(updatedElements);
-    //         // run layout
-    //         const layout = cy.layout({
-    //             name: "cola",
-    //             nodeGap: 5,
-    //             edgeLength: 100,
-    //             animate: true,
-    //             randomize: false,
-    //             maxSimulationTime: 1500,
-    //         });
-    //         layout.run();
-
-    //         // remove node topoviewer
-    //         topoViewerNode = cy.filter('node[name = "topoviewer"]');
-    //         topoViewerNode.remove();
-
-    //         // remove node TopoViewerParentNode
-    //         topoViewerParentNode = cy.filter('node[name = "TopoViewer:1"]');
-    //         topoViewerParentNode.remove();
-
-    //         var cyExpandCollapse = cy.expandCollapse({
-    //             layoutBy: null, // null means use existing layout
-    //             undoable: false,
-    //             fisheye: false,
-    //             animationDuration: 10, // when animate is true, the duration in milliseconds of the animation
-    //             animate: true
-    //         });
-
-    //         // Example collapse/expand after some delay
-    //         // Make sure the '#parent' node exists in your loaded elements
-    //         setTimeout(function () {
-    //             var parent = cy.$('#parent'); // Ensure that '#parent' is actually present in dataCytoMarshall.json
-    //             cyExpandCollapse.collapse(parent);
-
-    //             setTimeout(function () {
-    //                 cyExpandCollapse.expand(parent);
-    //             }, 2000);
-    //         }, 2000);
-
-    //     })
-    //     .catch((error) => {
-    //         console.error("Error loading graph data:", error);
-    //     });
-
-
     // Initially load data.
     fetchAndLoadData()
 
@@ -800,19 +718,19 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
-    // Listen for the custom 'dblclick' event.
-    cy.on("dblclick", 'node', function (event) {
-        var node = event.target;
+    // // Listen for the custom 'dblclick' event.
+    // cy.on("dblclick", 'node', function (event) {
+    //     var node = event.target;
 
-        globalSelectedNode = node.data("extraData").longname;
+    //     globalSelectedNode = node.data("extraData").longname;
 
 
-        console.log('Double-clicked on node:', node.id());
-        // For demonstration, change the node's color on double-click.
-        node.style('border-color', 'AD0000');
+    //     console.log('Double-clicked on node:', node.id());
+    //     // For demonstration, change the node's color on double-click.
+    //     node.style('border-color', 'AD0000');
 
-        sshWebBased(event)
-    });
+    //     sshWebBased(event)
+    // });
 
     // Click event listener for nodes
     cy.on("click", "node", async function (event) {
@@ -845,127 +763,95 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
 
-        // aarafat-tag: 
-        // protoype double click node to trigger Connect to SSH, but still mixed up with single clice to trigger show Panel-Node
-        const currentTime = Date.now();
-        // Check if the current tap is on the same node and within the threshold.
-        if (globalDblclickLastClick.id === node.id() && (currentTime - globalDblclickLastClick.time < globalDblClickThreshold)) {
-            // Trigger a custom 'dblclick' event on the node.
-            node.trigger("dblclick", event);
-            // Reset globalDblclickLastClick so that triple-clicks don't trigger extra dblclick events.
-            globalDblclickLastClick.time = 0;
-            globalDblclickLastClick.id = null;
+        // // aarafat-tag: 
+        // // protoype double click node to trigger Connect to SSH, but still mixed up with single clice to trigger show Panel-Node
+        // const currentTime = Date.now();
+        // // Check if the current tap is on the same node and within the threshold.
+        // if (globalDblclickLastClick.id === node.id() && (currentTime - globalDblclickLastClick.time < globalDblClickThreshold)) {
+        //     // Trigger a custom 'dblclick' event on the node.
+        //     node.trigger("dblclick", event);
+        //     // Reset globalDblclickLastClick so that triple-clicks don't trigger extra dblclick events.
+        //     globalDblclickLastClick.time = 0;
+        //     globalDblclickLastClick.id = null;
 
-            console.log(" ########### dblclick true")
+        //     console.log(" ########### dblclick true")
 
-        } else {
-            // Update globalDblclickLastClick with the current tap info.
-            globalDblclickLastClick.time = currentTime;
-            globalDblclickLastClick.id = node.id();
-            console.log(" ########### dblclick false")
-        }
-
-
-
+        // } else {
+        //     // Update globalDblclickLastClick with the current tap info.
+        //     globalDblclickLastClick.time = currentTime;
+        //     globalDblclickLastClick.id = node.id();
+        //     console.log(" ########### dblclick false")
+        // }
 
         console.info("editor Node: ", node.data("editor"));
 
         if (!node.isParent()) {
-            // Usage: Initialize the listener and get a live checker function
-            const isViewportDrawerClabEditorCheckboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
+            // Initialize the listener and get the live checker function
+            const checkboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
+            const originalEvent = event.originalEvent;
+            const extraData = node.data("extraData");
+            const isEditor = node.data("editor") === "true";
 
-            // Check if Shift + Alt is pressed and the node is a child
-            if (event.originalEvent.ctrlKey && node.isChild() && isViewportDrawerClabEditorCheckboxChecked) {
-                console.info(`Orphaning node: ${node.id()} from parent: ${node.parent().id()}`);
+            if (checkboxChecked) {
+                // Orphan node: Ctrl + click on a child node
+                if (originalEvent.ctrlKey && node.isChild()) {
+                    console.info(`Orphaning node: ${node.id()} from parent: ${node.parent().id()}`);
+                    node.move({ parent: null });
+                    console.info(`${node.id()} is now an orphan`);
+                }
 
-                // Make the node orphan
-                node.move({
-                    parent: null
-                });
-                console.info(`${node.id()} is now an orphan`);
+                // Start edge creation: Shift + click
+                if (originalEvent.shiftKey) {
+                    console.info("Shift + Click");
+                    console.info("edgeHandler Node: ", extraData.longname);
+                    isEdgeHandlerActive = true;
+                    eh.start(node);
+                    console.info("Node is an editor node");
+                    showPanelNodeEditor(node);
+                }
+
+                // Delete node: Alt + click when the node is an editor
+                if (originalEvent.altKey && isEditor) {
+                    console.info("Alt + Click is enabled");
+                    console.info("deleted Node: ", extraData.longname);
+                    deleteNodeToEditorToFile(node);
+                }
             }
 
-            if (event.originalEvent.shiftKey && isViewportDrawerClabEditorCheckboxChecked) { // Start edge creation on Shift and the isViewportDrawerClabEditorCheckboxChecked 
-                console.info("Shift + Click");
-                console.info("edgeHandler Node: ", node.data("extraData").longname);
-
-                // Set the edge handler flag
-                isEdgeHandlerActive = true;
-                // Start the edge handler from the clicked node
-                eh.start(node);
-
-                console.info("Node is an editor node");
-                showPanelNodeEditor(node) // after this cy.on('ehcomplete') is called, the 'ehcomplete' event will be triggered
-            }
-            if (event.originalEvent.altKey && isViewportDrawerClabEditorCheckboxChecked && (node.data("editor") === "true")) { // node deletion on Alt and the isViewportDrawerClabEditorCheckboxChecked 
-                console.info("Alt + Click is enabled");
-                console.info("deleted Node: ", node.data("extraData").longname);
-                deleteNodeToEditorToFile(node)
-            }
-
-            if ((node.data("editor") === "true")) {
-                showPanelNodeEditor(node)
-                
+            // For editor nodes, simply show the editor panel
+            if (isEditor) {
+                showPanelNodeEditor(node);
             } else {
-                // Remove all Overlayed Panel
-                const panelOverlays = document.getElementsByClassName("panel-overlay");
-                for (let i = 0; i < panelOverlays.length; i++) {
-                    panelOverlays[i].style.display = "none";
-                }
-                console.info(node);
-                // arafat-tag: vs-code
-                // console.info(node.data("containerDockerExtraAttribute").status); aarafat-tag: vs-code
-                console.info(node.data("extraData"));
-                if (document.getElementById("panel-node").style.display === "none") {
-                    document.getElementById("panel-node").style.display = "block";
+                if (originalEvent.ctrlKey) {
+                    globalSelectedNode = node.data("extraData").longname;
+                    sshWebBased(event)
                 } else {
-                    document.getElementById("panel-node").style.display = "none";
+                    // Hide all overlay panels
+                    const panelOverlays = document.getElementsByClassName("panel-overlay");
+                    Array.from(panelOverlays).forEach(panel => panel.style.display = "none");
+
+                    console.info(node, extraData);
+                    const panelNode = document.getElementById("panel-node");
+
+                    // Toggle panel-node display
+                    panelNode.style.display = (panelNode.style.display === "none") ? "block" : "none";
+
+                    // Update panel-node content with node data
+                    document.getElementById("panel-node-name").textContent = extraData.longname;
+                    document.getElementById("panel-node-kind").textContent = extraData.kind;
+                    document.getElementById("panel-node-image").textContent = extraData.image;
+                    document.getElementById("panel-node-mgmtipv4").textContent = extraData.mgmtIpv4Addresss;
+                    document.getElementById("panel-node-mgmtipv6").textContent = extraData.mgmtIpv6Address;
+                    document.getElementById("panel-node-fqdn").textContent = extraData.fqdn;
+                    document.getElementById("panel-node-group").textContent = extraData.group;
+                    document.getElementById("panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
+
+                    // Set global selected node and log details
+                    globalSelectedNode = extraData.longname;
+                    console.info("internal: ", globalSelectedNode);
+                    appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
+                    appendMessage(`"nodeClicked: " ${nodeClicked}`);
                 }
-
-                document.getElementById("panel-node-name").textContent = node.data("extraData").longname;
-                // arafat-tag: vs-code
-                // document.getElementById("panel-node-status").textContent = node.data("containerDockerExtraAttribute").status;
-                document.getElementById("panel-node-kind").textContent = node.data("extraData").kind;
-                document.getElementById("panel-node-image").textContent = node.data("extraData").image;
-                document.getElementById("panel-node-mgmtipv4").textContent = node.data("extraData").mgmtIpv4Addresss;
-                document.getElementById("panel-node-mgmtipv6").textContent = node.data("extraData").mgmtIpv6Address;
-                document.getElementById("panel-node-fqdn").textContent = node.data("extraData").fqdn;
-                document.getElementById("panel-node-group").textContent = node.data("extraData").group;
-                document.getElementById("panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
-
-                // Set selected node-long-name to global variable
-                globalSelectedNode = node.data("extraData").longname;
-                console.info("internal: ", globalSelectedNode);
-
-                appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
-                appendMessage(`"nodeClicked: " ${nodeClicked}`);
-
-
-                // ///
-                // if (document.getElementById("data-display-panel-node").style.display === "none") {
-                //     document.getElementById("data-display-panel-node").style.display = "block";
-                // } else {
-                //     document.getElementById("data-display-panel-node").style.display = "none";
-                // }
-
-                // document.getElementById("data-display-panel-node-name").textContent = node.data("extraData").longname;
-                // // arafat-tag: vs-code
-                // // document.getElementById("data-display-panel-node-status").textContent = node.data("containerDockerExtraAttribute").status;
-                // document.getElementById("data-display-panel-node-kind").textContent = node.data("extraData").kind;
-                // document.getElementById("data-display-panel-node-image").textContent = node.data("extraData").image;
-                // document.getElementById("data-display-panel-node-mgmtipv4").textContent = node.data("extraData").mgmtIpv4Addresss;
-                // document.getElementById("data-display-panel-node-mgmtipv6").textContent = node.data("extraData").mgmtIpv6Address;
-                // document.getElementById("data-display-panel-node-fqdn").textContent = node.data("extraData").fqdn;
-                // document.getElementById("data-display-panel-node-group").textContent = node.data("extraData").group;
-                // document.getElementById("data-display-panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
-
-                // Set selected node-long-name to global variable
-                globalSelectedNode = node.data("extraData").longname;
-                console.info("internal: ", globalSelectedNode);
-
-                appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
-                appendMessage(`"nodeClicked: " ${nodeClicked}`);
-                ///
             }
         }
     });
@@ -977,8 +863,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("isPanel01Cy: ", isPanel01Cy);
         console.info("nodeClicked: ", nodeClicked);
         console.info("edgeClicked: ", edgeClicked);
-
-
 
 
         // Remove all Overlayed Panel
@@ -1056,6 +940,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (clickedEdge.data("editor") !== "true") {
 
 
+
+            // set selected edge-id to global variable
+            globalSelectedEdge = clickedEdge.data("id")
+
+            console.log(`"edgeClicked: " ${globalSelectedEdge}`);
+            appendMessage(`"edgeClicked: " ${edgeClicked}`);
+
             console.log("clickedEdge.data.source 2nd:", clickedEdge.data("source"))
             console.log("clickedEdge.data.target 2nd:", clickedEdge.data("target"))
 
@@ -1082,7 +973,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         clabTargetLongName: clickedEdge.data("extraData").clabTargetLongName
                     };
                     console.log("clabLinkMacArgsList: ", clabLinkMacArgsList)
-                    const response = await sendMessageToVscodeEndpointGet("routerLinkMacaddress", clabLinkMacArgsList);
+                    const response = await sendMessageToVscodeEndpointGet("routerLinkMacaddress", clabLinkMacArgsList); // aarafat-tag: sendMessageToVscodeEndpointGet to be fixed with sendMessageToVscodeEndpointPost
                     console.log("############### Success from backend:", response);
                 } catch (err) {
                     console.error("############### Backend call failed:", err);
@@ -1294,10 +1185,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
 
-            // set selected edge-id to global variable
-            globalSelectedEdge = clickedEdge.data("id")
+            // // set selected edge-id to global variable
+            // globalSelectedEdge = clickedEdge.data("id")
 
-            appendMessage(`"edgeClicked: " ${edgeClicked}`);
+            // console.log(`"edgeClicked: " ${globalSelectedEdge}`);
+            // appendMessage(`"edgeClicked: " ${edgeClicked}`);
         }
 
     });
@@ -2178,254 +2070,237 @@ async function linkImpairmentClab(event, impairDirection) {
     }
 }
 
-
 async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
-    console.info("linkWireshark - globalSelectedEdge: ", globalSelectedEdge)
-    console.info("linkWireshark - option: ", option)
-    console.info("linkWireshark - endpoint: ", endpoint)
-    console.info("linkWireshark - referenceElementAfterId: ", referenceElementAfterId)
+    console.info("linkWireshark - globalSelectedEdge: ", globalSelectedEdge);
+    console.info("linkWireshark - option: ", option);
+    console.info("linkWireshark - endpoint: ", endpoint);
+    console.info("linkWireshark - referenceElementAfterId: ", referenceElementAfterId);
 
+    // Helper function to extract the namespace ID from the response string
+    const extractNamespaceId = (namespaceIdStr) => {
+        const start = namespaceIdStr.indexOf("[") + 1;
+        const end = namespaceIdStr.indexOf("]");
+        return namespaceIdStr.slice(start, end);
+    };
 
-    var edgeId = globalSelectedEdge
-    try {
-        environments = await getEnvironments(event);
-        console.info("linkWireshark - environments: ", environments)
+    // Helper function to copy text to the clipboard and show a toast message
+    const copyToClipboard = async (text, successMessage = "Hey, now you can paste the link to your terminal console. 😎") => {
+        const toastOptions = {
+            message: successMessage,
+            type: "is-warning is-size-6 p-3",
+            duration: 4000,
+            position: "top-center",
+            closeOnClick: true,
+        };
 
-        var deploymentType = environments["deployment-type"]
-
-        cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
-        edgeData = findCytoElementById(cytoTopologyJson, edgeId)
-
-        console.info("linkWireshark- edgeData: ", edgeData)
-        console.info("linkWireshark- edgeSource: ", edgeData["data"]["source"])
-
-        clabUser = edgeData["data"]["extraData"]["clabServerUsername"]
-
-        clabAllowedHostname = environments["clab-allowed-hostname"]
-
-        clabAllowedHostname01 = environments["clab-allowed-hostname01"]
-        if (clabAllowedHostname01 == "") {
-            clabAllowedHostname01 = clabAllowedHostname
-        }
-
-        clabServerAddress = environments["clab-server-address"]
-
-        clabSourceLongName = edgeData["data"]["extraData"]["clabSourceLongName"]
-        clabSourcePort = edgeData["data"]["extraData"]["clabSourcePort"]
-
-        clabTargetLongName = edgeData["data"]["extraData"]["clabTargetLongName"]
-        clabTargetPort = edgeData["data"]["extraData"]["clabTargetPort"]
-
-        if (option == "app") {
-            if (endpoint == "source") {
-                wiresharkHref = `clab-capture://${clabUser}@${clabServerAddress}?${clabSourceLongName}?${clabSourcePort}`
-                console.info("linkWireshark- wiresharkHref: ", wiresharkHref)
-
-            } else if (endpoint == "target") {
-                wiresharkHref = `clab-capture://${clabUser}@${clabServerAddress}?${clabTargetLongName}?${clabTargetPort}`
-                console.info("linkWireshark- wiresharkHref: ", wiresharkHref)
-            }
-            window.open(wiresharkHref);
-
-        } else if (option == "edgeSharkInterface") {
-            if (endpoint == "source") {
-                baseUrl = `packetflix:ws://${clabAllowedHostname01}:5001/capture?`;
-
-                netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", argsList = [clabSourceLongName])
-                console.info("linkWireshark - netNsSource: ", netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]")))
-                netNsIdSource = netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]"))
-
-                urlParams = `container={"netns":${netNsIdSource},"network-interfaces":["${clabSourcePort}"],"name":"${clabSourceLongName.toLocaleLowerCase()}","type":"docker","prefix":""}&nif=${clabSourcePort}`;
-                edgeSharkHref = baseUrl + urlParams;
-                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref)
-                window.open(edgeSharkHref);
-
-            } else if (endpoint == "target") {
-                baseUrl = `packetflix:ws://${clabAllowedHostname01}:5001/capture?`;
-
-                netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", argsList = [clabTargetLongName])
-                console.info("linkWireshark - netNsSource: ", netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]")))
-                netNsIdTarget = netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]"))
-
-                urlParams = `container={"netns":${netNsIdTarget},"network-interfaces":["${clabTargetPort}"],"name":"${clabTargetLongName.toLocaleLowerCase()}","type":"docker","prefix":""}&nif=${clabTargetPort}`;
-                edgeSharkHref = baseUrl + urlParams;
-                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref)
-                window.open(edgeSharkHref);
-            }
-
-        } else if (option == "edgeSharkSubInterface") {
-            if (referenceElementAfterId == "endpoint-a-edgeshark") {
-                baseUrl = `packetflix:ws://${clabAllowedHostname01}:5001/capture?`;
-
-                netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", argsList = [clabSourceLongName])
-                console.info("linkWireshark - netNsSource: ", netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]")))
-                netNsIdSource = netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]"))
-
-                urlParams = `container={"netns":${netNsIdSource},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLocaleLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
-                edgeSharkHref = baseUrl + urlParams;
-                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref)
-                window.open(edgeSharkHref);
-            }
-            if (referenceElementAfterId == "endpoint-b-edgeshark") {
-                console.info("linkWireshark - endpoint-b-edgeshark")
-                baseUrl = `packetflix:ws://${clabAllowedHostname01}:5001/capture?`;
-
-                netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", argsList = [clabTargetLongName])
-                console.info("linkWireshark - netNsSource: ", netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]")))
-                netNsIdTarget = netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]"))
-
-                urlParams = `container={"netns":${netNsIdTarget},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLocaleLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
-                edgeSharkHref = baseUrl + urlParams;
-                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref)
-                window.open(edgeSharkHref);
-            }
-            if (referenceElementAfterId == "endpoint-a-clipboard") {
-                console.info("linkWireshark - endpoint-a-clipboard")
-                if (deploymentType == "container") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`
-                } else if (deploymentType == "colocated") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`
-                }
-                // Check if the clipboard API is available
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(wiresharkSshCommand).then(function () {
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
-                    }).catch(function (error) {
-                        console.error('Could not copy text: ', error);
-                    });
-                } else {
-                    // Fallback method for older browsers
-                    let textArea = document.createElement('textarea');
-                    textArea.value = wiresharkSshCommand;
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    try {
-                        document.execCommand('copy');
-                        // alert('Text copied to clipboard');
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
-                    } catch (err) {
-                        console.error('Fallback: Oops, unable to copy', err);
-                    }
-                    document.body.removeChild(textArea);
-                }
-            }
-            if (referenceElementAfterId == "endpoint-b-clipboard") {
-                console.info("linkWireshark - endpoint-b-clipboard")
-                if (deploymentType == "container") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`
-                } else if (deploymentType == "colocated") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`
-                }
-                // Check if the clipboard API is available
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(wiresharkSshCommand).then(function () {
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
-                    }).catch(function (error) {
-                        console.error('Could not copy text: ', error);
-                    });
-                } else {
-                    // Fallback method for older browsers
-                    let textArea = document.createElement('textarea');
-                    textArea.value = wiresharkSshCommand;
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    try {
-                        document.execCommand('copy');
-                        // alert('Text copied to clipboard');
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
-                    } catch (err) {
-                        console.error('Fallback: Oops, unable to copy', err);
-                    }
-                    document.body.removeChild(textArea);
-                }
-            }
-
-
-        } else if (option == "copy") {
-            if (endpoint == "source") {
-                if (deploymentType == "container") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${clabSourcePort} -w -" | wireshark -k -i -`
-                } else if (deploymentType == "colocated") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${clabSourcePort} -w -" | wireshark -k -i -`
-                }
-            } else if (endpoint == "target") {
-                if (deploymentType == "container") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${clabTargetPort} -w -" | wireshark -k -i -`
-                } else if (deploymentType == "colocated") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${clabTargetPort} -w -" | wireshark -k -i -`
-                }
-            }
-
-            console.info("linkWireshark- wiresharkSShCommand: ", wiresharkSshCommand)
-
-            // Check if the clipboard API is available
+        try {
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(wiresharkSshCommand).then(function () {
-                    bulmaToast.toast({
-                        message: `Hey, now you can paste the link to your terminal console. 😎`,
-                        type: "is-warning is-size-6 p-3",
-                        duration: 4000,
-                        position: "top-center",
-                        closeOnClick: true,
-                    });
-                }).catch(function (error) {
-                    console.error('Could not copy text: ', error);
-                });
+                await navigator.clipboard.writeText(text);
+                bulmaToast.toast(toastOptions);
             } else {
-                // Fallback method for older browsers
-                let textArea = document.createElement('textarea');
-                textArea.value = wiresharkSshCommand;
+                // Fallback for older browsers
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
                 document.body.appendChild(textArea);
                 textArea.focus();
                 textArea.select();
-                try {
-                    document.execCommand('copy');
-                    // alert('Text copied to clipboard');
-                    bulmaToast.toast({
-                        message: `Hey, now you can paste the link to your terminal console. 😎`,
-                        type: "is-warning is-size-6 p-3",
-                        duration: 4000,
-                        position: "top-center",
-                        closeOnClick: true,
-                    });
-                } catch (err) {
-                    console.error('Fallback: Oops, unable to copy', err);
-                }
+                document.execCommand("copy");
+                bulmaToast.toast(toastOptions);
                 document.body.removeChild(textArea);
             }
+        } catch (error) {
+            console.error("Error copying text to clipboard:", error);
+        }
+    };
 
+    const edgeId = globalSelectedEdge;
+
+    console.log("edgeId: ", edgeId);
+
+    try {
+
+        let environments
+        let deploymentType
+        let cytoTopologyJson
+        let edgeData
+        let clabUser
+        let edgesharkHostUrl
+        let clabServerAddress
+        let clabSourceLongName
+        let clabSourcePort
+        let clabTargetLongName
+        let clabTargetPort
+
+        if (isVscodeDeployment) {
+
+            // call backend to get hostname
+
+            environments = await getEnvironments(event);
+            console.info("linkWireshark - environments: ", environments);
+
+            // edgesharkHostUrl = await sendMessageToVscodeEndpointPost("get-hostname", routerName);
+            // console.log("############### endpoint get-hostname response from backend:", edgesharkHostUrl);
+
+            edgesharkHostUrl = environments["clab-allowed-hostname01"] || environments["clab-allowed-hostname"]; // used for edgeshark
+            console.log("############### endpoint get-hostname response from backend:", edgesharkHostUrl);
+
+            cytoTopologyJson = environments["EnvCyTopoJsonBytes"];
+            edgeData = findCytoElementById(cytoTopologyJson, edgeId);
+            console.log("edgeData: ", edgeData);
+
+            clabSourceLongName = edgeData.data.extraData.clabSourceLongName; // used for edgeshark
+            console.log("edgeData.data.extraData.clabSourceLongName: ", clabSourceLongName);
+
+            clabSourcePort = edgeData.data.extraData.clabSourcePort; // used for edgeshark
+            console.log("edgeData.data.extraData.clabSourcePort: ", clabSourcePort);
+
+            clabTargetLongName = edgeData.data.extraData.clabTargetLongName; // used for edgeshark
+            console.log("edgeData.data.extraData.clabTargetLongName: ", clabTargetLongName);
+
+            clabTargetPort = edgeData.data.extraData.clabTargetPort; // used for edgeshark
+            console.log("edgeData.data.extraData.clabTargetPort: ", clabTargetPort);
+
+
+        } else {
+            environments = await getEnvironments(event);
+            console.info("linkWireshark - environments: ", environments);
+
+            deploymentType = environments["deployment-type"];
+            cytoTopologyJson = environments["EnvCyTopoJsonBytes"];
+            edgeData = findCytoElementById(cytoTopologyJson, edgeId);
+
+            console.info("linkWireshark- edgeData: ", edgeData);
+            console.info("linkWireshark- edgeSource: ", edgeData.data.source);
+
+            clabUser = edgeData.data.extraData.clabServerUsername;
+            edgesharkHostUrl = environments["clab-allowed-hostname01"] || environments["clab-allowed-hostname"]; // used for edgeshark
+            clabServerAddress = environments["clab-server-address"]; // used for edgeshark
+            clabSourceLongName = edgeData.data.extraData.clabSourceLongName; // used for edgeshark
+            clabSourcePort = edgeData.data.extraData.clabSourcePort; // used for edgeshark
+            clabTargetLongName = edgeData.data.extraData.clabTargetLongName; // used for edgeshark
+            clabTargetPort = edgeData.data.extraData.clabTargetPort; // used for edgeshark
         }
 
+        let wiresharkHref, baseUrl, urlParams, netNsResponse, netNsId, wiresharkSshCommand;
+
+        switch (option) {
+            case "app":
+                if (endpoint === "source") {
+                    wiresharkHref = `clab-capture://${clabUser}@${clabServerAddress}?${clabSourceLongName}?${clabSourcePort}`;
+                } else if (endpoint === "target") {
+                    wiresharkHref = `clab-capture://${clabUser}@${clabServerAddress}?${clabTargetLongName}?${clabTargetPort}`;
+                }
+                console.info("linkWireshark- wiresharkHref: ", wiresharkHref);
+                window.open(wiresharkHref);
+                break;
+
+            case "edgeSharkInterface": {
+                baseUrl = `packetflix:ws://${edgesharkHostUrl}:5001/capture?`;
+                if (endpoint === "source") {
+
+                    if (isVscodeDeployment) {
+                        try {
+                            const response = await sendMessageToVscodeEndpointPost("link-capture", {
+                                nodeName: clabSourceLongName,
+                                interfaceName: clabSourcePort
+                            });
+                            console.info("External URL opened successfully:", response);
+                        } catch (error) {
+                            console.error("Failed to open external URL:", error);
+                        }
+                    } else {
+                        netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabSourceLongName]);
+                        netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                        console.info("linkWireshark - netNsSource: ", netNsId);
+
+                        urlParams = `container={"netns":${netNsId},"network-interfaces":["${clabSourcePort}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${clabSourcePort}`;
+                    }
+
+                } else if (endpoint === "target") {
+                    if (isVscodeDeployment) {
+                        try {
+                            const response = await sendMessageToVscodeEndpointPost("link-capture", {
+                                nodeName: clabTargetLongName,
+                                interfaceName: clabTargetPort
+                            });
+                            console.info("External URL opened successfully:", response);
+                        } catch (error) {
+                            console.error("Failed to open external URL:", error);
+                        }
+                    } else {
+                        netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabTargetLongName]);
+                        netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                        console.info("linkWireshark - netNsTarget: ", netNsId);
+                        urlParams = `container={"netns":${netNsId},"network-interfaces":["${clabTargetPort}"],"name":"${clabTargetLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${clabTargetPort}`;
+                    }
+                }
+                const edgeSharkHref = baseUrl + urlParams;
+                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref);
+
+                // window.open(edgeSharkHref);
+
+                if (isVscodeDeployment) {
+                    // Instead of window.open, send a message to the VS Code extension.
+                    // sendMessageToVscodeEndpointPost("open-external", edgeSharkHref)
+                    //     .then(response => {
+                    //         console.info("External URL opened successfully:", response);
+                    //     })
+                    //     .catch(error => {
+                    //         console.error("Failed to open external URL:", error);
+                    //     });
+                } else {
+                    window.open(edgeSharkHref);
+                }
+
+                break;
+            }
+
+            case "edgeSharkSubInterface":
+                if (referenceElementAfterId === "endpoint-a-edgeshark" || referenceElementAfterId === "endpoint-b-edgeshark") {
+                    baseUrl = `packetflix:ws://${edgesharkHostUrl}:5001/capture?`;
+                    if (referenceElementAfterId === "endpoint-a-edgeshark") {
+                        netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabSourceLongName]);
+                        netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                        urlParams = `container={"netns":${netNsId},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
+                    } else {
+                        console.info("linkWireshark - endpoint-b-edgeshark");
+                        netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabTargetLongName]);
+                        netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                        urlParams = `container={"netns":${netNsId},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
+                    }
+                    const edgeSharkHref = baseUrl + urlParams;
+                    console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref);
+                    window.open(edgeSharkHref);
+                } else if (referenceElementAfterId === "endpoint-a-clipboard" || referenceElementAfterId === "endpoint-b-clipboard") {
+                    console.info(`linkWireshark - ${referenceElementAfterId}`);
+                    const targetLongName = referenceElementAfterId === "endpoint-a-clipboard" ? clabSourceLongName : clabTargetLongName;
+                    const targetPort = referenceElementAfterId === "endpoint-a-clipboard" ? clabSourcePort : clabTargetPort;
+
+                    // Both container and colocated use the same command in this case.
+                    wiresharkSshCommand = `ssh ${clabUser}@${environments["clab-allowed-hostname"]} "sudo -S /sbin/ip netns exec ${targetLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`;
+                    await copyToClipboard(wiresharkSshCommand);
+                }
+                break;
+
+            case "copy":
+                if (endpoint === "source") {
+                    wiresharkSshCommand = `ssh ${clabUser}@${environments["clab-allowed-hostname"]} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${clabSourcePort} -w -" | wireshark -k -i -`;
+                } else if (endpoint === "target") {
+                    wiresharkSshCommand = `ssh ${clabUser}@${environments["clab-allowed-hostname"]} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${clabTargetPort} -w -" | wireshark -k -i -`;
+                }
+                console.info("linkWireshark- wiresharkSshCommand: ", wiresharkSshCommand);
+                await copyToClipboard(wiresharkSshCommand);
+                break;
+
+            default:
+                console.warn("linkWireshark - Unknown option provided:", option);
+                break;
+        }
     } catch (error) {
-        console.error('Error executing linkImpairment configuration:', error);
+        console.error("Error executing linkWireshark configuration:", error);
     }
 }
+
 
 async function showPanelLogMessages(event) {
     document.getElementById("panel-log-messages").style.display = "block";
@@ -4983,20 +4858,20 @@ function addSvgIcon(targetHtmlId, svgIcon, altName, position, size) {
 
 
 
-if (isVscodeDeployment) {
+// if (isVscodeDeployment) {
 
-    console.log(`image-URI is ${window.imagesUrl}`)
-    addSvgIcon("endpoint-a-edgeshark", `${window.imagesUrl}svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
-    addSvgIcon("endpoint-b-edgeshark", `${window.imagesUrl}/svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
-    addSvgIcon("endpoint-a-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
-    addSvgIcon("endpoint-b-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
-    addSvgIcon("panel-link-action-impairment-B->A", `${window.imagesUrl}/svg-impairment.svg`, "Impairment Icon", "before", "15px");
-} else {
-    addSvgIcon("endpoint-a-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
-    addSvgIcon("endpoint-b-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
-    addSvgIcon("endpoint-a-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
-    addSvgIcon("endpoint-b-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
-    addSvgIcon("panel-link-action-impairment-B->A", "images/svg-impairment.svg", "Impairment Icon", "before", "15px");
-}
+//     console.log(`image-URI is ${window.imagesUrl}`)
+//     addSvgIcon("endpoint-a-edgeshark", `${window.imagesUrl}svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-edgeshark", `${window.imagesUrl}/svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-a-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
+//     addSvgIcon("panel-link-action-impairment-B->A", `${window.imagesUrl}/svg-impairment.svg`, "Impairment Icon", "before", "15px");
+// } else {
+//     addSvgIcon("endpoint-a-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-a-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
+//     addSvgIcon("panel-link-action-impairment-B->A", "images/svg-impairment.svg", "Impairment Icon", "before", "15px");
+// }
 
 // ASAD

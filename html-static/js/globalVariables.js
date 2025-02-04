@@ -37,3 +37,13 @@ var globalDblclickLastClick = { // Variables to keep track of the last click eve
 };
 
 var globalDblClickThreshold = 300; // Set the double-click threshold (in milliseconds)
+
+
+var vsCode
+if (isVscodeDeployment) {
+    // aarafat-tag:
+    // In a VS Code webview, the global function `acquireVsCodeApi()` is available.
+    // Call it to obtain the VS Code API object, which facilitates communication
+    // between the webview and the extension host.
+    vsCode = acquireVsCodeApi();
+}
