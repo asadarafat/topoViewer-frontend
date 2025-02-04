@@ -940,7 +940,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (clickedEdge.data("editor") !== "true") {
 
 
-
             // set selected edge-id to global variable
             globalSelectedEdge = clickedEdge.data("id")
 
@@ -965,24 +964,176 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
 
-            let actualLinkMacPair
+            //render sourceSubInterfaces
+
+            let clabSourceSubInterfacesClabData
             if (isVscodeDeployment) {
                 try {
-                    let clabLinkMacArgsList = {
-                        clabSourceLongName: clickedEdge.data("extraData").clabSourceLongName,
-                        clabTargetLongName: clickedEdge.data("extraData").clabTargetLongName
-                    };
-                    console.log("clabLinkMacArgsList: ", clabLinkMacArgsList)
-                    const response = await sendMessageToVscodeEndpointGet("routerLinkMacaddress", clabLinkMacArgsList); // aarafat-tag: sendMessageToVscodeEndpointGet to be fixed with sendMessageToVscodeEndpointPost
-                    console.log("############### Success from backend:", response);
-                } catch (err) {
-                    console.error("############### Backend call failed:", err);
+                    console.log("########################################################### source subInt")
+                    const response = await sendMessageToVscodeEndpointPost("clab-link-subinterfaces", {
+                        nodeName: clickedEdge.data("extraData").clabSourceLongName,
+                        interfaceName: clickedEdge.data("extraData").clabSourcePort
+                    });
+                    clabSourceSubInterfacesClabData = response.map(item => item.name); // Output: ["e1-1-1", "e1-1-2"]
+                    console.log("Source SubInterface list:", clabSourceSubInterfacesClabData);
+
+                    if (Array.isArray(clabSourceSubInterfacesClabData) && clabSourceSubInterfacesClabData.length > 0) {
+                        // Map sub-interfaces with prefix
+                        const sourceSubInterfaces = clabSourceSubInterfacesClabData
+                        // Render sub-interfaces
+                        renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-top', 'endpoint-a-bottom');
+                    } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
+                        console.info("No sub-interfaces found. The input data array is empty.");
+                        renderSubInterfaces(null, 'endpoint-a-top', 'endpoint-a-bottom');
+                    } else {
+                        console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+                        renderSubInterfaces(null, 'endpoint-a-top', 'endpoint-a-bottom');
+                    }
+
+
+
+                } catch (error) {
+                    console.error("Failed to get SubInterface list:", error);
                 }
+            } else {
+                let clabSourceSubInterfacesArgList = [
+                    clickedEdge.data("extraData").clabSourceLongName,
+                    clickedEdge.data("extraData").clabSourcePort
+                ];
+                clabSourceSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabSourceSubInterfacesArgList);
+                console.info("clabSourceSubInterfacesClabData: ", clabSourceSubInterfacesClabData);
+                if (Array.isArray(clabSourceSubInterfacesClabData) && clabSourceSubInterfacesClabData.length > 0) {
+                    // Map sub-interfaces with prefix
+                    const sourceSubInterfaces = clabSourceSubInterfacesClabData.map(
+                        item => `${item.ifname}`
+                    );
+
+                    // Render sub-interfaces
+                    renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
+                    renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+                } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
+                    console.info("No sub-interfaces found. The input data array is empty.");
+                    renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
+                    renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+                } else {
+                    console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+                    renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
+                    renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+                }
+            }
+
+
+
+            //render targetSubInterfaces
+            if (isVscodeDeployment) {
+                try {
+                    console.log("########################################################### target subInt")
+                    const response = await sendMessageToVscodeEndpointPost("clab-link-subinterfaces", {
+                        nodeName: clickedEdge.data("extraData").clabTargetLongName,
+                        interfaceName: clickedEdge.data("extraData").clabTargetPort
+                    });
+                    clabTargetSubInterfacesClabData = response.map(item => item.name); // Output: ["e1-1-1", "e1-1-2"]
+                    console.log("###########################################")
+                    console.log("Target SubInterface list:", clabTargetSubInterfacesClabData);
+
+                    if (Array.isArray(clabTargetSubInterfacesClabData) && clabTargetSubInterfacesClabData.length > 0) {
+                        // Map sub-interfaces with prefix
+                        const TargetSubInterfaces = clabTargetSubInterfacesClabData
+
+                        // Render sub-interfaces
+                        renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-top', 'endpoint-b-bottom');
+
+                    } else if (Array.isArray(clabTargetSubInterfacesClabData)) {
+                        console.info("No sub-interfaces found. The input data array is empty.");
+                        renderSubInterfaces(null, 'endpoint-b-top', 'endpoint-b-bottom');
+                    } else {
+                        console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+                        renderSubInterfaces(null, 'endpoint-b-top', 'endpoint-b-bottom');
+                    }
+
+                } catch (error) {
+                    console.error("Failed to get SubInterface list:", error);
+                }
+            }
+            else {
+                let clabTargetSubInterfacesArgList = [
+                    clickedEdge.data("extraData").clabTargetLongName,
+                    clickedEdge.data("extraData").clabTargetPort
+                ];
+                let clabTargetSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabTargetSubInterfacesArgList);
+                console.info("clabTargetSubInterfacesClabData: ", clabTargetSubInterfacesClabData);
+
+                if (Array.isArray(clabTargetSubInterfacesClabData) && clabTargetSubInterfacesClabData.length > 0) {
+                    // Map sub-interfaces with prefix
+                    const TargetSubInterfaces = clabTargetSubInterfacesClabData.map(
+                        item => `${item.ifname}`
+                    );
+
+                    // Render sub-interfaces
+                    renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
+                    renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-clipboard', 'endpoint-b-bottom');
+
+                } else if (Array.isArray(clabTargetSubInterfacesClabData)) {
+                    console.info("No sub-interfaces found. The input data array is empty.");
+                    renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
+                    renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
+                } else {
+                    console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+                    renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
+                    renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
+                }
+            }
+
+
+
+            let actualLinkMacPair
+            if (isVscodeDeployment) {
+
+                // get Source MAC Address
+                try {
+                    console.log("########################################################### Source MAC Address")
+                    const response = await sendMessageToVscodeEndpointPost("clab-link-mac-address", {
+                        nodeName: clickedEdge.data("extraData").clabSourceLongName,
+                        interfaceName: clickedEdge.data("extraData").clabSourcePort
+                    });
+                    clabSourceMacAddress = response
+                    console.log("###########################################")
+                    console.log("Source MAC address:", clabSourceMacAddress);
+
+                    if (clabSourceMacAddress) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-a-mac-address").textContent = clabSourceMacAddress
+                    }
+                } catch (error) {
+                    console.error("Failed to get SubInterface list:", error);
+                }
+
+                // get Target MAC Address
+                try {
+                    console.log("########################################################### Target MAC Address")
+                    const response = await sendMessageToVscodeEndpointPost("clab-link-mac-address", {
+                        nodeName: clickedEdge.data("extraData").clabTargetLongName,
+                        interfaceName: clickedEdge.data("extraData").clabTargetPort
+                    });
+                    clabTargetMacAddress = response
+                    console.log("###########################################")
+                    console.log("Target MAC address:", clabTargetMacAddress);
+
+                    if (clabTargetMacAddress) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-b-mac-address").textContent = clabTargetMacAddress
+
+                    } 
+                } catch (error) {
+                    console.error("Failed to get SubInterface list:", error);
+                }
+
+
+
             } else {
                 // setting MAC address endpoint-a values by getting the data from clab via /clab-link-mac GET API
                 clabLinkMacArgsList = [`${clickedEdge.data("extraData").clabSourceLongName}`, `${clickedEdge.data("extraData").clabTargetLongName}`]
                 actualLinkMacPair = await sendRequestToEndpointGetV3("/clab-link-macaddress", clabLinkMacArgsList)
-
 
 
                 console.info("actualLinkMacPair: ", actualLinkMacPair)
@@ -1018,7 +1169,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                         item.sourceIfName === sourceIfName &&
                         item.targetIfName === targetIfName
                     );
-
                     if (result) {
                         return {
                             sourceIfMac: result.sourceIfMac,
@@ -1029,27 +1179,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                     }
                 }
             }
-
-
-            // // Setting default impairment values for endpoint A
-            // let clabSourceLinkArgsList = [
-            //     clickedEdge.data("extraData").clabSourceLongName,
-            //     clickedEdge.data("extraData").clabSourcePort
-            // ];
-
-
-            // let clabSourceLinkImpairmentClabData
-            // if (isVscodeDeployment) {
-            //     try {
-            //         const response = await sendMessageToVscodeEndpointGet("routerLinkImpairment", clabSourceLinkArgsList);
-            //         console.log("############### Success from backend:", response);
-            //     } catch (err) {
-            //         console.error("############### Backend call failed:", err);
-            //     }
-            // } else {
-            //     clabSourceLinkImpairmentClabData = await sendRequestToEndpointGetV3("/clab-link-impairment", clabSourceLinkArgsList);
-            // }
-
 
             let clabSourceLinkImpairmentClabData
             if (isVscodeDeployment) {
@@ -1076,8 +1205,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 ];
                 clabSourceLinkImpairmentClabData = await sendRequestToEndpointGetV3("/clab-link-impairment", clabSourceLinkArgsList)
             }
-
-
 
 
 
@@ -1127,69 +1254,99 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.info("Empty or invalid JSON response received for endpoint B");
             }
 
-            //render sourceSubInterfaces
-            let clabSourceSubInterfacesArgList = [
-                clickedEdge.data("extraData").clabSourceLongName,
-                clickedEdge.data("extraData").clabSourcePort
-            ];
-            let clabSourceSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabSourceSubInterfacesArgList);
-            console.info("clabSourceSubInterfacesClabData: ", clabSourceSubInterfacesClabData);
+            // //render sourceSubInterfaces
 
-            if (Array.isArray(clabSourceSubInterfacesClabData) && clabSourceSubInterfacesClabData.length > 0) {
-                // Map sub-interfaces with prefix
-                const sourceSubInterfaces = clabSourceSubInterfacesClabData.map(
-                    item => `${item.ifname}`
-                );
+            // let clabSourceSubInterfacesClabData
+            // if (isVscodeDeployment) {
+            //     try {
+            //         const response = await sendMessageToVscodeEndpointPost("clab-link-subinterfaces", {
+            //             nodeName: clickedEdge.data("extraData").clabSourceLongName,
+            //             interfaceName: clickedEdge.data("extraData").clabSourcePort
+            //         });
+            //         clabSourceSubInterfacesClabData = response
+            //         console.info("External URL opened successfully:", response);
+            //     } catch (error) {
+            //         console.error("Failed to open external URL:", error);
+            //     }
+            // } else {
+            //     let clabSourceSubInterfacesArgList = [
+            //         clickedEdge.data("extraData").clabSourceLongName,
+            //         clickedEdge.data("extraData").clabSourcePort
+            //     ];
+            //     clabSourceSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabSourceSubInterfacesArgList);
+            //     console.info("clabSourceSubInterfacesClabData: ", clabSourceSubInterfacesClabData);
+            // }
 
-                // Render sub-interfaces
-                renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-                renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+            // if (Array.isArray(clabSourceSubInterfacesClabData) && clabSourceSubInterfacesClabData.length > 0) {
+            //     // Map sub-interfaces with prefix
+            //     const sourceSubInterfaces = clabSourceSubInterfacesClabData.map(
+            //         item => `${item.ifname}`
+            //     );
 
-            } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
-                console.info("No sub-interfaces found. The input data array is empty.");
-                renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-                renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
-            } else {
-                console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
-                renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-                renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
-            }
-
-
-            //render targetSubInterfaces
-            let clabTargetSubInterfacesArgList = [
-                clickedEdge.data("extraData").clabTargetLongName,
-                clickedEdge.data("extraData").clabTargetPort
-            ];
-            let clabTargetSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabTargetSubInterfacesArgList);
-            console.info("clabTargetSubInterfacesClabData: ", clabTargetSubInterfacesClabData);
-
-            if (Array.isArray(clabTargetSubInterfacesClabData) && clabTargetSubInterfacesClabData.length > 0) {
-                // Map sub-interfaces with prefix
-                const TargetSubInterfaces = clabTargetSubInterfacesClabData.map(
-                    item => `${item.ifname}`
-                );
-
-                // Render sub-interfaces
-                renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
-                renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-clipboard', 'endpoint-b-bottom');
-
-            } else if (Array.isArray(clabTargetSubInterfacesClabData)) {
-                console.info("No sub-interfaces found. The input data array is empty.");
-                renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
-                renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
-            } else {
-                console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
-                renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
-                renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
-            }
+            //     // Render sub-interfaces
+            //     renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
+            //     renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+            // } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
+            //     console.info("No sub-interfaces found. The input data array is empty.");
+            //     renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
+            //     renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+            // } else {
+            //     console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+            //     renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
+            //     renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+            // }
 
 
-            // // set selected edge-id to global variable
-            // globalSelectedEdge = clickedEdge.data("id")
+            // //render targetSubInterfaces
+            // if (isVscodeDeployment) {
+            //     try {
+            //         const response = await sendMessageToVscodeEndpointPost("clab-link-subinterfaces", {
+            //             nodeName: clickedEdge.data("extraData").clabTargetLongName,
+            //             interfaceName: clickedEdge.data("extraData").clabTargetPort
+            //         });
+            //         clabTargetSubInterfacesClabData = response
+            //         console.info("External URL opened successfully:", response);
+            //     } catch (error) {
+            //         console.error("Failed to open external URL:", error);
+            //     }
+            // }
+            // else {
+            //     let clabTargetSubInterfacesArgList = [
+            //         clickedEdge.data("extraData").clabTargetLongName,
+            //         clickedEdge.data("extraData").clabTargetPort
+            //     ];
+            //     let clabTargetSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabTargetSubInterfacesArgList);
+            //     console.info("clabTargetSubInterfacesClabData: ", clabTargetSubInterfacesClabData);
 
-            // console.log(`"edgeClicked: " ${globalSelectedEdge}`);
-            // appendMessage(`"edgeClicked: " ${edgeClicked}`);
+            //     if (Array.isArray(clabTargetSubInterfacesClabData) && clabTargetSubInterfacesClabData.length > 0) {
+            //         // Map sub-interfaces with prefix
+            //         const TargetSubInterfaces = clabTargetSubInterfacesClabData.map(
+            //             item => `${item.ifname}`
+            //         );
+
+            //         // Render sub-interfaces
+            //         renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
+            //         renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-clipboard', 'endpoint-b-bottom');
+
+            //     } else if (Array.isArray(clabTargetSubInterfacesClabData)) {
+            //         console.info("No sub-interfaces found. The input data array is empty.");
+            //         renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
+            //         renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
+            //     } else {
+            //         console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+            //         renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
+            //         renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
+            //     }
+            // }
+
+
+
+
+            // set selected edge-id to global variable
+            globalSelectedEdge = clickedEdge.data("id")
+
+            console.log(`"edgeClicked: " ${globalSelectedEdge}`);
+            appendMessage(`"edgeClicked: " ${edgeClicked}`);
         }
 
     });
@@ -1923,7 +2080,7 @@ async function sshWebBased(event) {
     if (isVscodeDeployment) {
 
         try {
-            const response = await sendMessageToVscodeEndpointPost("ssh-to-node", routerName);
+            const response = await sendMessageToVscodeEndpointPost("clab-node-connect-ssh", routerName);
             console.log("############### response from backend:", response);
 
         } catch (err) {
@@ -2138,11 +2295,11 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
             environments = await getEnvironments(event);
             console.info("linkWireshark - environments: ", environments);
 
-            // edgesharkHostUrl = await sendMessageToVscodeEndpointPost("get-hostname", routerName);
-            // console.log("############### endpoint get-hostname response from backend:", edgesharkHostUrl);
+            // edgesharkHostUrl = await sendMessageToVscodeEndpointPost("clab-host-get-hostname", routerName);
+            // console.log("############### endpoint clab-host-get-hostname response from backend:", edgesharkHostUrl);
 
             edgesharkHostUrl = environments["clab-allowed-hostname01"] || environments["clab-allowed-hostname"]; // used for edgeshark
-            console.log("############### endpoint get-hostname response from backend:", edgesharkHostUrl);
+            console.log("############### endpoint clab-host-get-hostname response from backend:", edgesharkHostUrl);
 
             cytoTopologyJson = environments["EnvCyTopoJsonBytes"];
             edgeData = findCytoElementById(cytoTopologyJson, edgeId);
@@ -2200,7 +2357,7 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
 
                     if (isVscodeDeployment) {
                         try {
-                            const response = await sendMessageToVscodeEndpointPost("link-capture", {
+                            const response = await sendMessageToVscodeEndpointPost("clab-link-capture", {
                                 nodeName: clabSourceLongName,
                                 interfaceName: clabSourcePort
                             });
@@ -2240,18 +2397,9 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
                 // window.open(edgeSharkHref);
 
                 if (isVscodeDeployment) {
-                    // Instead of window.open, send a message to the VS Code extension.
-                    // sendMessageToVscodeEndpointPost("open-external", edgeSharkHref)
-                    //     .then(response => {
-                    //         console.info("External URL opened successfully:", response);
-                    //     })
-                    //     .catch(error => {
-                    //         console.error("Failed to open external URL:", error);
-                    //     });
                 } else {
                     window.open(edgeSharkHref);
                 }
-
                 break;
             }
 
@@ -4738,6 +4886,12 @@ function sleep(ms) {
 
 
 async function renderSubInterfaces(subInterfaces, referenceElementAfterId, referenceElementBeforeId, edgeSharkClipboardToggle) {
+
+
+    console.log("##### renderSubInterfaces is called")
+    console.log("##### subInterfaces: ", subInterfaces)
+
+
     const containerSelectorId = 'panel-link-action-dropdown-menu-dropdown-content';
 
     const onClickHandler = (event, subInterface) => {
