@@ -864,7 +864,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("nodeClicked: ", nodeClicked);
         console.info("edgeClicked: ", edgeClicked);
 
-
         // Remove all Overlayed Panel
         // Get all elements with the class "panel-overlay"
         var panelOverlays = document.getElementsByClassName("panel-overlay");
@@ -883,7 +882,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
         edgeClicked = true;
-
 
         console.info("edge clicked after");
         console.info("isPanel01Cy: ", isPanel01Cy);
@@ -911,8 +909,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Assign middle labels
         assignMiddleLabels(clickedEdge);
 
-
-
         // Usage: Initialize the listener and get a live checker function
         const isViewportDrawerClabEditorCheckboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
 
@@ -921,7 +917,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.info("deleted Edge: ", clickedEdge.data("source"), clickedEdge.data("target"));
 
             deleteEdgeToEditorToFile(clickedEdge)
-
         }
         if (event.originalEvent.altKey && isViewportDrawerClabEditorCheckboxChecked && clickedEdge.data("editor") !== "true") {
             console.info("Alt + Click is enabled");
@@ -932,8 +927,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 position: "top-center",
                 closeOnClick: true,
             });
-
-
         }
 
 
@@ -1085,7 +1078,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
 
-
             let actualLinkMacPair
             if (isVscodeDeployment) {
 
@@ -1123,11 +1115,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                         // render MAC address
                         document.getElementById("panel-link-endpoint-b-mac-address").textContent = clabTargetMacAddress
 
-                    } 
+                    }
                 } catch (error) {
                     console.error("Failed to get SubInterface list:", error);
                 }
-
 
 
             } else {
@@ -2354,7 +2345,6 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
             case "edgeSharkInterface": {
                 baseUrl = `packetflix:ws://${edgesharkHostUrl}:5001/capture?`;
                 if (endpoint === "source") {
-
                     if (isVscodeDeployment) {
                         try {
                             const response = await sendMessageToVscodeEndpointPost("clab-link-capture", {
@@ -2372,7 +2362,6 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
 
                         urlParams = `container={"netns":${netNsId},"network-interfaces":["${clabSourcePort}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${clabSourcePort}`;
                     }
-
                 } else if (endpoint === "target") {
                     if (isVscodeDeployment) {
                         try {
@@ -2404,21 +2393,50 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
             }
 
             case "edgeSharkSubInterface":
-                if (referenceElementAfterId === "endpoint-a-edgeshark" || referenceElementAfterId === "endpoint-b-edgeshark") {
+                if (referenceElementAfterId === "endpoint-a-top" || referenceElementAfterId === "endpoint-b-top") {
                     baseUrl = `packetflix:ws://${edgesharkHostUrl}:5001/capture?`;
-                    if (referenceElementAfterId === "endpoint-a-edgeshark") {
-                        netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabSourceLongName]);
-                        netNsId = extractNamespaceId(netNsResponse.namespace_id);
-                        urlParams = `container={"netns":${netNsId},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
+                    if (isVscodeDeployment) {
+                        if (referenceElementAfterId === "endpoint-a-top") {
+                            console.info("linkWireshark - endpoint-b-subInterface");
+                            try {
+                                const response = await sendMessageToVscodeEndpointPost("clab-link-capture", {
+                                    nodeName: clabSourceLongName,
+                                    interfaceName: clabSourcePort
+                                });
+                                console.info("External URL opened successfully:", response);
+                            } catch (error) {
+                                console.error("Failed to open external URL:", error);
+                            }
+                        } else if (referenceElementAfterId === "endpoint-b-top") {
+                            console.info("linkWireshark - endpoint-b-subInterface");
+                            try {
+                                const response = await sendMessageToVscodeEndpointPost("link-capture", {
+                                    nodeName: clabTargetLongName,
+                                    interfaceName: clabTargetPort
+                                });
+                                console.info("External URL opened successfully:", response);
+                            } catch (error) {
+                                console.error("Failed to open external URL:", error);
+                            }
+
+                        }
+
                     } else {
-                        console.info("linkWireshark - endpoint-b-edgeshark");
-                        netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabTargetLongName]);
-                        netNsId = extractNamespaceId(netNsResponse.namespace_id);
-                        urlParams = `container={"netns":${netNsId},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
+                        if (referenceElementAfterId === "endpoint-a-edgeshark") {
+                            netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabSourceLongName]);
+                            netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                            urlParams = `container={"netns":${netNsId},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
+                        } else {
+                            console.info("linkWireshark - endpoint-b-edgeshark");
+                            netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabTargetLongName]);
+                            netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                            urlParams = `container={"netns":${netNsId},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
+                        }
+                        const edgeSharkHref = baseUrl + urlParams;
+                        console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref);
+                        window.open(edgeSharkHref);
                     }
-                    const edgeSharkHref = baseUrl + urlParams;
-                    console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref);
-                    window.open(edgeSharkHref);
+
                 } else if (referenceElementAfterId === "endpoint-a-clipboard" || referenceElementAfterId === "endpoint-b-clipboard") {
                     console.info(`linkWireshark - ${referenceElementAfterId}`);
                     const targetLongName = referenceElementAfterId === "endpoint-a-clipboard" ? clabSourceLongName : clabTargetLongName;
@@ -4887,10 +4905,8 @@ function sleep(ms) {
 
 async function renderSubInterfaces(subInterfaces, referenceElementAfterId, referenceElementBeforeId, edgeSharkClipboardToggle) {
 
-
     console.log("##### renderSubInterfaces is called")
     console.log("##### subInterfaces: ", subInterfaces)
-
 
     const containerSelectorId = 'panel-link-action-dropdown-menu-dropdown-content';
 
