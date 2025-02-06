@@ -379,17 +379,14 @@ function detectColorScheme() {
 	if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
 		// Dark mode is enabled
 		applyTheme('dark');
-
 		return 'dark';
 	} else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-		// Light mode is enabled
-		applyTheme('light');
-
-		return 'light';
+		// defaulted to dark mode
+		applyTheme('dark');
+		return 'dark';
 	} else {
 		// No preference or the browser does not support this media feature
-		applyTheme('light');
-
+		applyTheme('dark');
 		return 'no-preference';
 	}
 }

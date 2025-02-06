@@ -3959,6 +3959,15 @@ function loadCytoStyle(cy) {
             }
         },
         {
+            "selector": "node[topoViewerRole=\"switch\"]",
+            "style": {
+                "width": "12",
+                "height": "12",
+                "background-image": `${generateEncodedSVG("switch", "#001135")}`,
+                "background-fit": "cover"
+            }
+        },
+        {
             "selector": "node[topoViewerRole=\"rgw\"]",
             "style": {
                 "width": "12",
@@ -4000,6 +4009,15 @@ function loadCytoStyle(cy) {
                 "width": "8",
                 "height": "8",
                 "background-image": `${generateEncodedSVG("bridge", "#001135")}`,
+                "background-fit": "cover"
+            }
+        },
+        {
+            "selector": "node[topoViewerRole=\"client\"]",
+            "style": {
+                "width": "8",
+                "height": "8",
+                "background-image": `${generateEncodedSVG("client", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -4645,6 +4663,9 @@ function fetchAndLoadData() {
         .then((elements) => {
             // Process the data (assign missing lat/lng values).
             var updatedElements = assignMissingLatLng(elements);
+
+            // var updatedElements = (elements);
+
             console.log("Updated Elements:", updatedElements);
 
             // Clear current Cytoscape elements.
@@ -5025,6 +5046,51 @@ function addSvgIcon(targetHtmlId, svgIcon, altName, position, size) {
     `;
     document.head.appendChild(style);
 }
+
+
+async function saveTopoViewport(cy) {
+    if (isVscodeDeployment) {
+        try {
+
+            console.log("saveTopoViewport triggered")
+            // Ensure our Cytoscape instance is available
+            if (!window.cy) {
+                console.error('Cytoscape instance "cy" is not defined.');
+                return;
+            }
+
+            // Process nodes: update each node's "position" property with the current position.
+            const updatedNodes = cy.nodes().map(function (node) {
+                const nodeJson = node.json();
+                nodeJson.position = node.position();
+                return nodeJson;
+            });
+
+            // Process edges: simply get their JSON representation.
+            const updatedEdges = cy.edges().map(function (edge) {
+                return edge.json();
+            });
+
+            // Combine nodes and edges into one array
+            const updatedElements = updatedNodes.concat(updatedEdges);
+
+            // Convert the updated elements to a JSON string (pretty printed)
+            const jsonString = JSON.stringify(updatedElements, null, 2);
+
+            console.log(JSON.parse(updatedElements, null, 2));
+
+            const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
+            console.log("############### response from backend:", response);
+            sleep(1000)
+            // Re-Init load data.
+            fetchAndLoadData()
+
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
+    }
+}
+
 
 
 

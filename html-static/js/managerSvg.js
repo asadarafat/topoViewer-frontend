@@ -136,6 +136,45 @@ function generateEncodedSVG(nodeType, fillColor) {
                 `;
             break;
 
+        case "switch":  // Leaf Node
+            svgString = `
+                    <svg
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xml:space="preserve"
+                        style="enable-background:new 0 0 120 120;"
+                        viewBox="0 0 120 120"
+                        y="0px"
+                        x="0px"
+                        id="Layer_1"
+                        version="1.1"
+                        width="120px"
+                        height="120px"
+                        fill="none"
+                    >
+                        <style type="text/css">
+                            .st0 { fill: ${fillColor}; }
+                            .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
+                        </style>
+                        <rect height="120" width="120" class="st0" />
+                        <g>
+                            <g>
+                                <path d="M91.5,27.3l7.6,7.6c1.3,1.3,1.3,3.1,0,4.3l-7.6,7.7" class="st1" />
+                                <path d="M28.5,46.9l-7.6-7.6c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
+                            </g>
+                            <g>
+                                <path d="M91.5,73.1l7.6,7.6c1.3,1.3,1.3,3.1,0,4.3l-7.6,7.7" class="st1" />
+                                <path d="M28.5,92.7l-7.6-7.6c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
+                            </g>
+                            <g>
+                                <path d="M96.6,36.8H67.9l-16,45.9H23.2" class="st1" />
+                                <path d="M96.6,82.7H67.9l-16-45.9H23.2" class="st1" />
+                            </g>
+                        </g>
+                    </svg>
+
+                `;
+            break;
         case "spine":  // Spine Node
             svgString = `
                     <svg
@@ -350,7 +389,7 @@ function generateEncodedSVG(nodeType, fillColor) {
                             fill="none"
                         >
                             <style type="text/css">
-                                .st0 { fill: #001135; }
+                                .st0 { fill:  ${fillColor}; }
                                 .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
                                 .st2 { fill: #FFFFFF; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
                             </style>
@@ -365,6 +404,40 @@ function generateEncodedSVG(nodeType, fillColor) {
                             </g>
                         </svg>
 
+                    `;
+            break;
+
+        case "client": 
+            svgString = `
+                        <svg
+                            xmlns:xlink="http://www.w3.org/1999/xlink"
+                            xmlns="http://www.w3.org/2000/svg"
+                            xml:space="preserve"
+                            style="enable-background:new 0 0 120 120;"
+                            viewBox="0 0 120 120"
+                            y="0px"
+                            x="0px"
+                            id="Layer_1"
+                            version="1.1"
+                            width="120px"
+                            height="120px"
+                            fill="none"
+                        >
+                            <style type="text/css">
+                                .st0 { fill: #001135; }
+                                .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
+                                .st2 { fill: #FFFFFF; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
+                            </style>
+                            <rect height="120" width="120" class="st0" />
+                            <path d="M60,74.9c0.8,0,1.5-0.7,1.5-1.5c0-0.8-0.7-1.5-1.5-1.5c-0.8,0-1.5,0.7-1.5,1.5C58.5,74.2,59.2,74.9,60,74.9z" class="st2" />
+                            <path d="M46.8,54.6c7.5-7.5,20-7.5,27.5,0" class="st1" />
+                            <path d="M53.7,63.9c3.8-3.8,10-3.8,13.8,0" class="st1" />
+                            <g>
+                                <path d="M17,55.6l37.7-36.5c3.1-3,8.1-3,11.2,0L103,55.7" class="st1" />
+                                <path d="M29.9,63.8v31.2c0,4.4,3.6,8,8,8h17.9c2.4,0,4.3-1.9,4.3-4.3v-8.5" class="st1" />
+                                <path d="M90.3,63.8v31.2c0,4.4-3.6,8-8,8h-8.5" class="st1" />
+                            </g>
+                        </svg>
                     `;
             break;
 
