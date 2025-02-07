@@ -20,25 +20,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
-async function reloadViewport() {
-    if (isVscodeDeployment) {
-        try {
-            const response = await sendMessageToVscodeEndpointPost("reload-viewport", "Empty Payload");
-            console.log("############### response from backend:", response);
-            sleep(1000)
-            // Re-Init load data.
-            fetchAndLoadData()
-
-        } catch (err) {
-            console.error("############### Backend call failed:", err);
-        }
-    }
-}
-
-
-
-
 document.addEventListener("DOMContentLoaded", async function () {
     // vertical layout
     function initializeResizingLogic() {
@@ -154,7 +135,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             dataDisplay.style.left = '98.5%';
             dataDisplay.style.width = '1.5%';
             dataDisplay.classList.remove('transparent');
-
 
             console.info('togglePanelButtonExpand - dataDisplay.style.width: ', dataDisplay.style.width);
             console.info('togglePanelButtonExpand - rootDiv.style.width: ', rootDiv.style.width);
@@ -561,7 +541,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
 
-    // Initially load data.
+    // * Fetches data from the JSON file, processes it, and loads it into the Cytoscape instance.
+    // * This integrated function appends a timestamp to bypass caching, fetches the JSON data,
+    // * processes the data with `assignMissingLatLng()`, clears existing elements, adds the new ones,
+    // * applies the "cola" layout, removes specific nodes, and sets up expand/collapse functionality.   
+
     fetchAndLoadData()
 
     // Instantiate hover text element
@@ -717,20 +701,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             loadCytoStyle(cy)
         }
     });
-
-    // // Listen for the custom 'dblclick' event.
-    // cy.on("dblclick", 'node', function (event) {
-    //     var node = event.target;
-
-    //     globalSelectedNode = node.data("extraData").longname;
-
-
-    //     console.log('Double-clicked on node:', node.id());
-    //     // For demonstration, change the node's color on double-click.
-    //     node.style('border-color', 'AD0000');
-
-    //     sshWebBased(event)
-    // });
 
     // Click event listener for nodes
     cy.on("click", "node", async function (event) {
@@ -1244,94 +1214,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             } else {
                 console.info("Empty or invalid JSON response received for endpoint B");
             }
-
-            // //render sourceSubInterfaces
-
-            // let clabSourceSubInterfacesClabData
-            // if (isVscodeDeployment) {
-            //     try {
-            //         const response = await sendMessageToVscodeEndpointPost("clab-link-subinterfaces", {
-            //             nodeName: clickedEdge.data("extraData").clabSourceLongName,
-            //             interfaceName: clickedEdge.data("extraData").clabSourcePort
-            //         });
-            //         clabSourceSubInterfacesClabData = response
-            //         console.info("External URL opened successfully:", response);
-            //     } catch (error) {
-            //         console.error("Failed to open external URL:", error);
-            //     }
-            // } else {
-            //     let clabSourceSubInterfacesArgList = [
-            //         clickedEdge.data("extraData").clabSourceLongName,
-            //         clickedEdge.data("extraData").clabSourcePort
-            //     ];
-            //     clabSourceSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabSourceSubInterfacesArgList);
-            //     console.info("clabSourceSubInterfacesClabData: ", clabSourceSubInterfacesClabData);
-            // }
-
-            // if (Array.isArray(clabSourceSubInterfacesClabData) && clabSourceSubInterfacesClabData.length > 0) {
-            //     // Map sub-interfaces with prefix
-            //     const sourceSubInterfaces = clabSourceSubInterfacesClabData.map(
-            //         item => `${item.ifname}`
-            //     );
-
-            //     // Render sub-interfaces
-            //     renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-            //     renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-clipboard', 'endpoint-a-bottom');
-            // } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
-            //     console.info("No sub-interfaces found. The input data array is empty.");
-            //     renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-            //     renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
-            // } else {
-            //     console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
-            //     renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-            //     renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
-            // }
-
-
-            // //render targetSubInterfaces
-            // if (isVscodeDeployment) {
-            //     try {
-            //         const response = await sendMessageToVscodeEndpointPost("clab-link-subinterfaces", {
-            //             nodeName: clickedEdge.data("extraData").clabTargetLongName,
-            //             interfaceName: clickedEdge.data("extraData").clabTargetPort
-            //         });
-            //         clabTargetSubInterfacesClabData = response
-            //         console.info("External URL opened successfully:", response);
-            //     } catch (error) {
-            //         console.error("Failed to open external URL:", error);
-            //     }
-            // }
-            // else {
-            //     let clabTargetSubInterfacesArgList = [
-            //         clickedEdge.data("extraData").clabTargetLongName,
-            //         clickedEdge.data("extraData").clabTargetPort
-            //     ];
-            //     let clabTargetSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabTargetSubInterfacesArgList);
-            //     console.info("clabTargetSubInterfacesClabData: ", clabTargetSubInterfacesClabData);
-
-            //     if (Array.isArray(clabTargetSubInterfacesClabData) && clabTargetSubInterfacesClabData.length > 0) {
-            //         // Map sub-interfaces with prefix
-            //         const TargetSubInterfaces = clabTargetSubInterfacesClabData.map(
-            //             item => `${item.ifname}`
-            //         );
-
-            //         // Render sub-interfaces
-            //         renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
-            //         renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-clipboard', 'endpoint-b-bottom');
-
-            //     } else if (Array.isArray(clabTargetSubInterfacesClabData)) {
-            //         console.info("No sub-interfaces found. The input data array is empty.");
-            //         renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
-            //         renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
-            //     } else {
-            //         console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
-            //         renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
-            //         renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
-            //     }
-            // }
-
-
-
 
             // set selected edge-id to global variable
             globalSelectedEdge = clickedEdge.data("id")
@@ -2046,15 +1928,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 ////  - re-create log-messages
 ////  - re-create viewport
 
-async function initEnv() {
-    environments = await getEnvironments();
-    globalLabName = await environments["clab-name"]
-    deploymentType = await environments["deployment-type"]
 
-    console.info("Lab-Name: ", globalLabName)
-    console.info("DeploymentType: ", deploymentType)
-    return environments, globalLabName
-}
 
 async function changeTitle() {
     environments = await getEnvironments();
@@ -2801,6 +2675,11 @@ async function layoutAlgoChange(event) {
             // console.info(document.getElementById("viewport-drawer-geo-map-reset-start"))
 
             viewportDrawerLayoutGeoMap()
+
+        } else if (selectedOption === "Preset") {
+            console.info("Preset algo selected");
+
+            viewportDrawerPreset()
         }
 
     } catch (error) {
@@ -2895,295 +2774,6 @@ function viewportButtonContainerStatusVisibility() {
     }
 }
 
-
-
-// function viewportDrawerLayoutForceDirectedRadial() {
-
-//     // Disable GeoMap, in case it is active
-//     viewportDrawerDisableGeoMap()
-
-//     edgeLengthSlider = document.getElementById("force-directed-radial-slider-link-lenght");
-//     const edgeLengthValue = parseFloat(edgeLengthSlider.value);
-//     console.info("edgeLengthValue", edgeLengthValue);
-
-//     nodeGapSlider = document.getElementById("force-directed-radial-slider-node-gap");
-//     const nodeGapValue = parseFloat(nodeGapSlider.value);
-//     console.info("edgeLengthValue", nodeGapValue);
-
-//     // Map TopoViewerGroupLevel to weights (lower levels = higher weight)	
-//     const nodeWeights = {};
-//     cy.nodes().forEach((node) => {
-//         const level = node.data('extraData')?.labels?.TopoViewerGroupLevel ?
-//             parseInt(node.data('extraData').labels.TopoViewerGroupLevel) :
-//             1; // Default level to 1 if missing
-//         nodeWeights[node.id()] = 1 / level; // Higher weight for lower levels
-//     });
-
-//     // Adjust edge styles to avoid overlaps
-//     cy.edges().forEach((edge) => {
-//         edge.style({
-//             'curve-style': 'bezier', // Use curved edges
-//             'control-point-step-size': 20, // Distance for control points
-//         });
-//     });
-
-//     // Apply Cola layout with weights and better edge handling
-//     cy.layout({
-//         name: 'cola',
-//         fit: true, // Automatically fit the layout to the viewport
-//         nodeSpacing: nodeGapValue, // Gap between nodes
-//         edgeLength: (edge) => {
-//             const sourceWeight = nodeWeights[edge.source().id()] || 1;
-//             const targetWeight = nodeWeights[edge.target().id()] || 1;
-//             return (1 * edgeLengthValue) / (sourceWeight + targetWeight); // Shorter edges for higher-weight nodes
-//         },
-//         edgeSymDiffLength: 10, // Symmetrical edge separation to reduce overlaps
-//         nodeDimensionsIncludeLabels: true, // Adjust layout considering node labels
-//         animate: true,
-//         maxSimulationTime: 2000,
-//         avoidOverlap: true, // Prevents node overlaps
-//     }).run();
-
-//     var cyExpandCollapse = cy.expandCollapse({
-//         layoutBy: null,
-//         undoable: false,
-//         fisheye: true,
-//         animationDuration: 10, // when animate is true, the duration in milliseconds of the animation
-//         animate: true
-//     });
-
-//     // Example collapse/expand after some time:
-//     setTimeout(function () {
-//         var parent = cy.$('#parent');
-//         cyExpandCollapse.collapse(parent);
-
-//         setTimeout(function () {
-//             cyExpandCollapse.expand(parent);
-//         }, 2000);
-//     }, 2000);
-// }
-
-// function viewportDrawerLayoutVertical() {
-
-//     // Disable GeoMap, in case it is active
-//     viewportDrawerDisableGeoMap()
-
-//     // Retrieve the sliders for node and group vertical gaps
-//     const nodevGap = document.getElementById("vertical-layout-slider-node-v-gap");
-//     const groupvGap = document.getElementById("vertical-layout-slider-group-v-gap");
-
-//     // Parse the slider values for horizontal and vertical gaps
-//     const nodevGapValue = parseFloat(nodevGap.value); // Gap between child nodes within a parent
-//     const groupvGapValue = parseFloat(groupvGap.value); // Gap between parent nodes
-
-//     const delay = 100; // Delay to ensure layout updates after rendering
-
-//     setTimeout(() => {
-//         // Step 1: Position child nodes within their respective parents
-//         cy.nodes().forEach(function (node) {
-//             if (node.isParent()) {
-//                 const children = node.children(); // Get the children of the current parent node
-//                 const cellWidth = node.width() / children.length; // Calculate the width for each child node
-
-//                 // Position child nodes evenly spaced within the parent node
-//                 children.forEach(function (child, index) {
-//                     const xPos = index * (cellWidth + nodevGapValue); // Horizontal position for the child
-//                     const yPos = 0; // Keep child nodes on the same vertical level
-
-//                     child.position({
-//                         x: xPos,
-//                         y: yPos
-//                     });
-//                 });
-//             }
-//         });
-
-//         // Step 2: Sort parent nodes by their group level and ID for vertical stacking
-//         const sortedParents = cy.nodes()
-//             .filter(node => node.isParent()) // Only process parent nodes
-//             .sort((a, b) => {
-//                 // Extract group levels for primary sorting
-//                 const groupLevelA = parseInt(a.data('extraData')?.topoViewerGroupLevel || 0, 10);
-//                 const groupLevelB = parseInt(b.data('extraData')?.topoViewerGroupLevel || 0, 10);
-
-//                 if (groupLevelA !== groupLevelB) {
-//                     return groupLevelA - groupLevelB; // Sort by group level in ascending order
-//                 }
-//                 // Secondary sorting by node ID (alphabetical order)
-//                 return a.data('id').localeCompare(b.data('id'));
-//             });
-
-//         let yPos = 0; // Starting vertical position for parent nodes
-//         let maxWidth = 0; // Initialize variable to store the maximum parent width
-//         const centerX = 0; // Define the horizontal center reference
-
-//         // Step 3: Find the widest parent node
-//         cy.nodes().forEach(function (node) {
-//             if (node.isParent()) {
-//                 const width = node.width();
-//                 if (width > maxWidth) {
-//                     maxWidth = width; // Update maxWidth with the widest parent node's width
-//                     console.info("ParentMaxWidth: ", maxWidth);
-//                 }
-//             }
-//         });
-
-//         // Calculate division factor for aligning parent nodes
-//         const divisionFactor = maxWidth / 2;
-//         console.info("Division Factor: ", divisionFactor);
-
-//         // Step 4: Position parent nodes vertically and align them relative to the widest parent node
-//         sortedParents.forEach(function (parentNode) {
-//             const parentWidth = parentNode.width();
-
-//             // Calculate horizontal position relative to the widest parent
-//             const xPos = centerX - parentWidth / divisionFactor;
-
-//             // Position the parent node
-//             parentNode.position({
-//                 x: xPos,
-//                 y: yPos
-//             });
-
-//             console.info(`Parent Node '${parentNode.id()}' positioned at x: ${xPos}, y: ${yPos}`);
-
-//             // Increment vertical position for the next parent
-//             yPos += groupvGapValue;
-//         });
-
-//         // Step 5: Adjust the viewport to fit the updated layout
-//         cy.fit();
-
-//     }, delay);
-
-//     // Step 6: Expand/collapse functionality for parent nodes (optional)
-//     const cyExpandCollapse = cy.expandCollapse({
-//         layoutBy: null, // Use the existing layout
-//         undoable: false, // Disable undo functionality
-//         fisheye: false, // Disable fisheye view for expanded/collapsed nodes
-//         animationDuration: 10, // Duration of animations in milliseconds
-//         animate: true // Enable animation for expand/collapse
-//     });
-
-//     // Example: Demonstrate expand/collapse behavior with a specific parent node
-//     setTimeout(function () {
-//         const parent = cy.$('#parent'); // Replace '#parent' with the actual parent node ID if needed
-//         cyExpandCollapse.collapse(parent); // Collapse the parent node
-
-//         setTimeout(function () {
-//             cyExpandCollapse.expand(parent); // Re-expand the parent node after a delay
-//         }, 2000); // Wait 2 seconds before expanding
-//     }, 2000);
-// }
-
-// function viewportDrawerLayoutHorizontal() {
-//     // Retrieve the sliders for node and group horizontal gaps
-//     const nodehGap = document.getElementById("horizontal-layout-slider-node-h-gap");
-//     const grouphGap = document.getElementById("horizontal-layout-slider-group-h-gap");
-
-//     // Parse the slider values for horizontal and vertical gaps
-//     const nodehGapValue = parseFloat(nodehGap.value) * 10; // Gap between child nodes within a parent
-//     const grouphGapValue = parseFloat(grouphGap.value); // Gap between parent nodes
-
-//     const delay = 100; // Delay to ensure layout updates after rendering
-
-//     setTimeout(() => {
-//         // Step 1: Position child nodes within their respective parents
-//         cy.nodes().forEach(function (node) {
-//             if (node.isParent()) {
-//                 const children = node.children(); // Get the children of the current parent node
-//                 const cellHeight = node.height() / children.length; // Calculate the height for each child node
-
-//                 // Position child nodes evenly spaced within the parent node
-//                 children.forEach(function (child, index) {
-//                     const xPos = 0; // Keep child nodes on the same horizontal level
-//                     const yPos = index * (cellHeight + nodehGapValue); // Vertical position for the child
-
-//                     child.position({
-//                         x: xPos,
-//                         y: yPos
-//                     });
-//                 });
-//             }
-//         });
-
-//         // Step 2: Sort parent nodes by their group level and ID for horizontal stacking
-//         const sortedParents = cy.nodes()
-//             .filter(node => node.isParent()) // Only process parent nodes
-//             .sort((a, b) => {
-//                 // Extract group levels for primary sorting
-//                 const groupLevelA = parseInt(a.data('extraData')?.topoViewerGroupLevel || 0, 10);
-//                 const groupLevelB = parseInt(b.data('extraData')?.topoViewerGroupLevel || 0, 10);
-
-//                 if (groupLevelA !== groupLevelB) {
-//                     return groupLevelA - groupLevelB; // Sort by group level in ascending order
-//                 }
-//                 // Secondary sorting by node ID (alphabetical order)
-//                 return a.data('id').localeCompare(b.data('id'));
-//             });
-
-//         let xPos = 0; // Starting horizontal position for parent nodes
-//         let maxHeight = 0; // Initialize variable to store the maximum parent height
-//         const centerY = 0; // Define the vertical center reference
-
-//         // Step 3: Find the tallest parent node
-//         cy.nodes().forEach(function (node) {
-//             if (node.isParent()) {
-//                 const height = node.height();
-//                 if (height > maxHeight) {
-//                     maxHeight = height; // Update maxHeight with the tallest parent node's height
-//                     console.info("ParentMaxHeight: ", maxHeight);
-//                 }
-//             }
-//         });
-
-//         // Calculate division factor for aligning parent nodes
-//         const divisionFactor = maxHeight / 2;
-//         console.info("Division Factor: ", divisionFactor);
-
-//         // Step 4: Position parent nodes horizontally and align them relative to the tallest parent node
-//         sortedParents.forEach(function (parentNode) {
-//             const parentHeight = parentNode.height();
-
-//             // Calculate vertical position relative to the tallest parent
-//             const yPos = centerY - parentHeight / divisionFactor;
-
-//             // Position the parent node
-//             parentNode.position({
-//                 x: xPos,
-//                 y: yPos
-//             });
-
-//             console.info(`Parent Node '${parentNode.id()}' positioned at x: ${xPos}, y: ${yPos}`);
-
-//             // Increment horizontal position for the next parent
-//             xPos += grouphGapValue;
-//         });
-
-//         // Step 5: Adjust the viewport to fit the updated layout
-//         cy.fit();
-
-//     }, delay);
-
-//     // Step 6: Expand/collapse functionality for parent nodes (optional)
-//     const cyExpandCollapse = cy.expandCollapse({
-//         layoutBy: null, // Use the existing layout
-//         undoable: false, // Disable undo functionality
-//         fisheye: false, // Disable fisheye view for expanded/collapsed nodes
-//         animationDuration: 10, // Duration of animations in milliseconds
-//         animate: true // Enable animation for expand/collapse
-//     });
-
-//     // Example: Demonstrate expand/collapse behavior with a specific parent node
-//     setTimeout(function () {
-//         const parent = cy.$('#parent'); // Replace '#parent' with the actual parent node ID if needed
-//         cyExpandCollapse.collapse(parent); // Collapse the parent node
-
-//         setTimeout(function () {
-//             cyExpandCollapse.expand(parent); // Re-expand the parent node after a delay
-//         }, 2000); // Wait 2 seconds before expanding
-//     }, 2000);
-// }
 
 function viewportDrawerCaptureFunc() {
     console.info("viewportDrawerCaptureButton() - clicked")
@@ -3386,6 +2976,20 @@ function viewportButtonsGeoMapEdit() {
 }
 
 
+async function reloadViewport() {
+    if (isVscodeDeployment) {
+        try {
+            const response = await sendMessageToVscodeEndpointPost("reload-viewport", "Empty Payload");
+            console.log("############### response from backend:", response);
+            sleep(1000)
+            // Re-Init load data.
+            fetchAndLoadData()
+
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
+    }
+}
 
 // Define a function to get the checkbox state and attach the event listener
 function setupCheckboxListener(checkboxSelector) {
@@ -3601,188 +3205,6 @@ function loadCytoStyle(cy) {
     } else {
         jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
     }
-
-
-    // // Your SVG string
-    // const svgNodeStringRouter = `
-    //    <svg
-    //         xmlns:xlink="http://www.w3.org/1999/xlink"
-    //         xmlns="http://www.w3.org/2000/svg"
-    //         xml:space="preserve"
-    //         style="enable-background:new 0 0 120 120;"
-    //         viewBox="0 0 120 120"
-    //         y="0px"
-    //         x="0px"
-    //         id="Layer_1"
-    //         version="1.1"
-    //         width="120px"
-    //         height="120px"
-    //         fill="none"
-    //     >
-    //         <style type="text/css">
-    //             .st0 { fill: #001135; }
-    //             .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
-    //         </style>
-    //         <rect height="120" width="120" class="st0" />
-    //         <g>
-    //             <g>
-    //                 <path d="M71.7,19.7V48h28" class="st1" />
-    //                 <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
-    //             </g>
-    //             <g>
-    //                 <path d="M20,47.8h28.4v-28" class="st1" />
-    //                 <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
-    //             </g>
-    //             <g>
-    //                 <path d="M48,100.3V72H20" class="st1" />
-    //                 <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
-    //             </g>
-    //             <g>
-    //                 <path d="M100,71.9H71.6v28" class="st1" />
-    //                 <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
-    //             </g>
-    //         </g>
-    //     </svg>
-    // `;
-
-    // // // Encode SVG for Cytoscape background-image
-    // // const encodedSVGRouter = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgNodeStringRouter);
-
-    // function generateEncodedSVG(nodeType, fillColor) {
-    //     let svgString = "";
-
-    //     switch (nodeType) {
-    //         case "pe":  // Provider Edge Router
-    //             svgString = `
-    //             <svg
-    //                     xmlns:xlink="http://www.w3.org/1999/xlink"
-    //                     xmlns="http://www.w3.org/2000/svg"
-    //                     xml:space="preserve"
-    //                     style="enable-background:new 0 0 120 120;"
-    //                     viewBox="0 0 120 120"
-    //                     y="0px"
-    //                     x="0px"
-    //                     id="Layer_1"
-    //                     version="1.1"
-    //                     width="120px"
-    //                     height="120px"
-    //                     fill="none"
-    //                 >
-    //                     <style type="text/css">
-    //                         .st0 { fill: ${fillColor}; }
-    //                         .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
-    //                     </style>
-    //                     <rect height="120" width="120" class="st0" />
-    //                     <g>
-    //                         <g>
-    //                             <path d="M71.7,19.7V48h28" class="st1" />
-    //                             <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M20,47.8h28.4v-28" class="st1" />
-    //                             <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M48,100.3V72H20" class="st1" />
-    //                             <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M100,71.9H71.6v28" class="st1" />
-    //                             <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
-    //                         </g>
-    //                     </g>
-    //                 </svg>`
-    //             break;
-
-    //         case "leaf":  // Leaf Node
-    //             svgString = `
-    //             <svg
-    //                     xmlns:xlink="http://www.w3.org/1999/xlink"
-    //                     xmlns="http://www.w3.org/2000/svg"
-    //                     xml:space="preserve"
-    //                     style="enable-background:new 0 0 120 120;"
-    //                     viewBox="0 0 120 120"
-    //                     y="0px"
-    //                     x="0px"
-    //                     id="Layer_1"
-    //                     version="1.1"
-    //                     width="120px"
-    //                     height="120px"
-    //                     fill="none"
-    //                 >
-    //                     <style type="text/css">
-    //                         .st0 { fill: ${fillColor}; }
-    //                         .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
-    //                     </style>
-    //                     <rect height="120" width="120" class="st0" />
-    //                     <g>
-    //                         <g>
-    //                             <path d="M71.7,19.7V48h28" class="st1" />
-    //                             <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M20,47.8h28.4v-28" class="st1" />
-    //                             <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M48,100.3V72H20" class="st1" />
-    //                             <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M100,71.9H71.6v28" class="st1" />
-    //                             <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
-    //                         </g>
-    //                     </g>
-    //                 </svg>`;
-    //             break;
-
-    //         default:
-    //             console.warn(`Unknown nodeType: ${nodeType}, using default PE SVG.`);
-    //             svgString = `
-    //             <svg
-    //                     xmlns:xlink="http://www.w3.org/1999/xlink"
-    //                     xmlns="http://www.w3.org/2000/svg"
-    //                     xml:space="preserve"
-    //                     style="enable-background:new 0 0 120 120;"
-    //                     viewBox="0 0 120 120"
-    //                     y="0px"
-    //                     x="0px"
-    //                     id="Layer_1"
-    //                     version="1.1"
-    //                     width="120px"
-    //                     height="120px"
-    //                     fill="none"
-    //                 >
-    //                     <style type="text/css">
-    //                         .st0 { fill: ${fillColor}; }
-    //                         .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
-    //                     </style>
-    //                     <rect height="120" width="120" class="st0" />
-    //                     <g>
-    //                         <g>
-    //                             <path d="M71.7,19.7V48h28" class="st1" />
-    //                             <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M20,47.8h28.4v-28" class="st1" />
-    //                             <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M48,100.3V72H20" class="st1" />
-    //                             <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M100,71.9H71.6v28" class="st1" />
-    //                             <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
-    //                         </g>
-    //                     </g>
-    //                 </svg>`;
-    //     }
-
-    //     // Encode the final selected SVG for Cytoscape.js
-    //     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
-    // }
-
 
     const cytoscapeStylesForVscode = [
         {
@@ -4256,8 +3678,6 @@ function loadCytoStyle(cy) {
             }
         },
 
-
-
         { "selector": "edge[group=\"coexp\"]", "style": { "line-color": "#d0b7d5" } },
         { "selector": "edge[group=\"coloc\"]", "style": { "line-color": "#a0b3dc" } },
         { "selector": "edge[group=\"gi\"]", "style": { "line-color": "#90e190" } },
@@ -4273,14 +3693,12 @@ function loadCytoStyle(cy) {
 
     if (isVscodeDeployment) {
         // Apply the styles defined in the constant
-        cy.style().fromJson(cytoscapeStylesForVscode).update();
+        cy.style().fromJson(cytoscapeStylesForVscode).update(); // cytoscapeStylesForVscode is defined in the cytoscapeStyle.js file
         console.log("Cytoscape styles applied successfully.");
     } else {
         // // Load and apply Cytoscape styles from cy-style.json using fetch
         if (colorScheme == "light") {
-
             fetch("css/cy-style-dark.json")
-
                 .then((response) => response.json())
                 .then((styles) => {
                     cy.style().fromJson(styles).update();
@@ -4301,10 +3719,8 @@ function loadCytoStyle(cy) {
 
         } else if (colorScheme == "dark") {
             fetch("css/cy-style-dark.json")
-
                 .then((response) => response.json())
                 .then((styles) => {
-
                     console.log("globalIsGeoMapInitialized", globalIsGeoMapInitialized);
                     cy.style().fromJson(styles).update();
                     if (multiLayerViewPortState) {
@@ -4322,7 +3738,6 @@ function loadCytoStyle(cy) {
                     );
                 });
         }
-
     }
 
 
@@ -4626,8 +4041,6 @@ function assignMissingLatLng(dataArray) {
 }
 
 
-
-
 /**
  * Fetches data from the JSON file, processes it, and loads it into the Cytoscape instance.
  * This integrated function appends a timestamp to bypass caching, fetches the JSON data,
@@ -4636,51 +4049,54 @@ function assignMissingLatLng(dataArray) {
  *
  * @returns {void}
  */
-function fetchAndLoadData() {
+async function fetchAndLoadData() {
+    try {
+        if (isVscodeDeployment) {
+            jsonFileUrlDataCytoMarshall = window.jsonFileUrlDataCytoMarshall;
+        } else {
+            jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json";
+        }
 
-    if (isVscodeDeployment) {
-        jsonFileUrlDataCytoMarshall = window.jsonFileUrlDataCytoMarshall
-    } else {
-        jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json"
-    }
+        console.log(`fetchAndLoadData() called`);
+        console.log(`jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`);
 
+        // Optionally, append a timestamp to avoid caching:
+        // const fetchUrl = jsonFileUrlDataCytoMarshall + '?t=' + new Date().getTime();
+        const fetchUrl = jsonFileUrlDataCytoMarshall;
 
-    console.log(`fetchAndLoadData() called`)
-    console.log(`jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`)
-    // Append a timestamp to avoid caching.
-    //var fetchUrl = jsonFileUrlDataCytoMarshall + '?t=' + new Date().getTime();
+        // Fetch the JSON data.
+        const response = await fetch(fetchUrl);
+        if (!response.ok) {
+            throw new Error("Network response was not ok: " + response.statusText);
+        }
+        const elements = await response.json();
 
-    var fetchUrl = jsonFileUrlDataCytoMarshall;
+        // Process the data (assign missing lat/lng values).
+        const updatedElements = assignMissingLatLng(elements);
 
+        console.log("Updated Elements:", updatedElements);
 
-    fetch(fetchUrl)
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok: " + response.statusText);
-            }
-            return response.json();
-        })
-        .then((elements) => {
-            // Process the data (assign missing lat/lng values).
-            var updatedElements = assignMissingLatLng(elements);
+        // Clear current Cytoscape elements.
+        cy.json({ elements: [] });
 
-            // var updatedElements = (elements);
+        // Determine whether data is wrapped in an object with an "elements" property or is directly an array.
+        const elementsToAdd = (updatedElements.elements && Array.isArray(updatedElements.elements))
+            ? updatedElements.elements
+            : updatedElements;
 
-            console.log("Updated Elements:", updatedElements);
+        // Add new elements.
+        cy.add(elementsToAdd);
 
-            // Clear current Cytoscape elements.
-            // cy.elements().remove();
-            cy.json({ elements: [] });
-
-
-            // Determine whether data is wrapped in an object with an "elements" property or is directly an array.
-            var elementsToAdd = (updatedElements.elements && Array.isArray(updatedElements.elements))
-                ? updatedElements.elements
-                : updatedElements;
-
-            // Add new elements.
-            cy.add(elementsToAdd);
-
+        if (globalIsPresetLayout) {
+            // Run the preset layout.
+            const layout = cy.layout({
+                name: "preset",
+                animate: true,
+                randomize: false,
+                maxSimulationTime: 500
+            });
+            layout.run();
+        } else {
             // Run the layout.
             const layout = cy.layout({
                 name: "cola",
@@ -4691,35 +4107,35 @@ function fetchAndLoadData() {
                 maxSimulationTime: 1500
             });
             layout.run();
+        }
+        // Remove specific nodes by name if they exist.
+        cy.filter('node[name = "topoviewer"]').remove();
+        cy.filter('node[name = "TopoViewer:1"]').remove();
 
-            // Remove specific nodes by name if they exist.
-            cy.filter('node[name = "topoviewer"]').remove();
-            cy.filter('node[name = "TopoViewer:1"]').remove();
-
-            // Setup expand/collapse functionality using the extension.
-            var cyExpandCollapse = cy.expandCollapse({
-                layoutBy: null,      // null uses the current layout
-                undoable: false,
-                fisheye: false,
-                animationDuration: 10, // duration in milliseconds
-                animate: true
-            });
-
-            // Example collapse/expand for a node with id 'parent'.
-            setTimeout(function () {
-                var parent = cy.$('#parent'); // Adjust based on your data
-                if (parent.nonempty()) {
-                    cyExpandCollapse.collapse(parent);
-                    setTimeout(function () {
-                        cyExpandCollapse.expand(parent);
-                    }, 2000);
-                }
-            }, 2000);
-        })
-        .catch((error) => {
-            console.error("Error loading graph data:", error);
+        // Setup expand/collapse functionality using the extension.
+        const cyExpandCollapse = cy.expandCollapse({
+            layoutBy: null,      // null uses the current layout
+            undoable: false,
+            fisheye: false,
+            animationDuration: 10, // duration in milliseconds
+            animate: true
         });
+
+        // Example collapse/expand for a node with id 'parent'.
+        setTimeout(() => {
+            const parent = cy.$('#parent'); // Adjust based on your data
+            if (parent.nonempty()) {
+                cyExpandCollapse.collapse(parent);
+                setTimeout(() => {
+                    cyExpandCollapse.expand(parent);
+                }, 2000);
+            }
+        }, 2000);
+    } catch (error) {
+        console.error("Error loading graph data:", error);
+    }
 }
+
 
 // aarafat-tag:
 //// REFACTOR END
@@ -5062,28 +4478,35 @@ async function saveTopoViewport(cy) {
             // Process nodes: update each node's "position" property with the current position.
             const updatedNodes = cy.nodes().map(function (node) {
                 const nodeJson = node.json();
-                nodeJson.position = node.position();
-                return nodeJson;
-            });
+                nodeJson.position = node.position(); // Update position property
 
-            // Process edges: simply get their JSON representation.
-            const updatedEdges = cy.edges().map(function (edge) {
-                return edge.json();
-            });
+                // Check if extraData and labels exist before modifying
+                if (nodeJson.data?.extraData?.labels) {
+                    nodeJson.data.extraData.labels["topoViewer-presetPosX"] = nodeJson.position.x.toString();
+                    nodeJson.data.extraData.labels["topoViewer-presetPosY"] = nodeJson.position.y.toString();
+                }
+
+                return nodeJson;
+            }).filter(node => node.data.topoViewerRole !== "group"); // Exclude "group" nodes (parent nodes)
+
+
+            // // Process edges: simply get their JSON representation.
+            // const updatedEdges = cy.edges().map(function (edge) {
+            //     return edge.json();
+            // });
 
             // Combine nodes and edges into one array
-            const updatedElements = updatedNodes.concat(updatedEdges);
+            const updatedElements = updatedNodes;
 
             // Convert the updated elements to a JSON string (pretty printed)
             const jsonString = JSON.stringify(updatedElements, null, 2);
-
-            console.log(JSON.parse(updatedElements, null, 2));
+            // console.log(updatedElements);
 
             const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
             console.log("############### response from backend:", response);
-            sleep(1000)
-            // Re-Init load data.
-            fetchAndLoadData()
+            // sleep(1000)
+            // // Re-Init load data.
+            // fetchAndLoadData()
 
         } catch (err) {
             console.error("############### Backend call failed:", err);
