@@ -371,7 +371,7 @@ function generateEncodedSVG(nodeType, fillColor) {
 
                     `;
             break;
-            
+
         case "rgw":  // Resindential Gateway
             svgString = `
                         <svg
@@ -407,7 +407,7 @@ function generateEncodedSVG(nodeType, fillColor) {
                     `;
             break;
 
-        case "client": 
+        case "client":
             svgString = `
                         <svg
                             xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -415,8 +415,8 @@ function generateEncodedSVG(nodeType, fillColor) {
                             xml:space="preserve"
                             style="enable-background:new 0 0 120 120;"
                             viewBox="0 0 120 120"
-                            y="0px"
                             x="0px"
+                            y="0px"
                             id="Layer_1"
                             version="1.1"
                             width="120px"
@@ -424,20 +424,19 @@ function generateEncodedSVG(nodeType, fillColor) {
                             fill="none"
                         >
                             <style type="text/css">
-                                .st0 { fill: #001135; }
+                                .st0 { fill: ${fillColor}; }
                                 .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
-                                .st2 { fill: #FFFFFF; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
                             </style>
-                            <rect height="120" width="120" class="st0" />
-                            <path d="M60,74.9c0.8,0,1.5-0.7,1.5-1.5c0-0.8-0.7-1.5-1.5-1.5c-0.8,0-1.5,0.7-1.5,1.5C58.5,74.2,59.2,74.9,60,74.9z" class="st2" />
-                            <path d="M46.8,54.6c7.5-7.5,20-7.5,27.5,0" class="st1" />
-                            <path d="M53.7,63.9c3.8-3.8,10-3.8,13.8,0" class="st1" />
-                            <g>
-                                <path d="M17,55.6l37.7-36.5c3.1-3,8.1-3,11.2,0L103,55.7" class="st1" />
-                                <path d="M29.9,63.8v31.2c0,4.4,3.6,8,8,8h17.9c2.4,0,4.3-1.9,4.3-4.3v-8.5" class="st1" />
-                                <path d="M90.3,63.8v31.2c0,4.4-3.6,8-8,8h-8.5" class="st1" />
+                            <!-- Background rectangle -->
+                            <rect width="120" height="120" class="st0" />
+                            <!-- Scale the original 50x50 paths to 120x120 (scale factor 2.4 = 120/50) -->
+                            <g transform="scale(2.4)">
+                                <path class="st1" d="M41.67,37.96H8.33H41.67z M37.13,13.54c0,-0.21,0,-0.42,-0.08,-0.58c-0.08,-0.21,-0.17,-0.38,-0.33,-0.50
+                                c-0.13,-0.13,-0.33,-0.25,-0.50,-0.33c-0.21,-0.08,-0.38,-0.08,-0.58,-0.08H14.42c-0.21,0,-0.42,0,-0.58,0.08
+                                c-0.21,0.08,-0.38,0.17,-0.50,0.33c-0.13,0.13,-0.25,0.33,-0.33,0.50c-0.08,0.21,-0.08,0.38,-0.08,0.58V31.67h24.25V13.54z"/>
                             </g>
                         </svg>
+
                     `;
             break;
 

@@ -1,4 +1,3 @@
-// Check globalVariables.js for initiation
 
 require.config({
     paths: {
@@ -17,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // window.monacoEditor = monaco.editor.create(document.getElementById('editorContainer'), ...);
     });
 });
+
 
 
 
@@ -720,7 +720,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("isEdgeHandlerActive after node click: ", isEdgeHandlerActive);
 
         environments = await getEnvironments(event);
-        console.info("sshWebBased - environments: ", environments)
+        console.info("nodeActionConnectToSSH - environments: ", environments)
 
         cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
         clabServerAddress = environments["clab-server-address"]
@@ -794,7 +794,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             } else {
                 if (originalEvent.ctrlKey) {
                     globalSelectedNode = node.data("extraData").longname;
-                    sshWebBased(event)
+                    nodeActionConnectToSSH(event)
                 } else {
                     // Hide all overlay panels
                     const panelOverlays = document.getElementsByClassName("panel-overlay");
@@ -924,6 +924,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             // document.getElementById("panel-link-endpoint-a-mac-address").textContent = "getting the MAC address"
             document.getElementById("panel-link-endpoint-b-name").textContent = `${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
             // document.getElementById("panel-link-endpoint-b-mac-address").textContent = "getting the MAC address"
+
+
+            document.getElementById("endpoint-a-edgeshark").textContent = `Edgeshark :: ${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")}`
+            document.getElementById("endpoint-b-edgeshark").textContent = `Edgeshark :: ${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
+
 
 
 
@@ -1938,45 +1943,87 @@ async function changeTitle() {
     document.title = `TopoViewer::${globalLabName}`;
 }
 
-async function sshWebBased(event) {
-    console.info("sshWebBased: ", globalSelectedNode)
+async function nodeActionConnectToSSH(event) {
+    console.info("nodeActionConnectToSSH: ", globalSelectedNode)
     var routerName = globalSelectedNode
 
     if (isVscodeDeployment) {
-
         try {
             const response = await sendMessageToVscodeEndpointPost("clab-node-connect-ssh", routerName);
             console.log("############### response from backend:", response);
-
         } catch (err) {
             console.error("############### Backend call failed:", err);
         }
-
-
     } else {
         try {
             environments = await getEnvironments(event);
-            console.info("sshWebBased - environments: ", environments)
+            console.info("nodeActionConnectToSSH - environments: ", environments)
             cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
             routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
-
-            console.info("sshWebBased: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
-
+            console.info("nodeActionConnectToSSH: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
             window.open(`${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`);
         } catch (error) {
             console.error('Error executing restore configuration:', error);
         }
     }
+}
 
+async function nodeActionAttachShell(event) {
+    console.info("nodeActionAttachShell: ", globalSelectedNode)
+    var routerName = globalSelectedNode
 
+    if (isVscodeDeployment) {
+        try {
+            const response = await sendMessageToVscodeEndpointPost("clab-node-attach-shell", routerName);
+            console.log("############### response from backend:", response);
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
+    } else {
+        try {
+            environments = await getEnvironments(event);
+            console.info("nodeActionAttachShell - environments: ", environments)
+            cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
+            routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
+            console.info("nodeActionAttachShell: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
+            window.open(`${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`);
+        } catch (error) {
+            console.error('Error executing restore configuration:', error);
+        }
+    }
+}
+
+async function nodeActionViewLogs(event) {
+    console.info("nodeActionViewLogs: ", globalSelectedNode)
+    var routerName = globalSelectedNode
+
+    if (isVscodeDeployment) {
+        try {
+            const response = await sendMessageToVscodeEndpointPost("clab-node-view-logs", routerName);
+            console.log("############### response from backend:", response);
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
+    } else {
+        try {
+            environments = await getEnvironments(event);
+            console.info("nodeActionViewLogs - environments: ", environments)
+            cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
+            routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
+            console.info("nodeActionViewLogs: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
+            window.open(`${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`);
+        } catch (error) {
+            console.error('Error executing restore configuration:', error);
+        }
+    }
 }
 
 async function sshCliCommandCopy(event) {
-    console.info("sshWebBased: ", globalSelectedNode)
+    console.info("nodeActionConnectToSSH: ", globalSelectedNode)
     var routerName = globalSelectedNode
     try {
         environments = await getEnvironments(event);
-        console.info("sshWebBased - environments: ", environments)
+        console.info("nodeActionConnectToSSH - environments: ", environments)
 
         cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
         clabServerAddress = environments["clab-server-address"]
@@ -2019,11 +2066,11 @@ async function sshCliCommandCopy(event) {
             }
             document.body.removeChild(textArea);
         }
-
     } catch (error) {
         console.error('Error executing restore configuration:', error);
     }
 }
+
 
 
 async function linkImpairmentClab(event, impairDirection) {
@@ -2679,6 +2726,12 @@ async function layoutAlgoChange(event) {
         } else if (selectedOption === "Preset") {
             console.info("Preset algo selected");
 
+            var layoutAlgoPanels = document.getElementsByClassName("layout-algo");
+            // Loop through each element and set its display to 'none'
+            for (var i = 0; i < layoutAlgoPanels.length; i++) {
+                layoutAlgoPanels[i].style.display = "none";
+            }
+
             viewportDrawerPreset()
         }
 
@@ -2976,7 +3029,7 @@ function viewportButtonsGeoMapEdit() {
 }
 
 
-async function reloadViewport() {
+async function viewportButtonsReloadTopo() {
     if (isVscodeDeployment) {
         try {
             const response = await sendMessageToVscodeEndpointPost("reload-viewport", "Empty Payload");
@@ -3356,8 +3409,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"pon\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("pon", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3365,8 +3418,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"dcgw\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("dcgw", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3374,8 +3427,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"leaf\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("leaf", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3383,8 +3436,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"switch\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("switch", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3392,8 +3445,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"rgw\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("rgw", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3401,8 +3454,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"super-spine\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("super-spine", "#005AFF")}`,
                 "background-fit": "cover"
             }
@@ -3410,8 +3463,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"spine\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("spine", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3419,8 +3472,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"server\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("server", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3428,8 +3481,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"bridge\"]",
             "style": {
-                "width": "8",
-                "height": "8",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("bridge", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3437,8 +3490,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"client\"]",
             "style": {
-                "width": "8",
-                "height": "8",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("client", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3491,8 +3544,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"pon\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-pon-dark-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -3502,8 +3555,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"dcgw\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-dcgw-dark-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -3531,8 +3584,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"super-spine\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-spine-dark-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -3542,8 +3595,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"spine\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-spine-light-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -3553,8 +3606,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"server\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-server-dark-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -3564,8 +3617,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"bridge\"][editor=\"true\"]",
             "style": {
-                "width": "8",
-                "height": "8",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-bridge-light-grey.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -3585,16 +3638,20 @@ function loadCytoStyle(cy) {
                 "arrow-scale": "0.5",
                 "source-text-color": "#000000",
                 "target-text-color": "#000000",
+
+                // 'source-text-background-color': '#CACBCC',
+                // 'target-text-background-color': '#00CBCC',
+
                 "text-outline-width": "0.3px",
                 "text-outline-color": "#FFFFFF",
                 "text-background-color": "#CACBCC",
                 "text-opacity": 1,
-                "text-background-opacity": 0.7,
+                "text-background-opacity": 1,
                 "text-background-shape": "roundrectangle",
                 "text-background-padding": "1px",
                 "curve-style": "bezier",
                 "control-point-step-size": 20,
-                "opacity": "1",
+                "opacity": "0.7",
                 "line-color": "#969799",
                 "width": "1.5",
                 "label": " ",
@@ -3676,25 +3733,14 @@ function loadCytoStyle(cy) {
             "style": {
                 "opacity": 0
             }
-        },
-
-        { "selector": "edge[group=\"coexp\"]", "style": { "line-color": "#d0b7d5" } },
-        { "selector": "edge[group=\"coloc\"]", "style": { "line-color": "#a0b3dc" } },
-        { "selector": "edge[group=\"gi\"]", "style": { "line-color": "#90e190" } },
-        { "selector": "edge[group=\"path\"]", "style": { "line-color": "#9bd8de" } },
-        { "selector": "edge[group=\"pi\"]", "style": { "line-color": "#eaa2a2" } },
-        { "selector": "edge[group=\"predict\"]", "style": { "line-color": "#f6c384" } },
-        { "selector": "edge[group=\"spd\"]", "style": { "line-color": "#dad4a2" } },
-        { "selector": "edge[group=\"spd_attr\"]", "style": { "line-color": "#D0D0D0" } },
-        { "selector": "edge[group=\"reg\"]", "style": { "line-color": "#D0D0D0" } },
-        { "selector": "edge[group=\"reg_attr\"]", "style": { "line-color": "#D0D0D0" } },
-        { "selector": "edge[group=\"user\"]", "style": { "line-color": "#f0ec86" } }
+        }
     ]
 
     if (isVscodeDeployment) {
         // Apply the styles defined in the constant
         cy.style().fromJson(cytoscapeStylesForVscode).update(); // cytoscapeStylesForVscode is defined in the cytoscapeStyle.js file
         console.log("Cytoscape styles applied successfully.");
+
     } else {
         // // Load and apply Cytoscape styles from cy-style.json using fetch
         if (colorScheme == "light") {
@@ -3863,6 +3909,15 @@ function loadCytoStyle(cy) {
             parent.style('border-color', "rgba(76, 82, 97, 1)");
         });
     }
+
+
+    // Restore dynamic styles only if enabled.
+    if (globalToggleOnChangeCytoStyle) {
+        restoreDynamicStyles();
+    }
+
+    // Ensure the socket event binding reflects the current toggle.
+    updateSocketBinding();
 }
 
 function viewportButtonsMultiLayerViewPortToggle() {
@@ -3879,64 +3934,87 @@ function viewportButtonsMultiLayerViewPortToggle() {
     }
 }
 
-// // Function to process the data
-// function assignMissingLatLng(dataArray) {
-//     // Arrays to store existing lat and lng values
-//     const existingLats = [];
-//     const existingLngs = [];
 
-//     // First pass: Collect existing lat and lng values
-//     dataArray.forEach(item => {
-//         const data = item.data;
-//         if (data.lat && data.lat.trim() !== "") {
-//             const lat = parseFloat(data.lat);
-//             if (!isNaN(lat)) {
-//                 existingLats.push(lat);
-//             }
-//         }
-//         if (data.lng && data.lng.trim() !== "") {
-//             const lng = parseFloat(data.lng);
-//             if (!isNaN(lng)) {
-//                 existingLngs.push(lng);
-//             }
-//         }
-//     });
+async function viewportButtonsSaveTopo(cy) {
+    if (isVscodeDeployment) {
+        try {
 
-//     // Compute the average (mean) of existing lat and lng
-//     const averageLat = existingLats.length > 0 ? existingLats.reduce((a, b) => a + b, 0) / existingLats.length : 0;
-//     const averageLng = existingLngs.length > 0 ? existingLngs.reduce((a, b) => a + b, 0) / existingLngs.length : 0;
+            console.log("viewportButtonsSaveTopo triggered")
+            // Ensure our Cytoscape instance is available
+            if (!window.cy) {
+                console.error('Cytoscape instance "cy" is not defined.');
+                return;
+            }
 
-//     // Second pass: Assign missing lat and lng
-//     dataArray.forEach(item => {
-//         const data = item.data;
+            // Process nodes: update each node's "position" property with the current position.
+            const updatedNodes = cy.nodes().map(function (node) {
+                const nodeJson = node.json();
+                nodeJson.position = node.position(); // Update position property
 
-//         // Check and assign missing latitude
-//         if (!data.lat || data.lat.trim() === "") {
-//             // Assign normalized lat + random value between 0 and 0.1
-//             const newLat = averageLat + Math.random() * 0.9;
-//             data.lat = newLat.toFixed(15).toString(); // Convert back to string with precision
-//             console.log(`Assigned new lat for ID ${data.id}: ${data.lat}`);
-//         } else {
-//             // Optionally, normalize existing lat
-//             const normalizedLat = parseFloat(data.lat);
-//             data.lat = normalizedLat.toFixed(15).toString();
-//         }
+                // Check if extraData and labels exist before modifying
+                if (nodeJson.data?.extraData?.labels) {
+                    nodeJson.data.extraData.labels["topoViewer-presetPosX"] = nodeJson.position.x.toString();
+                    nodeJson.data.extraData.labels["topoViewer-presetPosY"] = nodeJson.position.y.toString();
+                }
 
-//         // Check and assign missing longitude
-//         if (!data.lng || data.lng.trim() === "") {
-//             // Assign normalized lng + random value between 0 and 0.1
-//             const newLng = averageLng + Math.random() * 0.9;
-//             data.lng = newLng.toFixed(15).toString(); // Convert back to string with precision
-//             console.log(`Assigned new lng for ID ${data.id}: ${data.lng}`);
-//         } else {
-//             // Optionally, normalize existing lng
-//             const normalizedLng = parseFloat(data.lng);
-//             data.lng = normalizedLng.toFixed(15).toString();
-//         }
-//     });
+                return nodeJson;
+            }).filter(node => node.data.topoViewerRole !== "group"); // Exclude "group" nodes (parent nodes)
 
-//     return dataArray;
-// }
+
+            // // Process edges: simply get their JSON representation.
+            // const updatedEdges = cy.edges().map(function (edge) {
+            //     return edge.json();
+            // });
+
+            // Combine nodes and edges into one array
+            const updatedElements = updatedNodes;
+
+            // Convert the updated elements to a JSON string (pretty printed)
+            const jsonString = JSON.stringify(updatedElements, null, 2);
+            // console.log(updatedElements);
+
+            const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
+            console.log("############### response from backend:", response);
+            // sleep(1000)
+            // // Re-Init load data.
+            // fetchAndLoadData()
+
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
+    }
+}
+
+/**
+ * toggleSocketEdgeUpdates()
+ * Flips the globalToggleOnChangeCytoStyle variable and then calls updateSocketBinding()
+ * so that the socket event handler is attached or detached accordingly.
+ * This function can be bound to a button in your webview.
+ */
+function viewportButtonsLinkOperState() {
+    console.log(`globalToggleOnChangeCytoStyle is now: ${globalToggleOnChangeCytoStyle}`);
+    globalToggleOnChangeCytoStyle = !globalToggleOnChangeCytoStyle;
+    if (globalToggleOnChangeCytoStyle) {
+        bulmaToast.toast({
+            message: `🕵️‍♂️ Bro, we're currently on a mission to probe that link status! Stay tuned for the results. 🔍🚀👨‍💻`,
+            type: "is-warning is-size-6 p-3",
+            duration: 4000,
+            position: "top-center",
+            closeOnClick: true,
+        });
+    } else {
+        bulmaToast.toast({
+            message: `Alright, mission control, we're standing down. 🛑🔍 link status probing aborted. Stay chill, folks. 😎👨‍💻`,
+            type: "is-warning is-size-6 p-3",
+            duration: 4000,
+            position: "top-center",
+            closeOnClick: true,
+        });
+    }
+    loadCytoStyle(cy);
+    console.log(`globalToggleOnChangeCytoStyle is become: ${globalToggleOnChangeCytoStyle}`);
+}
+
 
 // Enhanced Function to Process the Data
 function assignMissingLatLng(dataArray) {
@@ -4464,58 +4542,6 @@ function addSvgIcon(targetHtmlId, svgIcon, altName, position, size) {
 }
 
 
-async function saveTopoViewport(cy) {
-    if (isVscodeDeployment) {
-        try {
-
-            console.log("saveTopoViewport triggered")
-            // Ensure our Cytoscape instance is available
-            if (!window.cy) {
-                console.error('Cytoscape instance "cy" is not defined.');
-                return;
-            }
-
-            // Process nodes: update each node's "position" property with the current position.
-            const updatedNodes = cy.nodes().map(function (node) {
-                const nodeJson = node.json();
-                nodeJson.position = node.position(); // Update position property
-
-                // Check if extraData and labels exist before modifying
-                if (nodeJson.data?.extraData?.labels) {
-                    nodeJson.data.extraData.labels["topoViewer-presetPosX"] = nodeJson.position.x.toString();
-                    nodeJson.data.extraData.labels["topoViewer-presetPosY"] = nodeJson.position.y.toString();
-                }
-
-                return nodeJson;
-            }).filter(node => node.data.topoViewerRole !== "group"); // Exclude "group" nodes (parent nodes)
-
-
-            // // Process edges: simply get their JSON representation.
-            // const updatedEdges = cy.edges().map(function (edge) {
-            //     return edge.json();
-            // });
-
-            // Combine nodes and edges into one array
-            const updatedElements = updatedNodes;
-
-            // Convert the updated elements to a JSON string (pretty printed)
-            const jsonString = JSON.stringify(updatedElements, null, 2);
-            // console.log(updatedElements);
-
-            const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
-            console.log("############### response from backend:", response);
-            // sleep(1000)
-            // // Re-Init load data.
-            // fetchAndLoadData()
-
-        } catch (err) {
-            console.error("############### Backend call failed:", err);
-        }
-    }
-}
-
-
-
 
 // if (isVscodeDeployment) {
 
@@ -4534,3 +4560,4 @@ async function saveTopoViewport(cy) {
 // }
 
 // ASAD
+

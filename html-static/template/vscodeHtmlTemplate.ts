@@ -26,7 +26,7 @@ return `
   <link rel="stylesheet" href="${cssUri}/cytoscape-leaflet.css?ver=1" />
 
   <!-- JS Assets -->
-  <script src="${jsUri}/library/fontawesome-6-4-2.js?ver=1"></script>
+  <script src="${jsUri}/library/fontawesome-6-7-2.min.js?ver=1"></script>
 
 
   <script src="${jsUri}/library/bulma-slider.min.js?ver=1"></script>
@@ -188,7 +188,7 @@ return `
                 -->
 
         <p class="control p-0">
-          <a id="viewport-reload-topo" href="Reload TopoViewer" onclick="reloadViewport()"
+          <a id="viewport-reload-topo" href="Reload TopoViewer" onclick="viewportButtonsReloadTopo()"
             class="button px-4 py-4 is-smallest-element" style="outline: none;">
             <span class="icon is-small">
               <i class="fa-solid fa-arrow-rotate-right"></i>
@@ -197,7 +197,7 @@ return `
         </p>
 
         <p class="control p-0">
-          <a id="viewport-save-topo" href="Save TopoViewer" onclick="saveTopoViewport(cy)"
+          <a id="viewport-save-topo" href="Save TopoViewer" onclick="viewportButtonsSaveTopo(cy)"
             class="button px-4 py-4 is-smallest-element" style="outline: none;">
             <span class="icon is-small">
               <i class="fa-solid fa-floppy-disk"></i>
@@ -206,17 +206,24 @@ return `
         </p>
 
 
-        <!-- aarafat-tag: vs-code  
+        <p class="control p-0">
+          <a id="viewport-save-topo" href="Toggle Link Operational State" onclick="viewportButtonsLinkOperState(cy)"
+            class="button px-4 py-4 is-smallest-element" style="outline: none;">
+            <span class="icon is-small">
+              <i class="fa-solid fa-diagram-project"></i>
+            </span>
+          </a>
+        </p>
 
-                <p class="control p-0">
-                  <a  id="viewport-test-call-backend" href="Test Call to Backend" onclick="reloadViewport()" class="button px-4 py-4 is-smallest-element" style="outline: none;">
+        <!-- <p class="control p-0">
+                  <a  id="viewport-test-call-backend" href="Test Call to Backend" onclick="viewportButtonsReloadTopo()" class="button px-4 py-4 is-smallest-element" style="outline: none;">
                     <span class="icon is-small">
                       <i class="fa-solid fa-phone"></i>
                     </span>
                   </a>
-                </p>      
+                </p>       -->
 
-                 -->
+
 
         <hr id="viewport-geo-map-divider" class="my-1 viewport-geo-map is-hidden"
           style="border-top: 1px solid #dbdbdb;">
@@ -298,7 +305,6 @@ return `
         <div class="column p-0 is-flex-direction-column">
           <div class="column is-12 is-flex is-justify-content-flex-end">
             <div class="buttons">
-
               <button href="#" onclick="viewportDrawerLayoutForceDirected(event)"
                 class="button is-link is-outlined is-small">Enable</button>
             </div>
@@ -427,9 +433,8 @@ return `
                         </label>
                       </div>
                     </div>
-                  </div> 
-                  
-                  -->
+                  </div>         
+          -->
 
         </div>
       </div>
@@ -437,7 +442,7 @@ return `
         <div class="column my-auto is-11">
           <div class="panel-content">
             <div class="content p-0 mb-2 is-small">
-              <div class="px-0 py-0" style="max-height: 78px; overflow-y: auto;">
+              <div class="px-0 py-0" style="max-height: 100px; overflow-y: auto;">
                 <div class="content is-small pb-2">
                   <p>
                     <strong>Hint:</strong><br>
@@ -517,6 +522,8 @@ return `
         </div>
       </div>
     </div>
+
+    
     <div id="viewport-drawer-capture-sceenshoot" class="panel p-1 is-1 viewport-drawer" style="display: none; ">
       <div class="panel-block p-0 pb-2">
         <div class="column p-0 is-flex-direction-column">
@@ -690,9 +697,18 @@ return `
                       </div>
                       <div class="dropdown-menu" id="panel-node-action-dropdown-menu" role="menu">
                         <div class="dropdown-content">
-                          <a onclick="sshWebBased(event);"
+                          <a onclick="nodeActionConnectToSSH(event);"
                             class="dropdown-item label has-text-weight-normal is-small py-0"
-                            id="panel-node-action-ssh-web-based">Connect to SSH</a>
+                            id="panel-node-action-ssh-web-based">Connect to SSH
+                          </a>
+                          <a onclick="nodeActionAttachShell(event);"
+                            class="dropdown-item label has-text-weight-normal is-small py-0"
+                            id="panel-node-action-ssh-web-based">Attach Shell
+                          </a>
+                          <a onclick="nodeActionViewLogs(event);"
+                            class="dropdown-item label has-text-weight-normal is-small py-0"
+                            id="panel-node-action-ssh-web-based">View Logs
+                          </a>
 
                           <!--   aarafat-tag: vs-code
 
@@ -1329,8 +1345,10 @@ return `
                 <ul>
                   <li>Click on nodes and links to explore your network.</li>
                   <li>Use the settings menu to show/hide link endpoint labels.</li>
-                  <li>Visit GitHub repository for more details <a
-                      href="https/github.com/asadarafat/topoViewer">https/github.com/asadarafat/topoViewer</a>.</li>
+                  <li>
+                    Visit GitHub repository for more details
+                    <a href="https://github.com/asadarafat/topoViewer">https://github.com/asadarafat/topoViewer</a>.
+                  </li>
                 </ul>
                 <p>
                   We hope you find TopoViewer a valuable tool for your network needs. If you have any questions or
@@ -1339,26 +1357,42 @@ return `
                 <p>
                   Special Thanks:
                 <ul>
-                  <li><strong><a href="https://www.linkedin.com/in/siva19susi/">Siva Sivakumar</a></strong> - For
+                  <li>
+                    <strong><a href="https://www.linkedin.com/in/rdodin/">Roman Dodin</a></strong> - For his invaluable
+                    help during TopoViewer's early stages.
+                  </li>
+                  <li>
+                    <strong><a href="https://www.linkedin.com/in/siva19susi/">Siva Sivakumar</a></strong> - For
                     pioneering the integration of Bulma CSS, significantly enhancing TopoViewer design and usability.
                   </li>
-                  <li><strong><a href="https://www.linkedin.com/in/gatot-susilo-b073166//">Gatot Susilo</a></strong> -
-                    For seamlessly incorporating TopoViewer into the Komodo2 tool, bridging functionality with
-                    innovation.</li>
-                  <li><strong><a href="https://www.linkedin.com/in/gusman-dharma-putra-1b955117/">Gusman Dharma
+                  <li>
+                    <strong><a href="https://www.linkedin.com/in/gatot-susilo-b073166//">Gatot Susilo</a></strong> - For
+                    seamlessly incorporating TopoViewer into the Komodo2 tool, bridging functionality with innovation.
+                  </li>
+                  <li>
+                    <strong><a href="https://www.linkedin.com/in/gusman-dharma-putra-1b955117/">Gusman Dharma
                         Putra</a></strong> - For his invaluable contribution in integrating TopoViewer into Komodo2,
-                    enriching its capabilities.</li>
-                  <li><strong><a href="https://www.linkedin.com/in/sven-wisotzky-44788333/">Sven Wisotzky</a></strong> -
-                    For offering insightful feedback that led to significant full stack optimizations.</li>
-                  <li><strong><a href="https://linkedin.com/in/florian-schwarz-812a34145">Florian Schwarz</a></strong> -
+                    enriching its capabilities.
+                  </li>
+                  <li>
+                    <strong><a href="https://www.linkedin.com/in/sven-wisotzky-44788333/">Sven Wisotzky</a></strong> -
+                    For offering insightful feedback that led to significant full stack optimizations.
+                  </li>
+                  <li>
+                    <strong><a href="https://linkedin.com/in/florian-schwarz-812a34145">Florian Schwarz</a></strong> -
                     Spearheaded the integration of TopoViewer into the vscode-containerlab plugin and offered valuable
-                    feedback to enhance TopoViewer's functionality.</li>
-                  <li><strong><a href="https://linkedin.com/in/kaelem-chandra">Kaelem Chandra</a></strong>- Leads the
+                    feedback to enhance TopoViewer's functionality.
+                  </li>
+                  <li>
+                    <strong><a href="https://linkedin.com/in/kaelem-chandra">Kaelem Chandra</a></strong> - Leads the
                     maintenance of the vscode-containerlab plugin, ensuring seamless TopoViewer integration while
-                    providing expert insights and continuous support.</li>
+                    providing expert insights and continuous support.
+                  </li>
+
                 </ul>
                 </p>
               </div>
+
             </div>
           </div>
         </div>
@@ -1460,12 +1494,14 @@ return `
     <script src="${jsUri}/library/cytoscape-edgehandles.min.js?ver=1"></script>
     <script src="${jsUri}/library/cytoscape-expand-collapse.min.js"></script>
 
+    <script src="${jsUri}/library/socket.io.min.js?ver=1"></script>
 
     <script src="https://unpkg.com/@floating-ui/core@1.5.0"></script>
     <script src="https://unpkg.com/@floating-ui/dom@1.5.3"></script>
 
     <script src="${jsUri}/library/js-yaml.min.js?ver=1"></script>
     <script src="${jsUri}/library/monaco-loader.js?ver=1"></script>
+
 
     <!-- Inject imagesUri as a global variable -->
     <script> window.imagesUrl = "${imagesUri}"; </script>
@@ -1479,8 +1515,11 @@ return `
     <!-- Inject isVscodeDeployment boolean as a global variable -->
     <script> window.isVscodeDeployment = "${isVscodeDeployment}"; </script>
 
-    <script src="${jsUri}/globalVariables.js?ver=1"></script>
+    <!-- <script src="${jsUri}/globalVariables.js?ver=1"></script> -->
+    <script src="${jsUri}/managerDynamicStyle.js?ver=1"></script>
+
     <script src="${jsUri}/common.js?ver=1"></script>
+
 
     <script src="${jsUri}/dev.js?ver=1"></script>
 
