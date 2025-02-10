@@ -995,10 +995,12 @@ return `
 
                       <div class="dropdown-menu" id="panel-link-action-dropdown-menu" role="menu">
                         <div class="dropdown-content" id="panel-link-action-dropdown-menu-dropdown-content">
-                          <a onclick="linkImpairmentClab(event, 'bidirectional');"
+
+                          <!-- <a onclick="linkImpairmentClab(event, 'bidirectional');"
                             class="dropdown-item label has-text-weight-normal is-small py-0"
                             id="panel-link-action-impairment-B->A">Apply Impairment</a>
-                          <hr class="dropdown-divider" />
+                          <hr class="dropdown-divider" /> -->
+
                           <a onclick="linkWireshark(event, 'edgeSharkInterface', 'source', null);"
                             class="dropdown-item label has-text-weight-normal is-small py-0"
                             id="endpoint-a-edgeshark">Capture E.Point-A (Edgeshark)</a>
@@ -1099,7 +1101,7 @@ return `
           </div>
         </div>
 
-
+<!-- 
         <panel-block-impairment-a-b class="panel-block p-0" id="panel-block-impairment-a-b">
           <div class="column px-0">
             <div class="column my-auto is-11">
@@ -1241,7 +1243,7 @@ return `
               </div>
             </div>
           </div>
-        </panel-block-impairment-b-a>
+        </panel-block-impairment-b-a> -->
 
 
 
