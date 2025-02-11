@@ -17,7 +17,7 @@ return `
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TopoViewer</title>
-  <link rel="stylesheet" href="${jsUri}/library/bulma-1-0-0.min.css?ver=1">
+  <link rel="stylesheet" href="${jsUri}/library/bulma-1-0-2.min.css?ver=1">
 
   <!-- CSS Assets -->
   <link rel="stylesheet" href="${cssUri}/style.css?ver=1" />
@@ -206,14 +206,14 @@ return `
         </p>
 
 
-        <p class="control p-0">
+        <!-- <p class="control p-0">
           <a id="viewport-save-topo" href="Toggle Link Operational State" onclick="viewportButtonsLinkOperState(cy)"
             class="button px-4 py-4 is-smallest-element" style="outline: none;">
             <span class="icon is-small">
               <i class="fa-solid fa-diagram-project"></i>
             </span>
           </a>
-        </p>
+        </p> -->
 
         <!-- <p class="control p-0">
                   <a  id="viewport-test-call-backend" href="Test Call to Backend" onclick="viewportButtonsReloadTopo()" class="button px-4 py-4 is-smallest-element" style="outline: none;">

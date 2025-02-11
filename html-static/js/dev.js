@@ -2796,34 +2796,34 @@ function viewportButtonsLabelEndpoint() {
 function viewportButtonContainerStatusVisibility() {
     if (globalNodeContainerStatusVisibility) {
         globalNodeContainerStatusVisibility = false;
-        console.info(
-            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
-        );
-        appendMessage(
-            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
-        );
-        bulmaToast.toast({
-            message: `Alright, mission control, we're standing down. 🛑🔍 Container status probing aborted. Stay chill, folks. 😎👨‍💻`,
-            type: "is-warning is-size-6 p-3",
-            duration: 4000,
-            position: "top-center",
-            closeOnClick: true,
-        });
+        // console.info(
+        //     "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
+        // );
+        // appendMessage(
+        //     "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
+        // );
+        // bulmaToast.toast({
+        //     message: `Alright, mission control, we're standing down. 🛑🔍 Container status probing aborted. Stay chill, folks. 😎👨‍💻`,
+        //     type: "is-warning is-size-6 p-3",
+        //     duration: 4000,
+        //     position: "top-center",
+        //     closeOnClick: true,
+        // });
     } else {
         globalNodeContainerStatusVisibility = true;
-        console.info(
-            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
-        );
-        appendMessage(
-            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
-        );
-        bulmaToast.toast({
-            message: `🕵️‍♂️ Bro, we're currently on a mission to probe that container status! Stay tuned for the results. 🔍🚀👨‍💻`,
-            type: "is-warning is-size-6 p-3",
-            duration: 4000,
-            position: "top-center",
-            closeOnClick: true,
-        });
+        // console.info(
+        //     "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
+        // );
+        // appendMessage(
+        //     "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
+        // );
+        // bulmaToast.toast({
+        //     message: `🕵️‍♂️ Bro, we're currently on a mission to probe that container status! Stay tuned for the results. 🔍🚀👨‍💻`,
+        //     type: "is-warning is-size-6 p-3",
+        //     duration: 4000,
+        //     position: "top-center",
+        //     closeOnClick: true,
+        // });
     }
 }
 
@@ -3253,11 +3253,11 @@ function loadCytoStyle(cy) {
     // VS-CODE start 
     let jsonFileUrl;
 
-    if (colorScheme === "dark") {
-        jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
-    } else {
-        jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
-    }
+    // if (colorScheme === "dark") {
+    //     jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
+    // } else {
+    //     jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
+    // }
 
     const cytoscapeStylesForVscode = [
         {
@@ -3994,23 +3994,23 @@ async function viewportButtonsSaveTopo(cy) {
 function viewportButtonsLinkOperState() {
     console.log(`globalToggleOnChangeCytoStyle is now: ${globalToggleOnChangeCytoStyle}`);
     globalToggleOnChangeCytoStyle = !globalToggleOnChangeCytoStyle;
-    if (globalToggleOnChangeCytoStyle) {
-        bulmaToast.toast({
-            message: `🕵️‍♂️ Bro, we're currently on a mission to probe that link status! Stay tuned for the results. 🔍🚀👨‍💻`,
-            type: "is-warning is-size-6 p-3",
-            duration: 4000,
-            position: "top-center",
-            closeOnClick: true,
-        });
-    } else {
-        bulmaToast.toast({
-            message: `Alright, mission control, we're standing down. 🛑🔍 link status probing aborted. Stay chill, folks. 😎👨‍💻`,
-            type: "is-warning is-size-6 p-3",
-            duration: 4000,
-            position: "top-center",
-            closeOnClick: true,
-        });
-    }
+    // if (globalToggleOnChangeCytoStyle) {
+    //     bulmaToast.toast({
+    //         message: `🕵️‍♂️ Bro, we're currently on a mission to probe that link status! Stay tuned for the results. 🔍🚀👨‍💻`,
+    //         type: "is-warning is-size-6 p-3",
+    //         duration: 4000,
+    //         position: "top-center",
+    //         closeOnClick: true,
+    //     });
+    // } else {
+    //     bulmaToast.toast({
+    //         message: `Alright, mission control, we're standing down. 🛑🔍 link status probing aborted. Stay chill, folks. 😎👨‍💻`,
+    //         type: "is-warning is-size-6 p-3",
+    //         duration: 4000,
+    //         position: "top-center",
+    //         closeOnClick: true,
+    //     });
+    // }
     loadCytoStyle(cy);
     console.log(`globalToggleOnChangeCytoStyle is become: ${globalToggleOnChangeCytoStyle}`);
 }

@@ -1,6 +1,6 @@
 // Global toggle for enabling/disabling dynamic style updates.
 // When true, the socket event handler will be bound; when false, it will be unbound.
-var globalToggleOnChangeCytoStyle = false;
+var globalToggleOnChangeCytoStyle = true;
 
 
 // aarafat-tag: vscode socket.io
