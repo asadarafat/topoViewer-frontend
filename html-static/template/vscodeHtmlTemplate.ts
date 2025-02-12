@@ -1,15 +1,17 @@
 // vscodeHtmlTemplate.ts
 export function getHTMLTemplate(
-cssUri: string,
-jsUri: string,
-imagesUri: string,
-jsonFileUrlDataCytoMarshall: string,
-jsonFileUrlDataEnvironment: string,
-isVscodeDeployment: boolean,
-jsOutDir: string
+  cssUri: string,
+  jsUri: string,
+  imagesUri: string,
+  jsonFileUrlDataCytoMarshall: string,
+  jsonFileUrlDataEnvironment: string,
+  isVscodeDeployment: boolean,
+  jsOutDir: string,
+  allowedhostname: string,
+  socketAssignedPort: number
 ): string {
 
-return `
+  return `
 <!DOCTYPE html>
 <html lang="en" id="root">
 
@@ -27,15 +29,8 @@ return `
 
   <!-- JS Assets -->
   <script src="${jsUri}/library/fontawesome-6-7-2.min.js?ver=1"></script>
-
-
   <script src="${jsUri}/library/bulma-slider.min.js?ver=1"></script>
-
-
   <script src="${jsUri}/library/bulma-toast.min.js?ver=1"></script>
-
-
-
 </head>
 
 <body>
@@ -49,7 +44,7 @@ return `
       <div class="p-0 is-flex is-justify-content-space-evenly is-flex-direction-column">
         <p class="title    m-0 px-1 py-0   is-4 is-unselectable has-text-weight-normal has-text-white"> containerlab</p>
         <p class="subtitle m-0 px-1 py-0   is-6                 has-text-weight-light  has-text-white"
-          id="ClabSubtitle">Topology name: nokia-MAGc-lab ::: Uptime: 10m10s</p>
+          id="ClabSubtitle">Topology name: clab ::: Uptime: 10m10s</p>
       </div>
     </div>
 
@@ -1495,7 +1490,6 @@ return `
     <script src="${jsUri}/library/cytoscape-grid-guide.min.js?ver=1"></script>
     <script src="${jsUri}/library/cytoscape-edgehandles.min.js?ver=1"></script>
     <script src="${jsUri}/library/cytoscape-expand-collapse.min.js"></script>
-
     <script src="${jsUri}/library/socket.io.min.js?ver=1"></script>
 
     <script src="https://unpkg.com/@floating-ui/core@1.5.0"></script>
@@ -1517,19 +1511,20 @@ return `
     <!-- Inject isVscodeDeployment boolean as a global variable -->
     <script> window.isVscodeDeployment = "${isVscodeDeployment}"; </script>
 
-    <!-- <script src="${jsUri}/globalVariables.js?ver=1"></script> -->
-    <script src="${jsUri}/managerDynamicStyle.js?ver=1"></script>
+    <!-- Inject allowedhostname string as a global variable -->
+    <script> window.allowedhostname = ${allowedhostname}; </script>
+
+    <!-- Inject allowedhostname number as a global variable -->
+    <script> window.socketAssignedPort = ${socketAssignedPort}; </script>
 
     <script src="${jsUri}/common.js?ver=1"></script>
 
-
     <script src="${jsUri}/dev.js?ver=1"></script>
 
+    <script src="${jsUri}/managerOnChangeFramework.js?ver=1"></script>
     <script src="${jsUri}/managerVscodeWebview.js?ver=1"></script>
-
     <script src="${jsUri}/managerSvg.js?ver=1"></script>
     <script src="${jsUri}/managerLayoutAlgo.js?ver=1"></script>
-
 
     <script src="${jsUri}/backupRestore.js?ver=1"></script>
     <script src="${jsUri}/managerClabEditor.js?ver=1"></script>

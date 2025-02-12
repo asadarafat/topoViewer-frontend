@@ -1,10 +1,94 @@
+// ---
+
+// ## Overview
+
+// This code sets up a small framework to monitor changes in “lab data” and update the UI (e.g., Cytoscape edges) accordingly. It revolves around these main pieces:
+
+// 1. **Use‐Case Configuration (`monitorConfigs`)**  
+//    Each “use case” specifies:  
+//    - A unique name (e.g. `"interfaceState"`)  
+//    - A **mapping** function (e.g. `onChangeRuleInterfaceOperState`) that examines the raw data and derives a state mapping (key → value).  
+//    - A **handler** function (e.g. `onChangeHandlerInterfaceOperState`) that reacts to state changes and updates the UI or performs other logic.
+
+// 2. **State Monitor Engine (`stateMonitorEngine`)**  
+//    - Receives the raw lab data and each use‐case configuration.  
+//    - Calls the mapping function to get the current “state map.”  
+//    - Compares that map to the previously cached state.  
+//    - When changes (or removals) are found, calls the corresponding handler.
+
+// 3. **Socket Event Listener**  
+//    - Listens for updates on `"clab-tree-provider-data"`.  
+//    - Invokes `stateMonitorEngine` with fresh data and the array of use‐case configs.
+
+// 4. **Global Storage**  
+//    - `window.previousStateByUseCase` caches previous states so we can detect changes.  
+//    - `window.dynamicCytoStyles` can hold dynamic styles for Cytoscape.
+
+// In short, the flow is: **socket event** → **stateMonitorEngine** → **mapping** → compare to **previous state** → if changed, **handler** executes.
+
+// ---
+
+// ##  Diagram
+
+// Below is a textual illustration of how these pieces connect:
+
+// ```
+// +----------------------------------------------------------+
+// |               Config (monitorConfigs)                    |
+// |  ------------------------------------------------------  |
+// |  useCase: "interfaceState",                              |
+// |  mapping: onChangeRuleInterfaceOperState,                |
+// |  handler: onChangeHandlerInterfaceOperState              |
+// +-----------------------------+----------------------------+
+//                               |
+//                               | (passed to)
+//                               v
+// +----------------------------------------------------------+
+// |               stateMonitorEngine(labData, configs)       |
+// |                                                          |
+// |    1) Call mapping() to produce current state map        |
+// |    2) Compare with previousStateByUseCase[useCase]       |
+// |    3) If different, call handler(updateMessage)          |
+// +---------+------------------------------------------+-----+
+//           |                                          |
+//           | calls                                    | calls
+//           v                                          v
+// +-------------------------------------+   +-------------------------------------+
+// | mapping:                            |   | handler:                            |
+// | onChangeRuleInterfaceOperState      |   | onChangeHandlerInterfaceOperState   |
+// | (Derives Up/Down from raw lab data) |   | (Updates Cytoscape edges)           |
+// +-------------------------------------+   +-------------------------------------+
+// ```
+
+// 1. **Config** (shown at top) defines which **mapping** and **handler** functions belong to this use case.  
+// 2. When lab data arrives, **stateMonitorEngine** iterates over each config and calls the designated **mapping** function.  
+// 3. The engine checks whether the newly computed state differs from the previously stored state.  
+// 4. If a difference is found, the engine calls the **handler** to perform UI or other updates.
+
+// ---
+
+// ### Key Points
+
+// - **Global Toggle (`globalToggleOnChangeCytoStyle`)**  
+//   A simple boolean that can enable or disable the on‐change feature altogether.
+
+// - **Global Maps & Caches**  
+//   - `window.dynamicCytoStyles` can store style overrides for edges/nodes.  
+//   - `window.previousStateByUseCase` keeps each use case’s prior key‐value map so we know when a value has changed or disappeared.
+
+// - **Mapping Function** (`onChangeRuleInterfaceOperState`)  
+//   Looks at each container’s interfaces and sets a “Up” or “Down” state based on the interface’s description.
+
+// - **Handler Function** (`onChangeHandlerInterfaceOperState`)  
+//   Locates edges in the Cytoscape graph that match the changed interface and updates their color based on “Up” (green) or “Down” (red). If an interface is removed, it reverts to a default style.
+
+// ---
+
+
+
 // Global toggle for enabling/disabling dynamic style updates.
 // When true, the socket event handler will be bound; when false, it will be unbound.
 var globalToggleOnChangeCytoStyle = true;
-
-
-// aarafat-tag: vscode socket.io
-const socket = io('http://localhost:3000');
 
 // Global storage for dynamic Cytoscape style updates.
 window.dynamicCytoStyles = new Map();
@@ -15,67 +99,6 @@ window.previousStateByUseCase = {};
 
 // (Optional) Global cache for last known state per endpoint.
 window.cachedEndpointStates = {};
-
-
-
-
-// -----------------------------------------------------------------------------
-// STYLE HELPER FUNCTIONS
-// -----------------------------------------------------------------------------
-
-/**
- * Updates the dynamic style for an edge and caches the update.
- *
- * @param {string} edgeId - The unique ID of the edge.
- * @param {string} styleProp - The style property to update (e.g. "text-background-color").
- * @param {string|number} value - The new value for the style property.
- */
-function updateEdgeDynamicStyle(edgeId, styleProp, value) {
-    const edge = cy.$(`#${edgeId}`);
-    if (edge.length > 0) {
-        edge.style(styleProp, value);
-        const cacheKey = `edge:${edgeId}:${styleProp}`;
-        window.dynamicCytoStyles.set(cacheKey, value);
-    }
-}
-
-/**
- * Updates the dynamic style for a node and caches the update.
- *
- * @param {string} nodeId - The unique ID of the node.
- * @param {string} styleProp - The style property to update (e.g. "background-color").
- * @param {string|number} value - The new value for the style property.
- */
-function updateNodeDynamicStyle(nodeId, styleProp, value) {
-    const node = cy.$(`#${nodeId}`);
-    if (node.length > 0) {
-        node.style(styleProp, value);
-        const cacheKey = `node:${nodeId}:${styleProp}`;
-        window.dynamicCytoStyles.set(cacheKey, value);
-    }
-}
-
-/**
- * Iterates over the dynamic style cache and re-applies the stored styles.
- */
-function restoreDynamicStyles() {
-    window.dynamicCytoStyles.forEach((value, key) => {
-        const parts = key.split(":"); // e.g. ["edge", "Clab-Link0", "text-background-color"]
-        if (parts.length !== 3) return;
-        const [type, id, styleProp] = parts;
-        if (type === "edge") {
-            const edge = cy.$(`#${id}`);
-            if (edge.length > 0) {
-                edge.style(styleProp, value);
-            }
-        } else if (type === "node") {
-            const node = cy.$(`#${id}`);
-            if (node.length > 0) {
-                node.style(styleProp, value);
-            }
-        }
-    });
-}
 
 
 // -----------------------------------------------------------------------------
@@ -167,7 +190,6 @@ function onChangeHandlerInterfaceOperState(updateMessage) {
     console.log("edgeSelector: ", edgeSelector);
 
     const edges = cy.$(edgeSelector);
-
 
 
     edgeCollection = edges
@@ -300,32 +322,4 @@ function stateMonitorEngine(labData, monitorConfigs) {
         // Step 4: Update the cached state.
         window.previousStateByUseCase[useCase] = currentState;
     });
-}
-
-
-
-// -----------------------------------------------------------------------------
-// SOCKET BINDING CONTROL
-// -----------------------------------------------------------------------------
-
-/**
- * updateSocketBinding()
- *
- * Unbinds any previous listener for "clab-tree-provider-data" and, if the global toggle is enabled,
- * binds an inline listener that processes the lab data using the generic state monitor engine.
- */
-function updateSocketBinding() {
-    // Unbind previous "clab-tree-provider-data" listeners.
-    socket.off('clab-tree-provider-data');
-
-    if (globalToggleOnChangeCytoStyle) {
-        socket.on('clab-tree-provider-data', (labData) => {
-            console.log("Received clab-tree-provider-data:", labData);
-            // Use the global monitorConfigs defined below.
-            stateMonitorEngine(labData, monitorConfigs);
-        });
-        console.log("Socket 'clab-tree-provider-data' event bound.");
-    } else {
-        console.log("Socket 'clab-tree-provider-data' event unbound.");
-    }
 }
