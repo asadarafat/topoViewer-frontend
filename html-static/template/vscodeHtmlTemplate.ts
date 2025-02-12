@@ -3,21 +3,21 @@
 import { log } from '../../../backend/logger';
 
 export function getHTMLTemplate(
-  cssUri: string,
-  jsUri: string,
-  imagesUri: string,
-  jsonFileUrlDataCytoMarshall: string,
-  jsonFileUrlDataEnvironment: string,
-  isVscodeDeployment: boolean,
-  jsOutDir: string,
-  allowedHostname: string,
-  socketAssignedPort: number
+cssUri: string,
+jsUri: string,
+imagesUri: string,
+jsonFileUrlDataCytoMarshall: string,
+jsonFileUrlDataEnvironment: string,
+isVscodeDeployment: boolean,
+jsOutDir: string,
+allowedHostname: string,
+socketAssignedPort: number
 ): string {
 
-        log.info(`allowedHostname in vscodeHtmlTemplate.ts: ${allowedHostname}`);
-  
+log.info(`allowedHostname in vscodeHtmlTemplate.ts: ${allowedHostname}`);
 
-  return `
+
+return `
 <!DOCTYPE html>
 <html lang="en" id="root">
 
@@ -524,7 +524,7 @@ export function getHTMLTemplate(
       </div>
     </div>
 
-    
+
     <div id="viewport-drawer-capture-sceenshoot" class="panel p-1 is-1 viewport-drawer" style="display: none; ">
       <div class="panel-block p-0 pb-2">
         <div class="column p-0 is-flex-direction-column">
@@ -660,15 +660,20 @@ export function getHTMLTemplate(
       </div>
     </div>
 
-    <div class="panel panel-overlay is-link" id="panel-node" style="display: none;">
-      <p class="panel-heading is-size-7">Node Properties</p>
+    <!-- Node Properties Panel with Improved Semantic Markup & Responsive Design -->
+    <section class="panel panel-overlay is-link" id="panel-node" aria-labelledby="node-panel-heading"
+      style="display: none;">
+      <header class="panel-heading is-size-7" id="node-panel-heading">
+        Node Properties
+      </header>
       <div class="panel-tabContainer">
         <div class="panel-block p-0">
           <div class="column px-0">
+            <!-- Grouping the content into responsive columns -->
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
-                  <div class="column is-4 p-1"><label
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-full-mobile is-half-tablet is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Node Name</label></div>
                   <div class="column is-8 p-1 pl-3">
                     <label
@@ -679,12 +684,14 @@ export function getHTMLTemplate(
               </div>
             </div>
 
-
-            <div class="column my-auto is-11">
+            <!-- Actions Dropdown (as an example, kept within its own block) -->
+            <div class="column is-full-mobile is-half-tablet my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
-                  <div class="column is-4 p-1"><label
-                      class="label is-size-7 has-text-right has-text-weight-medium px-auto"></label></div>
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1">
+                    <!-- Using an empty label if needed for alignment -->
+                    <label class="label is-size-7 has-text-right has-text-weight-medium px-auto"></label>
+                  </div>
                   <div class="column is-8 p-1 pl-3">
                     <div class="dropdown is-hoverable">
                       <div class="dropdown-trigger">
@@ -717,9 +724,7 @@ export function getHTMLTemplate(
                                   <hr class="dropdown-divider" />
                                   <a onclick="backupRestoreNodeConfig(event);" class="dropdown-item label has-text-weight-normal is-small py-0"> Backup-Restore Config </a>
                                   <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0"> Reboot </a>
-
-                                    -->
-
+                          -->
                         </div>
                       </div>
                     </div>
@@ -727,28 +732,24 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
-
-
-
           </div>
         </div>
         <div class="panel-block p-0">
           <div class="column px-0">
-
             <!--   aarafat-tag: vs-code
                     <div  class="column my-auto is-11">
                       <div  class="panel-content">
-                        <div class="columns py-auto" >
+                        <div class="columns is-mobile is-multiline py-auto" >
                           <div  class="column is-4 p-1"><label class="label is-size-7 has-text-right has-text-weight-medium px-auto" >State</label></div>
                           <div class="column is-8 p-1 pl-3" ><label class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content" id="panel-node-state">node-state-placeholder</label></div>
                         </div>
                       </div>
                     </div>
-                    -->
-
+            -->
+            <!-- Kind -->
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Kind</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -757,9 +758,10 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
+            <!-- Image -->
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Image</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -768,9 +770,10 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
+            <!-- Management IPv4 -->
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Management IPv4</label>
                   </div>
@@ -780,9 +783,10 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
+            <!-- Management IPv6 -->
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Management IPv6</label>
                   </div>
@@ -792,9 +796,10 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
+            <!-- FQDN -->
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">FQDN</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -803,9 +808,10 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
+            <!-- Group -->
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Group</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -814,9 +820,10 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
+            <!-- TopoViewer Role -->
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">TopoViewer Role</label>
                   </div>
@@ -826,10 +833,11 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          </div> <!-- End .columns -->
+        </div> <!-- End .panel-block -->
+      </div> <!-- End .panel-tabContainer -->
+    </section>
+
     <div class="panel is-link" id="panel-node-editor" style="display: none;">
       <p class="panel-heading is-size-7">Node Properties Editor</p>
       <div class="panel-tabContainer">
@@ -957,14 +965,38 @@ export function getHTMLTemplate(
         </div>
       </div>
     </div>
-    <div class="panel panel-overlay is-link" id="panel-link" style="display: none;">
+
+<!-- 
+    <div class="panel-tabContainer">
+      <div class="panel-block p-0">
+        <div class="column px-0">
+          <div class="column my-auto is-11">
+            <div class="panel-content">
+              <div class="columns is-mobile is-multiline py-auto">
+                <div class="column is-full-mobile is-half-tablet is-4 p-1"><label
+                    class="label is-size-7 has-text-right has-text-weight-medium px-auto">Node Name</label></div>
+                <div class="column is-8 p-1 pl-3">
+                  <label
+                    class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                    id="panel-node-name">node-name-placeholder</label>
+                </div>
+              </div>
+            </div>
+          </div> 
+        
+        -->
+
+
+    <!-- Link Properties Panel with Improved Semantic Markup & Responsive Design -->
+    <!-- Link Properties Panel with Improved Semantic Markup & Responsive Design -->
+    <section class="panel panel-overlay is-link" id="panel-link" style="display: none;">
       <p class="panel-heading is-size-7">Link Properties</p>
       <div class="panel-tabContainer">
         <div class="panel-block p-0">
           <div class="column px-0">
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Link Name</label></div>
                   <div class="column is-8 p-1 pl-3">
@@ -979,7 +1011,7 @@ export function getHTMLTemplate(
 
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto"></label></div>
                   <div class="column is-8 p-1 pl-3">
@@ -1029,21 +1061,18 @@ export function getHTMLTemplate(
                             id="endpoint-b-bottom"></a>
                         </div>
                       </div>
-
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-
           </div>
         </div>
         <div class="panel-block p-0" id="panel-link-endpoint-a">
           <div class="column px-0">
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Endpoint-A</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -1052,11 +1081,9 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
-
-
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">MAC address</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -1065,17 +1092,13 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
-
-
           </div>
         </div>
         <div class="panel-block p-0" id="panel-link-endpoint-b">
           <div class="column px-0">
-
-
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Endpoint-B</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -1084,11 +1107,9 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
-
-
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">MAC address</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -1097,17 +1118,14 @@ export function getHTMLTemplate(
                 </div>
               </div>
             </div>
-
-
           </div>
         </div>
 
-<!-- 
-        <panel-block-impairment-a-b class="panel-block p-0" id="panel-block-impairment-a-b">
+        <!-- <panel-block-impairment-a-b class="panel-block p-0" id="panel-block-impairment-a-b">
           <div class="column px-0">
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Impairment</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -1117,7 +1135,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Delay (ms)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1128,7 +1146,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Jitter (ms)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1139,7 +1157,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Rate (kpbs)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1150,7 +1168,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Loss (%)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1161,7 +1179,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Corruption (%)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1173,14 +1191,11 @@ export function getHTMLTemplate(
           </div>
         </panel-block-impairment-a-b>
 
-
-
-
         <panel-block-impairment-b-a class="panel-block p-0" id="panel-block-impairment-b-a">
           <div class="column px-0">
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Impairment</label></div>
                   <div class="column is-8 p-1 pl-3"><label
@@ -1190,7 +1205,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Delay (ms)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1201,7 +1216,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Jitter (ms)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1212,7 +1227,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Rate (kpbs)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1223,7 +1238,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Loss (%)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1234,7 +1249,7 @@ export function getHTMLTemplate(
             </div>
             <div class="column my-auto is-11">
               <div class="panel-content">
-                <div class="columns py-auto">
+                <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">Corruption (%)</label></div>
                   <div class="column is-8 p-1 pl-3"><input
@@ -1244,12 +1259,14 @@ export function getHTMLTemplate(
               </div>
             </div>
           </div>
-        </panel-block-impairment-b-a> -->
-
+        </panel-block-impairment-b-a>  -->
 
 
       </div>
-    </div>
+    </section>
+
+
+
     <div class="panel panel-overlay is-link" id="panel-backup-restore" style="display: none;">
       <p class="panel-heading is-size-7" id="diff-panel-title">Diff</p>
       <div>
@@ -1521,7 +1538,7 @@ export function getHTMLTemplate(
     <script> window.allowedHostname = "${allowedHostname}"; </script>
 
     <!-- Inject allowedHostname number as a global variable -->
-    <script> window.socketAssignedPort = ${socketAssignedPort}; </script>
+    <script> window.socketAssignedPort = "${socketAssignedPort}"; </script>
 
     <script src="${jsUri}/common.js?ver=1"></script>
 

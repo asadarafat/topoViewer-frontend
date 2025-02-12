@@ -1,4 +1,3 @@
-
 require.config({
     paths: {
         'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/min/vs'
@@ -919,7 +918,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 document.getElementById("panel-link").style.display = "none";
             }
 
-            document.getElementById("panel-link-name").textContent = `${clickedEdge.data("source")} --- ${clickedEdge.data("target")}`
+            document.getElementById("panel-link-name").textContent = `${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")} | ${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
             document.getElementById("panel-link-endpoint-a-name").textContent = `${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")}`
             // document.getElementById("panel-link-endpoint-a-mac-address").textContent = "getting the MAC address"
             document.getElementById("panel-link-endpoint-b-name").textContent = `${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
@@ -949,13 +948,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                         // Map sub-interfaces with prefix
                         const sourceSubInterfaces = clabSourceSubInterfacesClabData
                         // Render sub-interfaces
-                        renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-top', 'endpoint-a-bottom');
+                        renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-top', 'endpoint-a-bottom', nodeName);
                     } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
                         console.info("No sub-interfaces found. The input data array is empty.");
-                        renderSubInterfaces(null, 'endpoint-a-top', 'endpoint-a-bottom');
+                        renderSubInterfaces(null, 'endpoint-a-top', 'endpoint-a-bottom', nodeName);
                     } else {
                         console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
-                        renderSubInterfaces(null, 'endpoint-a-top', 'endpoint-a-bottom');
+                        renderSubInterfaces(null, 'endpoint-a-top', 'endpoint-a-bottom', nodeName);
                     }
 
 
@@ -975,18 +974,17 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const sourceSubInterfaces = clabSourceSubInterfacesClabData.map(
                         item => `${item.ifname}`
                     );
-
                     // Render sub-interfaces
-                    renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-                    renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+                    renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-edgeshark', 'endpoint-a-clipboard', nodeName);
+                    renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-clipboard', 'endpoint-a-bottom', nodeName);
                 } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
                     console.info("No sub-interfaces found. The input data array is empty.");
-                    renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-                    renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+                    renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard', nodeName);
+                    renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom', nodeName);
                 } else {
                     console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
-                    renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-                    renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
+                    renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard', nodeName);
+                    renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom', nodeName);
                 }
             }
 
@@ -1007,16 +1005,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                     if (Array.isArray(clabTargetSubInterfacesClabData) && clabTargetSubInterfacesClabData.length > 0) {
                         // Map sub-interfaces with prefix
                         const TargetSubInterfaces = clabTargetSubInterfacesClabData
-
                         // Render sub-interfaces
-                        renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-top', 'endpoint-b-bottom');
-
+                        renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-top', 'endpoint-b-bottom', nodeName);
                     } else if (Array.isArray(clabTargetSubInterfacesClabData)) {
                         console.info("No sub-interfaces found. The input data array is empty.");
-                        renderSubInterfaces(null, 'endpoint-b-top', 'endpoint-b-bottom');
+                        renderSubInterfaces(null, 'endpoint-b-top', 'endpoint-b-bottom', nodeName);
                     } else {
                         console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
-                        renderSubInterfaces(null, 'endpoint-b-top', 'endpoint-b-bottom');
+                        renderSubInterfaces(null, 'endpoint-b-top', 'endpoint-b-bottom', nodeName);
                     }
 
                 } catch (error) {
@@ -1933,8 +1929,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 ////  - re-create log-messages
 ////  - re-create viewport
 
-
-
 async function changeTitle() {
     environments = await getEnvironments();
     globalLabName = await environments["clab-name"]
@@ -2620,10 +2614,8 @@ function viewportNodeFindEvent(event) {
 }
 
 async function layoutAlgoChange(event) {
-
     try {
         console.info("layoutAlgoChange clicked");
-
         var selectElement = document.getElementById("select-layout-algo");
         var selectedOption = selectElement.value;
 
@@ -2731,10 +2723,8 @@ async function layoutAlgoChange(event) {
             for (var i = 0; i < layoutAlgoPanels.length; i++) {
                 layoutAlgoPanels[i].style.display = "none";
             }
-
             viewportDrawerPreset()
         }
-
     } catch (error) {
         console.error("Error occurred:", error);
         // Handle errors as needed
@@ -2966,13 +2956,13 @@ async function captureAndSaveViewportAsDrawIo(cy) {
     a.download = "filename.drawio";
     document.body.appendChild(a);
 
-    bulmaToast.toast({
-        message: `Brace yourselves for a quick snapshot, folks! 📸 Capturing the viewport in 3... 2... 1... 🚀💥`,
-        type: "is-warning is-size-6 p-3",
-        duration: 2000,
-        position: "top-center",
-        closeOnClick: true,
-    });
+    // bulmaToast.toast({
+    //     message: `Brace yourselves for a quick snapshot, folks! 📸 Capturing the viewport in 3... 2... 1... 🚀💥`,
+    //     type: "is-warning is-size-6 p-3",
+    //     duration: 2000,
+    //     position: "top-center",
+    //     closeOnClick: true,
+    // });
     await sleep(2000);
 
     // Simulate a click to trigger the download
@@ -3006,8 +2996,6 @@ function viewportButtonsClabEditor() {
     viewportDrawerClabEditorContent02.style.display = "block"
 
     console.log("viewportDrawerClabEditorContent02", viewportDrawerClabEditorContent02)
-
-
 }
 
 function viewportButtonsGeoMapPan() {
@@ -3182,7 +3170,6 @@ function insertAndColorSvg(containerId, color) {
 
 
 function avoidEdgeLabelOverlap(cy) {
-
     console.info("avoidEdgeLabelOverlap called");
     // Helper function to calculate edge length
     function calculateEdgeLength(edge) {
@@ -3240,7 +3227,28 @@ function avoidEdgeLabelOverlap(cy) {
 
 
 
-
+/**
+ * Loads and applies Cytoscape styles to nodes, edges, and parent nodes based on deployment context,
+ * user preferences, and global state flags.
+ *
+ * This function performs the following operations:
+ * 1. Removes any existing styles from all nodes and edges.
+ * 2. Detects the user's preferred color scheme (light or dark) and logs the preference along with the current
+ *    multi-layer viewport state.
+ * 3. Depending on the deployment context:
+ *    - If running in VS Code (`isVscodeDeployment` is true), it applies a predefined set of Cytoscape styles.
+ *    - Otherwise, it fetches styles from a local JSON file and applies them. If the multi-layer viewport state is active,
+ *      a custom SVG background is set for parent nodes.
+ * 4. Adjusts edge label opacity if `globalLinkEndpointVisibility` is disabled.
+ * 5. If a geographical map is initialized (`globalIsGeoMapInitialized` is true), applies style multipliers to nodes,
+ *    edges, and parent nodes to adjust dimensions and font sizes.
+ * 6. Restores dynamic styles (if enabled via `globalToggleOnChangeCytoStyle`) and updates socket bindings.
+ *
+ * @async
+ * @function loadCytoStyle
+ * @param {cytoscape.Core} cy - The Cytoscape instance to style.
+ * @returns {Promise<void>} A promise that resolves once the styles have been applied.
+ */
 function loadCytoStyle(cy) {
     cy.nodes().removeStyle();
     cy.edges().removeStyle();
@@ -3908,7 +3916,6 @@ function loadCytoStyle(cy) {
         });
     }
 
-
     // Restore dynamic styles only if enabled.
     if (globalToggleOnChangeCytoStyle) {
         restoreDynamicStyles();
@@ -3918,6 +3925,16 @@ function loadCytoStyle(cy) {
     updateSocketBinding();
 }
 
+/**
+ * Toggles the multi-layer viewport state and reloads the Cytoscape style.
+ *
+ * This function checks the current state of `multiLayerViewPortState`. If it is `false`, the state is set to `true`;
+ * otherwise, it is set to `false`. After toggling, it logs the new state to the console and calls `loadCytoStyle(cy)`
+ * to update the Cytoscape style accordingly.
+ *
+ * @function viewportButtonsMultiLayerViewPortToggle
+ * @returns {void}
+ */
 function viewportButtonsMultiLayerViewPortToggle() {
     if (multiLayerViewPortState == false) {
         multiLayerViewPortState = true; // toggle
@@ -3932,56 +3949,60 @@ function viewportButtonsMultiLayerViewPortToggle() {
     }
 }
 
-
+/**
+ * Updates node positions and sends the topology data to the backend.
+ *
+ * This asynchronous function iterates over each node in the provided Cytoscape instance (`cy`),
+ * updating each node's "position" property with its current coordinates. If a node contains extra
+ * label data under `node.data.extraData.labels`, it also updates the "graph-posX" and "graph-posY" labels
+ * with the node's current x and y positions, respectively. The updated nodes are then sent to a backend
+ * endpoint ("topo-viewport-save") via the `sendMessageToVscodeEndpointPost` function, but only if the
+ * deployment is detected to be within VS Code.
+ *
+ * Note: If the global Cytoscape instance (`window.cy`) is not defined, the function logs an error and
+ * returns without performing further operations.
+ *
+ * @async
+ * @function viewportButtonsSaveTopo
+ * @param {cytoscape.Core} cy - The Cytoscape instance containing the graph elements.
+ * @returns {Promise<void>} A promise that resolves once the topology data has been processed and sent.
+ */
 async function viewportButtonsSaveTopo(cy) {
     if (isVscodeDeployment) {
-        try {
-
-            console.log("viewportButtonsSaveTopo triggered")
-            // Ensure our Cytoscape instance is available
-            if (!window.cy) {
-                console.error('Cytoscape instance "cy" is not defined.');
-                return;
-            }
-
-            // Process nodes: update each node's "position" property with the current position.
-            const updatedNodes = cy.nodes().map(function (node) {
-                const nodeJson = node.json();
-                nodeJson.position = node.position(); // Update position property
-
-                // Check if extraData and labels exist before modifying
-                if (nodeJson.data?.extraData?.labels) {
-                    nodeJson.data.extraData.labels["graph-posX"] = nodeJson.position.x.toString();
-                    nodeJson.data.extraData.labels["graph-posY"] = nodeJson.position.y.toString();
-                }
-
-                return nodeJson;
-            })// .filter(node => node.data.topoViewerRole !== "group"); // Exclude "group" nodes (parent nodes)
-
-
-            // // Process edges: simply get their JSON representation.
-            // const updatedEdges = cy.edges().map(function (edge) {
-            //     return edge.json();
-            // });
-
-            // Combine nodes and edges into one array
-            const updatedElements = updatedNodes;
-
-            // Convert the updated elements to a JSON string (pretty printed)
-            const jsonString = JSON.stringify(updatedElements, null, 2);
-            // console.log(updatedElements);
-
-            const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
-            console.log("############### response from backend:", response);
-            // sleep(1000)
-            // // Re-Init load data.
-            // fetchAndLoadData()
-
-        } catch (err) {
-            console.error("############### Backend call failed:", err);
+      try {
+        console.log("viewportButtonsSaveTopo triggered");
+        // Ensure our Cytoscape instance is available
+        if (!window.cy) {
+          console.error('Cytoscape instance "cy" is not defined.');
+          return;
         }
+        // Process nodes: update each node's "position" property with the current position.
+        const updatedNodes = cy.nodes().map(function (node) {
+          const nodeJson = node.json();
+          nodeJson.position = node.position(); // Update position property
+  
+          // Check if extraData and labels exist before modifying
+          if (nodeJson.data?.extraData?.labels) {
+            nodeJson.data.extraData.labels["graph-posX"] = nodeJson.position.x.toString();
+            nodeJson.data.extraData.labels["graph-posY"] = nodeJson.position.y.toString();
+          }
+          return nodeJson;
+        });
+  
+        // Combine nodes into one array (edges could be added here if needed)
+        const updatedElements = updatedNodes;
+  
+        // Convert the updated elements to a JSON string (pretty printed)
+        const jsonString = JSON.stringify(updatedElements, null, 2);
+  
+        const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
+        console.log("############### response from backend:", response);
+      } catch (err) {
+        console.error("############### Backend call failed:", err);
+      }
     }
-}
+  }
+  
 
 /**
  * toggleSocketEdgeUpdates()
@@ -4133,8 +4154,8 @@ async function fetchAndLoadData() {
             jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json";
         }
 
-        console.log(`fetchAndLoadData() called`);
-        console.log(`jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`);
+        console.log(`#####  fetchAndLoadData called`);
+        console.log(`#####  fetchAndLoadData jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`);
 
         // Optionally, append a timestamp to avoid caching:
         // const fetchUrl = jsonFileUrlDataCytoMarshall + '?t=' + new Date().getTime();
@@ -4211,6 +4232,147 @@ async function fetchAndLoadData() {
         console.error("Error loading graph data:", error);
     }
 }
+
+
+
+async function renderSubInterfaces(subInterfaces, referenceElementAfterId, referenceElementBeforeId, nodeName) {
+    console.log("##### renderSubInterfaces is called")
+    console.log("##### subInterfaces: ", subInterfaces)
+
+    const containerSelectorId = 'panel-link-action-dropdown-menu-dropdown-content';
+
+    const onClickHandler = (event, subInterface) => {
+        console.info(`Clicked on: ${subInterface}`);
+        linkWireshark(event, "edgeSharkSubInterface", subInterface, referenceElementAfterId);
+    };
+
+    // Validate container
+    const containerElement = document.getElementById(containerSelectorId);
+    if (!containerElement) {
+        console.error(`Container element with ID "${containerSelectorId}" not found.`);
+        return;
+    }
+
+    // Validate reference elements
+    const referenceElementAfter = document.getElementById(referenceElementAfterId);
+    const referenceElementBefore = document.getElementById(referenceElementBeforeId);
+    if (!referenceElementAfter || !referenceElementBefore) {
+        console.error(`Reference elements not found: afterId="${referenceElementAfterId}", beforeId="${referenceElementBeforeId}".`);
+        return;
+    }
+
+    // Remove all elements between referenceElementAfter and referenceElementBefore
+    let currentNode = referenceElementAfter.nextSibling;
+    while (currentNode && currentNode !== referenceElementBefore) {
+        const nextNode = currentNode.nextSibling;
+        currentNode.remove(); // Remove the current node
+        currentNode = nextNode;
+    }
+
+    // Handle case when subInterfaces is null
+    if (!subInterfaces) {
+        console.info("Sub-interfaces is null. Cleared existing items and performed no further actions.");
+        // Optionally, you could display a placeholder message or take other actions:
+        // const placeholder = document.createElement("div");
+        // placeholder.textContent = "No sub-interfaces available.";
+        // placeholder.style.textAlign = "center";
+        // insertAfter(placeholder, referenceElementAfter);
+        return;
+    }
+
+    // Add new sub-interface items
+    subInterfaces.forEach(subInterface => {
+        const a = document.createElement("a");
+        a.className = "dropdown-item label has-text-weight-normal is-small py-0";
+        a.style.display = "flex";
+        a.style.justifyContent = "flex-end";
+        a.textContent = `└ sub-interface :: ${nodeName} :: ${subInterface}`;
+        a.onclick = (event) => onClickHandler(event, subInterface);
+
+        insertAfter(a, referenceElementAfter);
+    });
+}
+
+
+// Helper function to insert an element after a reference element
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+function addSvgIcon(targetHtmlId, svgIcon, altName, position, size) {
+    // Find the target node
+    const targetNode = document.getElementById(targetHtmlId);
+    if (!targetNode) {
+        console.error(`Target node with ID "${targetHtmlId}" not found.`);
+        return;
+    }
+
+    // Ensure the target node uses flexbox for alignment
+    targetNode.style.display = "flex";
+    targetNode.style.alignItems = "center";
+
+    // Create the <img> element for the SVG icon
+    const imgIcon = document.createElement("img");
+    imgIcon.src = svgIcon;
+    imgIcon.alt = altName; // Accessible description
+    imgIcon.style.width = size;
+    imgIcon.style.height = size;
+    imgIcon.style.marginLeft = position === "after" ? "4px" : "0"; // Add spacing between the label and the icon if "after"
+    imgIcon.style.marginRight = position === "before" ? "4px" : "0"; // Add spacing if "before"
+
+    // Add CSS class for gradient animation
+    imgIcon.classList.add("gradient-animation");
+
+    // Insert the image based on the position
+    if (position === "after") {
+        // Append the image after the label
+        targetNode.append(imgIcon);
+    } else if (position === "before") {
+        // Insert the image before the label
+        targetNode.prepend(imgIcon);
+    } else {
+        console.error(
+            `Invalid position "${position}" specified. Use "after" or "before".`
+        );
+        return;
+    }
+
+    // Add dynamic style for gradient animation
+    const style = document.createElement("style");
+    style.textContent = `
+        @keyframes gradientColorChange {
+            0% { filter: invert(100%); } /* White */
+            20% { filter: invert(85%); } /* Light Grey */
+            40% { filter: invert(60%); } /* Dark Grey */
+            60% { filter: invert(40%); } /* Very Dark Grey */
+            80% { filter: invert(60%); } /* Back to Dark Grey */
+            100% { filter: invert(100%); } /* Back to White */
+        }
+        .gradient-animation {
+            animation: gradientColorChange 3600s infinite;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+
+
+// if (isVscodeDeployment) {
+
+//     console.log(`image-URI is ${window.imagesUrl}`)
+//     addSvgIcon("endpoint-a-edgeshark", `${window.imagesUrl}svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-edgeshark", `${window.imagesUrl}/svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-a-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
+//     addSvgIcon("panel-link-action-impairment-B->A", `${window.imagesUrl}/svg-impairment.svg`, "Impairment Icon", "before", "15px");
+// } else {
+//     addSvgIcon("endpoint-a-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-a-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
+//     addSvgIcon("panel-link-action-impairment-B->A", "images/svg-impairment.svg", "Impairment Icon", "before", "15px");
+// }
+
 
 
 // aarafat-tag:
@@ -4414,148 +4576,6 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-
-
-async function renderSubInterfaces(subInterfaces, referenceElementAfterId, referenceElementBeforeId, edgeSharkClipboardToggle) {
-
-    console.log("##### renderSubInterfaces is called")
-    console.log("##### subInterfaces: ", subInterfaces)
-
-    const containerSelectorId = 'panel-link-action-dropdown-menu-dropdown-content';
-
-    const onClickHandler = (event, subInterface) => {
-        console.info(`Clicked on: ${subInterface}`);
-        linkWireshark(event, "edgeSharkSubInterface", subInterface, referenceElementAfterId);
-    };
-
-    // Validate container
-    const containerElement = document.getElementById(containerSelectorId);
-    if (!containerElement) {
-        console.error(`Container element with ID "${containerSelectorId}" not found.`);
-        return;
-    }
-
-    // Validate reference elements
-    const referenceElementAfter = document.getElementById(referenceElementAfterId);
-    const referenceElementBefore = document.getElementById(referenceElementBeforeId);
-    if (!referenceElementAfter || !referenceElementBefore) {
-        console.error(`Reference elements not found: afterId="${referenceElementAfterId}", beforeId="${referenceElementBeforeId}".`);
-        return;
-    }
-
-    // Remove all elements between referenceElementAfter and referenceElementBefore
-    let currentNode = referenceElementAfter.nextSibling;
-    while (currentNode && currentNode !== referenceElementBefore) {
-        const nextNode = currentNode.nextSibling;
-        currentNode.remove(); // Remove the current node
-        currentNode = nextNode;
-    }
-
-    // Handle case when subInterfaces is null
-    if (!subInterfaces) {
-        console.info("Sub-interfaces is null. Cleared existing items and performed no further actions.");
-        // Optionally, you could display a placeholder message or take other actions:
-        // const placeholder = document.createElement("div");
-        // placeholder.textContent = "No sub-interfaces available.";
-        // placeholder.style.textAlign = "center";
-        // insertAfter(placeholder, referenceElementAfter);
-        return;
-    }
-
-    // Add new sub-interface items
-    subInterfaces.forEach(subInterface => {
-        const a = document.createElement("a");
-        a.className = "dropdown-item label has-text-weight-normal is-small py-0";
-        a.style.display = "flex";
-        a.style.justifyContent = "flex-end";
-        a.textContent = `└ Sub-Interface ${subInterface}`;
-        a.onclick = (event) => onClickHandler(event, subInterface);
-
-        insertAfter(a, referenceElementAfter);
-    });
-}
-
-
-
-
-// Helper function to insert an element after a reference element
-function insertAfter(newNode, referenceNode) {
-    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-}
-
-function addSvgIcon(targetHtmlId, svgIcon, altName, position, size) {
-    // Find the target node
-    const targetNode = document.getElementById(targetHtmlId);
-    if (!targetNode) {
-        console.error(`Target node with ID "${targetHtmlId}" not found.`);
-        return;
-    }
-
-    // Ensure the target node uses flexbox for alignment
-    targetNode.style.display = "flex";
-    targetNode.style.alignItems = "center";
-
-    // Create the <img> element for the SVG icon
-    const imgIcon = document.createElement("img");
-    imgIcon.src = svgIcon;
-    imgIcon.alt = altName; // Accessible description
-    imgIcon.style.width = size;
-    imgIcon.style.height = size;
-    imgIcon.style.marginLeft = position === "after" ? "4px" : "0"; // Add spacing between the label and the icon if "after"
-    imgIcon.style.marginRight = position === "before" ? "4px" : "0"; // Add spacing if "before"
-
-    // Add CSS class for gradient animation
-    imgIcon.classList.add("gradient-animation");
-
-    // Insert the image based on the position
-    if (position === "after") {
-        // Append the image after the label
-        targetNode.append(imgIcon);
-    } else if (position === "before") {
-        // Insert the image before the label
-        targetNode.prepend(imgIcon);
-    } else {
-        console.error(
-            `Invalid position "${position}" specified. Use "after" or "before".`
-        );
-        return;
-    }
-
-    // Add dynamic style for gradient animation
-    const style = document.createElement("style");
-    style.textContent = `
-        @keyframes gradientColorChange {
-            0% { filter: invert(100%); } /* White */
-            20% { filter: invert(85%); } /* Light Grey */
-            40% { filter: invert(60%); } /* Dark Grey */
-            60% { filter: invert(40%); } /* Very Dark Grey */
-            80% { filter: invert(60%); } /* Back to Dark Grey */
-            100% { filter: invert(100%); } /* Back to White */
-        }
-        .gradient-animation {
-            animation: gradientColorChange 3600s infinite;
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-
-
-// if (isVscodeDeployment) {
-
-//     console.log(`image-URI is ${window.imagesUrl}`)
-//     addSvgIcon("endpoint-a-edgeshark", `${window.imagesUrl}svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
-//     addSvgIcon("endpoint-b-edgeshark", `${window.imagesUrl}/svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
-//     addSvgIcon("endpoint-a-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
-//     addSvgIcon("endpoint-b-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
-//     addSvgIcon("panel-link-action-impairment-B->A", `${window.imagesUrl}/svg-impairment.svg`, "Impairment Icon", "before", "15px");
-// } else {
-//     addSvgIcon("endpoint-a-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
-//     addSvgIcon("endpoint-b-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
-//     addSvgIcon("endpoint-a-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
-//     addSvgIcon("endpoint-b-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
-//     addSvgIcon("panel-link-action-impairment-B->A", "images/svg-impairment.svg", "Impairment Icon", "before", "15px");
-// }
 
 // ASAD
 
