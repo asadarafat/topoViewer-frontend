@@ -175,6 +175,7 @@ function generateEncodedSVG(nodeType, fillColor) {
 
                 `;
             break;
+
         case "spine":  // Spine Node
             svgString = `
                     <svg
@@ -415,8 +416,8 @@ function generateEncodedSVG(nodeType, fillColor) {
                             xml:space="preserve"
                             style="enable-background:new 0 0 120 120;"
                             viewBox="0 0 120 120"
-                            x="0px"
                             y="0px"
+                            x="0px"
                             id="Layer_1"
                             version="1.1"
                             width="120px"
@@ -427,13 +428,14 @@ function generateEncodedSVG(nodeType, fillColor) {
                                 .st0 { fill: ${fillColor}; }
                                 .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
                             </style>
-                            <!-- Background rectangle -->
-                            <rect width="120" height="120" class="st0" />
-                            <!-- Scale the original 50x50 paths to 120x120 (scale factor 2.4 = 120/50) -->
-                            <g transform="scale(2.4)">
-                                <path class="st1" d="M41.67,37.96H8.33H41.67z M37.13,13.54c0,-0.21,0,-0.42,-0.08,-0.58c-0.08,-0.21,-0.17,-0.38,-0.33,-0.50
-                                c-0.13,-0.13,-0.33,-0.25,-0.50,-0.33c-0.21,-0.08,-0.38,-0.08,-0.58,-0.08H14.42c-0.21,0,-0.42,0,-0.58,0.08
-                                c-0.21,0.08,-0.38,0.17,-0.50,0.33c-0.13,0.13,-0.25,0.33,-0.33,0.50c-0.08,0.21,-0.08,0.38,-0.08,0.58V31.67h24.25V13.54z"/>
+                            <rect height="120" width="120" class="st0" />
+                            <g>
+                                <path
+                                    class="st1"
+                                    d="M100,91.1H20H100z M89.1,32.5c0-0.5,0-1-0.2-1.4c-0.2-0.5-0.4-0.9-0.8-1.2
+                                    c-0.3-0.3-0.8-0.6-1.2-0.8c-0.5-0.2-0.9-0.2-1.4-0.2H34.6c-0.5,0-1,0-1.4,0.2
+                                    c-0.5,0.2-0.9,0.4-1.2,0.8c-0.3,0.3-0.6,0.8-0.8,1.2c-0.2,0.5-0.2,0.9-0.2,1.4V76h58.2V32.5z"
+                                />
                             </g>
                         </svg>
 

@@ -1,4 +1,7 @@
 // vscodeHtmlTemplate.ts
+
+import { log } from '../../../backend/logger';
+
 export function getHTMLTemplate(
   cssUri: string,
   jsUri: string,
@@ -7,9 +10,12 @@ export function getHTMLTemplate(
   jsonFileUrlDataEnvironment: string,
   isVscodeDeployment: boolean,
   jsOutDir: string,
-  allowedhostname: string,
+  allowedHostname: string,
   socketAssignedPort: number
 ): string {
+
+        log.info(`allowedHostname in vscodeHtmlTemplate.ts: ${allowedHostname}`);
+  
 
   return `
 <!DOCTYPE html>
@@ -1511,10 +1517,10 @@ export function getHTMLTemplate(
     <!-- Inject isVscodeDeployment boolean as a global variable -->
     <script> window.isVscodeDeployment = "${isVscodeDeployment}"; </script>
 
-    <!-- Inject allowedhostname string as a global variable -->
-    <script> window.allowedhostname = ${allowedhostname}; </script>
+    <!-- Inject allowedHostname string as a global variable -->
+    <script> window.allowedHostname = "${allowedHostname}"; </script>
 
-    <!-- Inject allowedhostname number as a global variable -->
+    <!-- Inject allowedHostname number as a global variable -->
     <script> window.socketAssignedPort = ${socketAssignedPort}; </script>
 
     <script src="${jsUri}/common.js?ver=1"></script>

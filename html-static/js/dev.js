@@ -1445,13 +1445,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             console.info(`Expanded parallel edges for ${groupId}`);
-            bulmaToast.toast({
-                message: `Expanded parallel edges for ${groupId}`,
-                type: "is-warning is-size-6 p-3",
-                duration: 4000,
-                position: "top-center",
-                closeOnClick: true,
-            });
+            // bulmaToast.toast({
+            //     message: `Expanded parallel edges for ${groupId}`,
+            //     type: "is-warning is-size-6 p-3",
+            //     duration: 4000,
+            //     position: "top-center",
+            //     closeOnClick: true,
+            // });
 
         } else {
             // Collapse parallel edges except the clicked one
@@ -1469,13 +1469,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             console.info(`Collapsed parallel edges for ${groupId}`);
-            bulmaToast.toast({
-                message: `Collapsed parallel edges for ${groupId}`,
-                type: "is-warning is-size-6 p-3",
-                duration: 4000,
-                position: "top-center",
-                closeOnClick: true,
-            });
+            // bulmaToast.toast({
+            //     message: `Collapsed parallel edges for ${groupId}`,
+            //     type: "is-warning is-size-6 p-3",
+            //     duration: 4000,
+            //     position: "top-center",
+            //     closeOnClick: true,
+            // });
         }
     }
 
@@ -3288,7 +3288,7 @@ function loadCytoStyle(cy) {
                 "text-background-opacity": 0.7,
                 "text-background-shape": "roundrectangle",
                 "text-background-padding": "1px",
-                "overlay-padding": "0.3px",
+                // "overlay-padding": "0.3px",
                 "z-index": "2"
             }
         },
@@ -3318,8 +3318,6 @@ function loadCytoStyle(cy) {
                 "background-opacity": "0.2",
                 "color": "#EBECF0",
                 "text-outline-color": "#000000",
-                "width": "3px",
-                "height": "3x",
                 "font-size": "8px",
                 "z-index": "1"
             }
@@ -3953,12 +3951,12 @@ async function viewportButtonsSaveTopo(cy) {
 
                 // Check if extraData and labels exist before modifying
                 if (nodeJson.data?.extraData?.labels) {
-                    nodeJson.data.extraData.labels["topoViewer-presetPosX"] = nodeJson.position.x.toString();
-                    nodeJson.data.extraData.labels["topoViewer-presetPosY"] = nodeJson.position.y.toString();
+                    nodeJson.data.extraData.labels["graph-posX"] = nodeJson.position.x.toString();
+                    nodeJson.data.extraData.labels["graph-posY"] = nodeJson.position.y.toString();
                 }
 
                 return nodeJson;
-            }).filter(node => node.data.topoViewerRole !== "group"); // Exclude "group" nodes (parent nodes)
+            })// .filter(node => node.data.topoViewerRole !== "group"); // Exclude "group" nodes (parent nodes)
 
 
             // // Process edges: simply get their JSON representation.

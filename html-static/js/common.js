@@ -1,5 +1,4 @@
 "use strict";
-
 // -----------------------------------------------------------
 // Global State Variables
 // -----------------------------------------------------------
@@ -39,7 +38,9 @@ var jsonFileUrlDataCytoMarshall;
 var globalDblclickLastClick = { time: 0, id: null };
 var globalDblClickThreshold = 300; // Threshold in milliseconds
 
-var globalAllowedhostname = 'nsp-clab1.nice.nokia.net'
+// var globalAllowedhostname = 'nsp-clab1.nice.nokia.net'
+
+
 
 // -----------------------------------------------------------
 // Expose a Promise to load environment variables
@@ -284,11 +285,15 @@ function hideLoadingSpinnerGlobal() {
 
 // // Initiate socket port as number, to be used in socket creation
 var globalSocketAssignedPort = window.socketAssignedPort
-
+var globalAllowedhostname = window.allowedHostname
+console.log(`window.allowedHostname: ${window.allowedHostname}`)
+console.log('allowedHostname', globalAllowedhostname)
 
 // // aarafat-tag: vscode socket.io
 const socketIoServerAddress = `${globalAllowedhostname}:${globalSocketAssignedPort}`
 console.log(`socketIoServerAddress: ${socketIoServerAddress}`)
+console.log('socketIoServerAddress:',  socketIoServerAddress)
+
 
 const socket = io(`http://${socketIoServerAddress}`);
 
