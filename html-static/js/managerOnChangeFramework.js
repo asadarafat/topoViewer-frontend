@@ -311,6 +311,7 @@ function updateSocketBinding() {
             // Use the global monitorConfigs defined below.
             stateMonitorEngine(labData, monitorConfigs);
             socketDataEncrichmentLink(labData);
+            socketDataEncrichmentNode(labData)
 
         });
         console.log("Socket 'clab-tree-provider-data' event bound.");
@@ -409,7 +410,6 @@ function socketDataEncrichmentLink(labData) {
                         // if (!iface || typeof iface.mtu !== "number") return; // aarafat-tag: get mtu 
                         // if (!iface || typeof iface.type !== "string") return; // aarafat-tag: get type
 
-
                         const mac = iface.mac
                         const mtu = iface.mtu
                         const type = iface.type
@@ -422,8 +422,6 @@ function socketDataEncrichmentLink(labData) {
 
                         const key = `${lab.name}::${nodeName}::${endpoint}`;
                         linkDataEncrichmentMap[key] = linkDataUpdate;
-
-
                     });
                 });
             }
@@ -460,12 +458,69 @@ function socketDataEncrichmentLink(labData) {
                 edge.data('targetMac', iface.mac);
                 edge.data('targetMtu', iface.mtu);
                 edge.data('targetType', iface.type);
-
-
             }
         });
     });
+}
 
 
-    // return linkDataEncrichmentMap;
+
+function socketDataEncrichmentNode(labData) {
+    const nodeDataEncrichmentMap = {};
+    for (const labPath in labData) {
+        try {
+            const lab = labData[labPath];
+            console.log("socketDataEncrichmentNode - labName: ", lab.name);
+
+            if (lab.name === globalLabName) {
+                console.log("socketDataEncrichmentNode - globalLabName: ", globalLabName);
+
+                if (!lab || !Array.isArray(lab.containers)) continue;
+                lab.containers.forEach(container => {
+                    if (typeof container.label !== "string") return;
+                    // Remove lab-specific prefix; adjust the regex as needed.
+                    //   const nodeName = container.label.replace(/^clab-.*?-/, '');
+                    const nodeClabName = container.label
+
+                    const getRouterName = (fullString, keyword) =>
+                        fullString.split(keyword)[1].replace(/^-/, '');
+
+                    nodeName = getRouterName(nodeClabName, lab.name); // Outputs: router1
+                    // console.log("socketDataEncrichmentNode - nodeName: ", nodeName);
+
+                    const state = container.state
+                    const key = `${lab.name}::${nodeName}`;
+                    const nodeDataUpdate = { state };
+
+                    nodeDataEncrichmentMap[key] = nodeDataUpdate;
+
+                });
+            }
+        } catch (err) {
+            console.error(`socketDataEncrichmentNode - Error processing labPath "${labPath}" in node data enrichment:`, err);
+        }
+    }
+    console.log("socketDataEncrichmentNode - node-data-update for: ", nodeDataEncrichmentMap);
+    console.log("socketDataEncrichmentNode - globalLabName: ", globalLabName);
+
+    // aarafat-tag: update cytoscape edge data
+
+    // Loop over each interface key
+    Object.keys(nodeDataEncrichmentMap).forEach(key => {
+        // Split the key into [labName, nodeName, endPointName]
+        const parts = key.split("::");
+        if (parts.length !== 2) return; // skip keys not matching the expected format
+        const [labName, nodeName] = parts;
+        const nodeData = nodeDataEncrichmentMap[key];
+
+        // Iterate over each Cytoscape edge
+        cy.nodes().forEach(node => {
+            const data = node.data();
+
+            // If the node's source matches the node key, update its corresponding data
+            if (data.id === nodeName) {
+                node.data('state', nodeData.state);
+            }
+        });
+    });
 }

@@ -736,16 +736,6 @@ return `
         </div>
         <div class="panel-block p-0">
           <div class="column px-0">
-            <!--   aarafat-tag: vs-code
-                    <div  class="column my-auto is-11">
-                      <div  class="panel-content">
-                        <div class="columns is-mobile is-multiline py-auto" >
-                          <div  class="column is-4 p-1"><label class="label is-size-7 has-text-right has-text-weight-medium px-auto" >State</label></div>
-                          <div class="column is-8 p-1 pl-3" ><label class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content" id="panel-node-state">node-state-placeholder</label></div>
-                        </div>
-                      </div>
-                    </div>
-            -->
             <!-- Kind -->
             <div class="column my-auto is-11">
               <div class="panel-content">
@@ -767,6 +757,18 @@ return `
                   <div class="column is-8 p-1 pl-3"><label
                       class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
                       id="panel-node-image">node-image-placeholder</label></div>
+                </div>
+              </div>
+            </div>
+            <!-- State -->
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">State</label></div>
+                  <div class="column is-8 p-1 pl-3"><label
+                      class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-node-state">node-state-placeholder</label></div>
                 </div>
               </div>
             </div>
@@ -809,7 +811,7 @@ return `
               </div>
             </div>
             <!-- Group -->
-            <div class="column my-auto is-11">
+            <!-- <div class="column my-auto is-11">
               <div class="panel-content">
                 <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
@@ -819,13 +821,13 @@ return `
                       id="panel-node-group">node-group-placeholder</label></div>
                 </div>
               </div>
-            </div>
+            </div> -->
             <!-- TopoViewer Role -->
             <div class="column my-auto is-11">
               <div class="panel-content">
                 <div class="columns is-mobile is-multiline py-auto">
                   <div class="column is-4 p-1"><label
-                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">TopoViewer Role</label>
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">Icon</label>
                   </div>
                   <div class="column is-8 p-1 pl-3"><label
                       class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
