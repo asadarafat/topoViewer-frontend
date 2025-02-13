@@ -966,7 +966,7 @@ return `
       </div>
     </div>
 
-<!-- 
+    <!-- 
     <div class="panel-tabContainer">
       <div class="panel-block p-0">
         <div class="column px-0">
@@ -1088,7 +1088,29 @@ return `
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">MAC address</label></div>
                   <div class="column is-8 p-1 pl-3"><label
                       class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
-                      id="panel-link-endpoint-a-mac-address">link-mac-address-placeholder</label></div>
+                      id="panel-link-endpoint-a-mac-address">link-mac-address</label></div>
+                </div>
+              </div>
+            </div>
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">MTU</label></div>
+                  <div class="column is-8 p-1 pl-3"><label
+                      class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-link-endpoint-a-mtu">getting-link-mtu</label></div>
+                </div>
+              </div>
+            </div>
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">Type</label></div>
+                  <div class="column is-8 p-1 pl-3"><label
+                      class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-link-endpoint-a-type">getting-link-type</label></div>
                 </div>
               </div>
             </div>
@@ -1114,7 +1136,29 @@ return `
                       class="label is-size-7 has-text-right has-text-weight-medium px-auto">MAC address</label></div>
                   <div class="column is-8 p-1 pl-3"><label
                       class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
-                      id="panel-link-endpoint-b-mac-address">link-mac-address-placeholder</label></div>
+                      id="panel-link-endpoint-b-mac-address">getting-link-mac-address</label></div>
+                </div>
+              </div>
+            </div>
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">MTU</label></div>
+                  <div class="column is-8 p-1 pl-3"><label
+                      class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-link-endpoint-b-mtu">getting-link-mtu</label></div>
+                </div>
+              </div>
+            </div>
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">Type</label></div>
+                  <div class="column is-8 p-1 pl-3"><label
+                      class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-link-endpoint-b-type">getting-link-type</label></div>
                 </div>
               </div>
             </div>

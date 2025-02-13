@@ -297,31 +297,31 @@ console.log('socketIoServerAddress:',  socketIoServerAddress)
 
 const socket = io(`http://${socketIoServerAddress}`);
 
-// -----------------------------------------------------------------------------
-// SOCKET BINDING CONTROL
-// -----------------------------------------------------------------------------
+// // -----------------------------------------------------------------------------
+// // SOCKET BINDING CONTROL
+// // -----------------------------------------------------------------------------
 
-/**
- * updateSocketBinding()
- *
- * Unbinds any previous listener for "clab-tree-provider-data" and, if the global toggle is enabled,
- * binds an inline listener that processes the lab data using the generic state monitor engine.
- */
-function updateSocketBinding() {
-    // Unbind previous "clab-tree-provider-data" listeners.
-    socket.off('clab-tree-provider-data');
+// /**
+//  * updateSocketBinding()
+//  *
+//  * Unbinds any previous listener for "clab-tree-provider-data" and, if the global toggle is enabled,
+//  * binds an inline listener that processes the lab data using the generic state monitor engine.
+//  */
+// function updateSocketBinding() {
+//     // Unbind previous "clab-tree-provider-data" listeners.
+//     socket.off('clab-tree-provider-data');
 
-    if (globalToggleOnChangeCytoStyle) {
-        socket.on('clab-tree-provider-data', (labData) => {
-            console.log("Received clab-tree-provider-data:", labData);
-            // Use the global monitorConfigs defined below.
-            stateMonitorEngine(labData, monitorConfigs);
-        });
-        console.log("Socket 'clab-tree-provider-data' event bound.");
-    } else {
-        console.log("Socket 'clab-tree-provider-data' event unbound.");
-    }
-}
+//     if (globalToggleOnChangeCytoStyle) {
+//         socket.on('clab-tree-provider-data', (labData) => {
+//             console.log("Received clab-tree-provider-data - globalToggleOnChangeCytoStyl:", labData);
+//             // Use the global monitorConfigs defined below.
+//             stateMonitorEngine(labData, monitorConfigs);
+//         });
+//         console.log("Socket 'clab-tree-provider-data' event bound.");
+//     } else {
+//         console.log("Socket 'clab-tree-provider-data' event unbound.");
+//     }
+// }
 
 
 

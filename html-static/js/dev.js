@@ -1055,18 +1055,39 @@ document.addEventListener("DOMContentLoaded", async function () {
                 // get Source MAC Address
                 try {
                     console.log("########################################################### Source MAC Address")
-                    const response = await sendMessageToVscodeEndpointPost("clab-link-mac-address", {
-                        nodeName: clickedEdge.data("extraData").clabSourceLongName,
-                        interfaceName: clickedEdge.data("extraData").clabSourcePort
-                    });
-                    clabSourceMacAddress = response
+                    // const response = await sendMessageToVscodeEndpointPost("clab-link-mac-address", {
+                    //     nodeName: clickedEdge.data("extraData").clabSourceLongName,
+                    //     interfaceName: clickedEdge.data("extraData").clabSourcePort
+                    // });
+                    // clabSourceMacAddress = response
+
+                    clabSourceMacAddress = clickedEdge.data("sourceMac") // aarafat-tag: get source MAC address from the edge data; suplied by the backend socket
                     console.log("###########################################")
                     console.log("Source MAC address:", clabSourceMacAddress);
-
                     if (clabSourceMacAddress) {
                         // render MAC address
                         document.getElementById("panel-link-endpoint-a-mac-address").textContent = clabSourceMacAddress
                     }
+                    console.log("clicked-edge-sourceMac", clickedEdge.data("sourceMac"))
+
+                    clabSourceMtu = clickedEdge.data("sourceMtu") // aarafat-tag: get source MTU from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Source MAC address:", clabSourceMtu);
+                    if (clabSourceMtu) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-a-mtu").textContent = clabSourceMtu
+                    }
+                    console.log("clicked-edge-sourceMtu", clickedEdge.data("sourceMtu"))
+
+                    clabSourceType = clickedEdge.data("sourceType") // aarafat-tag: get source MTU from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Source MAC address:", clabSourceType);
+                    if (clabSourceType) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-a-type").textContent = clabSourceType
+                    }
+                    console.log("clicked-edge-sourceType", clickedEdge.data("sourceType"))
+
                 } catch (error) {
                     console.error("Failed to get SubInterface list:", error);
                 }
@@ -1074,19 +1095,39 @@ document.addEventListener("DOMContentLoaded", async function () {
                 // get Target MAC Address
                 try {
                     console.log("########################################################### Target MAC Address")
-                    const response = await sendMessageToVscodeEndpointPost("clab-link-mac-address", {
-                        nodeName: clickedEdge.data("extraData").clabTargetLongName,
-                        interfaceName: clickedEdge.data("extraData").clabTargetPort
-                    });
-                    clabTargetMacAddress = response
+                    // const response = await sendMessageToVscodeEndpointPost("clab-link-mac-address", {
+                    //     nodeName: clickedEdge.data("extraData").clabTargetLongName,
+                    //     interfaceName: clickedEdge.data("extraData").clabTargetPort
+                    // });
+                    // clabTargetMacAddress = response
+
+                    clabTargetMacAddress = clickedEdge.data("targetMac") // aarafat-tag: get target MAC address from the edge data; suplied by the backend socket
                     console.log("###########################################")
                     console.log("Target MAC address:", clabTargetMacAddress);
-
                     if (clabTargetMacAddress) {
                         // render MAC address
                         document.getElementById("panel-link-endpoint-b-mac-address").textContent = clabTargetMacAddress
-
                     }
+                    console.log("clicked-edge-targetMac", clickedEdge.data("targetMac"))
+
+                    clabTargetMtu = clickedEdge.data("targetMtu") // aarafat-tag: get target MTU from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Target MAC address:", clabTargetMtu);
+                    if (clabTargetMtu) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-b-mtu").textContent = clabTargetMtu
+                    }
+                    console.log("clicked-edge-targetMtu", clickedEdge.data("targetMtu"))
+
+                    clabTargetType = clickedEdge.data("targetType") // aarafat-tag: get target MTU from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Target MAC address:", clabTargetType);
+                    if (clabTargetType) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-b-type").textContent = clabTargetType
+                    }
+                    console.log("clicked-edge-targetType", clickedEdge.data("targetType"))
+
                 } catch (error) {
                     console.error("Failed to get SubInterface list:", error);
                 }
@@ -3969,40 +4010,40 @@ function viewportButtonsMultiLayerViewPortToggle() {
  */
 async function viewportButtonsSaveTopo(cy) {
     if (isVscodeDeployment) {
-      try {
-        console.log("viewportButtonsSaveTopo triggered");
-        // Ensure our Cytoscape instance is available
-        if (!window.cy) {
-          console.error('Cytoscape instance "cy" is not defined.');
-          return;
+        try {
+            console.log("viewportButtonsSaveTopo triggered");
+            // Ensure our Cytoscape instance is available
+            if (!window.cy) {
+                console.error('Cytoscape instance "cy" is not defined.');
+                return;
+            }
+            // Process nodes: update each node's "position" property with the current position.
+            const updatedNodes = cy.nodes().map(function (node) {
+                const nodeJson = node.json();
+                nodeJson.position = node.position(); // Update position property
+
+                // Check if extraData and labels exist before modifying
+                if (nodeJson.data?.extraData?.labels) {
+                    nodeJson.data.extraData.labels["graph-posX"] = nodeJson.position.x.toString();
+                    nodeJson.data.extraData.labels["graph-posY"] = nodeJson.position.y.toString();
+                }
+                return nodeJson;
+            });
+
+            // Combine nodes into one array (edges could be added here if needed)
+            const updatedElements = updatedNodes;
+
+            // Convert the updated elements to a JSON string (pretty printed)
+            const jsonString = JSON.stringify(updatedElements, null, 2);
+
+            const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
+            console.log("############### response from backend:", response);
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
         }
-        // Process nodes: update each node's "position" property with the current position.
-        const updatedNodes = cy.nodes().map(function (node) {
-          const nodeJson = node.json();
-          nodeJson.position = node.position(); // Update position property
-  
-          // Check if extraData and labels exist before modifying
-          if (nodeJson.data?.extraData?.labels) {
-            nodeJson.data.extraData.labels["graph-posX"] = nodeJson.position.x.toString();
-            nodeJson.data.extraData.labels["graph-posY"] = nodeJson.position.y.toString();
-          }
-          return nodeJson;
-        });
-  
-        // Combine nodes into one array (edges could be added here if needed)
-        const updatedElements = updatedNodes;
-  
-        // Convert the updated elements to a JSON string (pretty printed)
-        const jsonString = JSON.stringify(updatedElements, null, 2);
-  
-        const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
-        console.log("############### response from backend:", response);
-      } catch (err) {
-        console.error("############### Backend call failed:", err);
-      }
     }
-  }
-  
+}
+
 
 /**
  * toggleSocketEdgeUpdates()
