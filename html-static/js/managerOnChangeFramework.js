@@ -489,8 +489,10 @@ function socketDataEncrichmentNode(labData) {
                     // console.log("socketDataEncrichmentNode - nodeName: ", nodeName);
 
                     const state = container.state
+                    const image = container.image
+
                     const key = `${lab.name}::${nodeName}`;
-                    const nodeDataUpdate = { state };
+                    const nodeDataUpdate = { state, image };
 
                     nodeDataEncrichmentMap[key] = nodeDataUpdate;
 
@@ -520,6 +522,10 @@ function socketDataEncrichmentNode(labData) {
             // If the node's source matches the node key, update its corresponding data
             if (data.id === nodeName) {
                 node.data('state', nodeData.state);
+                node.data('image', nodeData.image);
+                // node.data(("extraData").image, nodeData.image);
+
+
             }
         });
     });

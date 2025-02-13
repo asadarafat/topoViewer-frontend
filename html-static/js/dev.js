@@ -808,15 +808,15 @@ document.addEventListener("DOMContentLoaded", async function () {
                     // Update panel-node content with node data
                     document.getElementById("panel-node-name").textContent = extraData.longname;
                     document.getElementById("panel-node-kind").textContent = extraData.kind;
-
-
-                    document.getElementById("panel-node-image").textContent = extraData.image;
+                    // document.getElementById("panel-node-image").textContent = extraData.image; // from socket
                     document.getElementById("panel-node-mgmtipv4").textContent = extraData.mgmtIpv4Addresss;
                     document.getElementById("panel-node-mgmtipv6").textContent = extraData.mgmtIpv6Address;
                     document.getElementById("panel-node-fqdn").textContent = extraData.fqdn;
                     // document.getElementById("panel-node-group").textContent = extraData.group;
                     document.getElementById("panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
                     document.getElementById("panel-node-state").textContent =  node.data("state");
+                    document.getElementById("panel-node-image").textContent =  node.data("image");
+
 
 
                     console.log ("nodeState: ", node.data("state"))
