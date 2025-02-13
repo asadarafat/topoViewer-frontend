@@ -140,12 +140,21 @@ function onChangeRuleInterfaceOperState(labData) {
 
                 if (!Array.isArray(container.interfaces)) return;
                 container.interfaces.forEach(iface => {
-                    if (!iface || typeof iface.label !== "string") return;
+                    // if (!iface || typeof iface.name !== "string") return;
+                    // if (!iface || typeof iface.alias !== "string") return;
+                    if (!iface || typeof iface.label !== "string") return; // aarafat-tag: intf.name is replaced with intf.label; why not intf.alias? intf.alias not available when default for interfaceName is used.
+
                     const description = iface.description || "";
                     const state = description.toUpperCase().includes("UP") ? "Up" : "Down";
+                    // const endpoint = iface.name;
+                    // const endpoint = iface.alias;
                     const endpoint = iface.label;
+
                     const key = `${nodeName}::${endpoint}`;
                     stateMap[key] = state;
+
+                    console.log(`managerOnChangeFramework--rule -- Interface-state-for ${key}: ${state}`);
+
                 });
             });
         } catch (err) {
@@ -176,21 +185,32 @@ function onChangeRuleInterfaceOperState(labData) {
  * @param {object} updateMessage - The update message.
  */
 function onChangeHandlerInterfaceOperState(updateMessage) {
-    console.log("onChangeHandlerInterfaceOperState received:", updateMessage);
+    console.log("managerOnChangeFramework managerOnChangeFramework | handler | received updateMessage:", updateMessage);
+    // Example output:
+    // {
+    //     "nodeName": "router1",
+    //     "monitoredObject": "ethernet-1/1",
+    //     "state": "Up"
+    // }
+
     const { nodeName, monitoredObject, state, removed } = updateMessage;
     const safeNodeName = typeof CSS !== "undefined" ? CSS.escape(nodeName) : nodeName;
-    const safeEndpoint = typeof CSS !== "undefined" ? CSS.escape(monitoredObject) : monitoredObject;
-    // const edgeSelector = `edge[source="${safeNodeName}"][sourceEndpoint="${safeEndpoint}"]`;
+    // const safeEndpoint = typeof CSS !== "undefined" ? CSS.escape(monitoredObject) : monitoredObject;
+
+    const safeEndpoint =
+        typeof CSS !== "undefined"
+            ? CSS.escape(monitoredObject).replace(/\\\//g, "/")
+            : monitoredObject;
 
 
     const edgeSelector = `edge[source="${safeNodeName}"][sourceEndpoint="${safeEndpoint}"]`;
-
-    console.log("safeNodeName: ", safeNodeName);
-    console.log("safeEndpoint: ", safeEndpoint);
-    console.log("edgeSelector: ", edgeSelector);
-
     const edges = cy.$(edgeSelector);
-
+    console.log(`managerOnChangeFramework | handler | safeNodeName: ${safeNodeName} \n safeEndpoint: ${safeEndpoint} \n edgeSelector: ${edgeSelector} \n selectedEdges: ${edges}`);
+    // Example output:
+    // managerOnChangeFramework | handler | safeNodeName: router1 
+    // safeEndpoint: ethernet-3\/1 
+    // edgeSelector: edge[source="router1"][sourceEndpoint="ethernet-3\/1"] 
+    // selectedEdges: 
 
     edgeCollection = edges
     // Check if any matching edge was found and retrieve its id
@@ -199,7 +219,7 @@ function onChangeHandlerInterfaceOperState(updateMessage) {
         const edgeId = edgeCollection[0].id(); // or edgeCollection[0].data('id')
         console.log("edgeId:", edgeId);
     } else {
-        console.log(`No edge found with source ${safeNodeName} and sourceEndpoint ${safeEndpoint}`);
+        console.log(`managerOnChangeFramework | handler | No edge found with source ${safeNodeName} and sourceEndpoint ${safeEndpoint}`);
     }
 
     if (edges.length > 0) {
@@ -211,7 +231,7 @@ function onChangeHandlerInterfaceOperState(updateMessage) {
                 updateEdgeDynamicStyle(edge.id(), "line-color", "#969799");
 
             });
-            console.log(`Reverted styles for removed edge(s) matching: ${edgeSelector}`);
+            console.log(`managerOnChangeFramework | handler | Reverted styles for removed edge(s) matching: ${edgeSelector}`);
         } else {
             const newColor = state === "Up" ? '#00df2b' : '#df2b00';
             edges.forEach(edge => {
@@ -220,10 +240,10 @@ function onChangeHandlerInterfaceOperState(updateMessage) {
 
                 updateEdgeDynamicStyle(edge.id(), "line-color", newColor);
             });
-            console.log(`Updated edge(s) matching ${edgeSelector} with color: ${newColor}`);
+            console.log(`managerOnChangeFramework | handler | Updated edge(s) matching ${edgeSelector} with color: ${newColor}`);
         }
     } else {
-        console.warn(`No edge found matching: ${edgeSelector}`);
+        console.warn(`managerOnChangeFramework | handler | No edge found matching: ${edgeSelector}`);
     }
 }
 
