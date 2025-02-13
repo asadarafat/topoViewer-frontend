@@ -918,7 +918,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 document.getElementById("panel-link").style.display = "none";
             }
 
-            document.getElementById("panel-link-name").textContent = `${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")} | ${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
+            document.getElementById("panel-link-name").innerHTML = `┌ ${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")}<br>└ ${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
             document.getElementById("panel-link-endpoint-a-name").textContent = `${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")}`
             // document.getElementById("panel-link-endpoint-a-mac-address").textContent = "getting the MAC address"
             document.getElementById("panel-link-endpoint-b-name").textContent = `${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
