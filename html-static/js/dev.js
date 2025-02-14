@@ -755,6 +755,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("editor Node: ", node.data("editor"));
 
         if (!node.isParent()) {
+
             // Initialize the listener and get the live checker function
             const checkboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
             const originalEvent = event.originalEvent;
@@ -773,6 +774,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (originalEvent.shiftKey) {
                     console.info("Shift + Click");
                     console.info("edgeHandler Node: ", extraData.longname);
+
                     isEdgeHandlerActive = true;
                     eh.start(node);
                     console.info("Node is an editor node");
@@ -824,6 +826,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     // Set global selected node and log details
                     globalSelectedNode = extraData.longname;
                     console.info("internal: ", globalSelectedNode);
+
                     appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
                     appendMessage(`"nodeClicked: " ${nodeClicked}`);
                 }
