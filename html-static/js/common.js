@@ -292,36 +292,38 @@ console.log('allowedHostname', globalAllowedhostname)
 // // aarafat-tag: vscode socket.io
 const socketIoServerAddress = `${globalAllowedhostname}:${globalSocketAssignedPort}`
 console.log(`socketIoServerAddress: ${socketIoServerAddress}`)
-console.log('socketIoServerAddress:',  socketIoServerAddress)
+console.log('socketIoServerAddress:', socketIoServerAddress)
 
 
 const socket = io(`http://${socketIoServerAddress}`);
 
-// // -----------------------------------------------------------------------------
-// // SOCKET BINDING CONTROL
-// // -----------------------------------------------------------------------------
+// // -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// // SOCKET BINDING CONTROL // aarafat-tag: this is the main function to bind the socket // entry point for managerOnChangeEvent.js, managerSocketDataEnrichment.js
+// // -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+/**
+ * updateSocketBinding()
+ *
+ * Unbinds any previous listener for "clab-tree-provider-data" and, if the global toggle is enabled,
+ * binds an inline listener that processes the lab data using the generic state monitor engine.
+ */
+function updateSocketBinding() {
+	// Unbind previous "clab-tree-provider-data" listeners.
+	socket.off('clab-tree-provider-data');
 
-// /**
-//  * updateSocketBinding()
-//  *
-//  * Unbinds any previous listener for "clab-tree-provider-data" and, if the global toggle is enabled,
-//  * binds an inline listener that processes the lab data using the generic state monitor engine.
-//  */
-// function updateSocketBinding() {
-//     // Unbind previous "clab-tree-provider-data" listeners.
-//     socket.off('clab-tree-provider-data');
+	if (globalToggleOnChangeCytoStyle) {
+		socket.on('clab-tree-provider-data', (labData) => {
+			console.log("Received clab-tree-provider-data - globalToggleOnChangeCytoStyl:", labData);
+			// Use the global monitorConfigs defined below.
+			stateMonitorEngine(labData, monitorConfigs);
+			socketDataEncrichmentLink(labData);
+			socketDataEncrichmentNode(labData)
 
-//     if (globalToggleOnChangeCytoStyle) {
-//         socket.on('clab-tree-provider-data', (labData) => {
-//             console.log("Received clab-tree-provider-data - globalToggleOnChangeCytoStyl:", labData);
-//             // Use the global monitorConfigs defined below.
-//             stateMonitorEngine(labData, monitorConfigs);
-//         });
-//         console.log("Socket 'clab-tree-provider-data' event bound.");
-//     } else {
-//         console.log("Socket 'clab-tree-provider-data' event unbound.");
-//     }
-// }
+		});
+		console.log("Socket 'clab-tree-provider-data' event bound.");
+	} else {
+		console.log("Socket 'clab-tree-provider-data' event unbound.");
+	}
+}
 
 
 
@@ -338,12 +340,12 @@ const socket = io(`http://${socketIoServerAddress}`);
  * @param {string|number} value - The new value for the style property.
  */
 function updateEdgeDynamicStyle(edgeId, styleProp, value) {
-    const edge = cy.$(`#${edgeId}`);
-    if (edge.length > 0) {
-        edge.style(styleProp, value);
-        const cacheKey = `edge:${edgeId}:${styleProp}`;
-        window.dynamicCytoStyles.set(cacheKey, value);
-    }
+	const edge = cy.$(`#${edgeId}`);
+	if (edge.length > 0) {
+		edge.style(styleProp, value);
+		const cacheKey = `edge:${edgeId}:${styleProp}`;
+		window.dynamicCytoStyles.set(cacheKey, value);
+	}
 }
 
 /**
@@ -354,32 +356,32 @@ function updateEdgeDynamicStyle(edgeId, styleProp, value) {
  * @param {string|number} value - The new value for the style property.
  */
 function updateNodeDynamicStyle(nodeId, styleProp, value) {
-    const node = cy.$(`#${nodeId}`);
-    if (node.length > 0) {
-        node.style(styleProp, value);
-        const cacheKey = `node:${nodeId}:${styleProp}`;
-        window.dynamicCytoStyles.set(cacheKey, value);
-    }
+	const node = cy.$(`#${nodeId}`);
+	if (node.length > 0) {
+		node.style(styleProp, value);
+		const cacheKey = `node:${nodeId}:${styleProp}`;
+		window.dynamicCytoStyles.set(cacheKey, value);
+	}
 }
 
 /**
  * Iterates over the dynamic style cache and re-applies the stored styles.
  */
 function restoreDynamicStyles() {
-    window.dynamicCytoStyles.forEach((value, key) => {
-        const parts = key.split(":"); // e.g. ["edge", "Clab-Link0", "text-background-color"]
-        if (parts.length !== 3) return;
-        const [type, id, styleProp] = parts;
-        if (type === "edge") {
-            const edge = cy.$(`#${id}`);
-            if (edge.length > 0) {
-                edge.style(styleProp, value);
-            }
-        } else if (type === "node") {
-            const node = cy.$(`#${id}`);
-            if (node.length > 0) {
-                node.style(styleProp, value);
-            }
-        }
-    });
+	window.dynamicCytoStyles.forEach((value, key) => {
+		const parts = key.split(":"); // e.g. ["edge", "Clab-Link0", "text-background-color"]
+		if (parts.length !== 3) return;
+		const [type, id, styleProp] = parts;
+		if (type === "edge") {
+			const edge = cy.$(`#${id}`);
+			if (edge.length > 0) {
+				edge.style(styleProp, value);
+			}
+		} else if (type === "node") {
+			const node = cy.$(`#${id}`);
+			if (node.length > 0) {
+				node.style(styleProp, value);
+			}
+		}
+	});
 }

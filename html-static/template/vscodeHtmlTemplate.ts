@@ -1590,7 +1590,10 @@ return `
 
     <script src="${jsUri}/dev.js?ver=1"></script>
 
+    <!-- clabTreeProviderData provided to below script using socket.io -->
     <script src="${jsUri}/managerOnChangeFramework.js?ver=1"></script>
+    <script src="${jsUri}/managerSocketDataEnrichment.js?ver=1"></script>
+
     <script src="${jsUri}/managerVscodeWebview.js?ver=1"></script>
     <script src="${jsUri}/managerSvg.js?ver=1"></script>
     <script src="${jsUri}/managerLayoutAlgo.js?ver=1"></script>
