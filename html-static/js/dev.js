@@ -1,6 +1,3 @@
-// Check globalVariables.js for initiation
-
-
 require.config({
     paths: {
         'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/min/vs'
@@ -18,25 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // window.monacoEditor = monaco.editor.create(document.getElementById('editorContainer'), ...);
     });
 });
-
-
-
-
-async function reloadViewport() {
-    if (isVscodeDeployment) {
-        try {
-            const response = await sendMessageToVscodeEndpointPost("reload-viewport", "Empty Payload");
-            console.log("############### response from backend:", response);
-            sleep(1000)
-            // Re-Init load data.
-            fetchAndLoadData()
-
-        } catch (err) {
-            console.error("############### Backend call failed:", err);
-        }
-    }
-
-}
 
 
 
@@ -157,7 +135,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             dataDisplay.style.width = '1.5%';
             dataDisplay.classList.remove('transparent');
 
-
             console.info('togglePanelButtonExpand - dataDisplay.style.width: ', dataDisplay.style.width);
             console.info('togglePanelButtonExpand - rootDiv.style.width: ', rootDiv.style.width);
             console.info('togglePanelButtonExpand - divider.style.left: ', divider.style.left);
@@ -249,7 +226,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                     const IPAddress = JSON.parse(msgContainerNodeStatus.data).Networks.Networks.clab.IPAddress;
                     const GlobalIPv6Address = JSON.parse(msgContainerNodeStatus.data).Networks.Networks.clab.GlobalIPv6Address
-
 
                     setNodeDataWithContainerAttribute(Names, Status, State, IPAddress, GlobalIPv6Address);
 
@@ -564,86 +540,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
 
+    // * Fetches data from the JSON file, processes it, and loads it into the Cytoscape instance.
+    // * This integrated function appends a timestamp to bypass caching, fetches the JSON data,
+    // * processes the data with `assignMissingLatLng()`, clears existing elements, adds the new ones,
+    // * applies the "cola" layout, removes specific nodes, and sets up expand/collapse functionality.   
 
-
-
-    // if (isVscodeDeployment) {
-    //     jsonFileUrlDataCytoMarshall = window.jsonFileUrlDataCytoMarshall
-    // } else {
-    //     jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json"
-    // }
-
-    // // Fetch and load element data from a JSON file , jsonFileUrl absolut path of dataCytoMarshall.json
-    // // Main Version EDITOR 
-    // console.log(`deployment-type: ${isVscodeDeployment}`)
-    // console.log(`jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`)
-
-    // fetch(jsonFileUrlDataCytoMarshall)
-
-    //     .then((response) => response.json())
-    //     .then((elements) => {
-
-    //         // Process the data to assign missing lat and lng
-    //         var updatedElements
-    //         if (isVscodeDeployment) {
-    //             // updatedElements = (elements);
-    //             updatedElements = assignMissingLatLng(elements);
-
-    //         } else {
-    //             updatedElements = assignMissingLatLng(elements);
-    //         }
-
-    //         // Now, you can use updatedElements as needed
-    //         // For example, logging them to the console
-    //         console.log("Updated Elements:", updatedElements);
-
-    //         // Add the elements to the Cytoscape instance
-    //         cy.add(updatedElements);
-    //         // run layout
-    //         const layout = cy.layout({
-    //             name: "cola",
-    //             nodeGap: 5,
-    //             edgeLength: 100,
-    //             animate: true,
-    //             randomize: false,
-    //             maxSimulationTime: 1500,
-    //         });
-    //         layout.run();
-
-    //         // remove node topoviewer
-    //         topoViewerNode = cy.filter('node[name = "topoviewer"]');
-    //         topoViewerNode.remove();
-
-    //         // remove node TopoViewerParentNode
-    //         topoViewerParentNode = cy.filter('node[name = "TopoViewer:1"]');
-    //         topoViewerParentNode.remove();
-
-    //         var cyExpandCollapse = cy.expandCollapse({
-    //             layoutBy: null, // null means use existing layout
-    //             undoable: false,
-    //             fisheye: false,
-    //             animationDuration: 10, // when animate is true, the duration in milliseconds of the animation
-    //             animate: true
-    //         });
-
-    //         // Example collapse/expand after some delay
-    //         // Make sure the '#parent' node exists in your loaded elements
-    //         setTimeout(function () {
-    //             var parent = cy.$('#parent'); // Ensure that '#parent' is actually present in dataCytoMarshall.json
-    //             cyExpandCollapse.collapse(parent);
-
-    //             setTimeout(function () {
-    //                 cyExpandCollapse.expand(parent);
-    //             }, 2000);
-    //         }, 2000);
-
-    //     })
-    //     .catch((error) => {
-    //         console.error("Error loading graph data:", error);
-    //     });
-
-
-    // Initially load data.
     fetchAndLoadData()
 
     // Instantiate hover text element
@@ -800,20 +701,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
-    // Listen for the custom 'dblclick' event.
-    cy.on("dblclick", 'node', function (event) {
-        var node = event.target;
-
-        globalSelectedNode = node.data("extraData").longname;
-
-
-        console.log('Double-clicked on node:', node.id());
-        // For demonstration, change the node's color on double-click.
-        node.style('border-color', 'AD0000');
-
-        sshWebBased(event)
-    });
-
     // Click event listener for nodes
     cy.on("click", "node", async function (event) {
 
@@ -832,7 +719,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("isEdgeHandlerActive after node click: ", isEdgeHandlerActive);
 
         environments = await getEnvironments(event);
-        console.info("sshWebBased - environments: ", environments)
+        console.info("nodeActionConnectToSSH - environments: ", environments)
 
         cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
         clabServerAddress = environments["clab-server-address"]
@@ -845,134 +732,100 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
 
-        // aarafat-tag: 
-        // protoype double click node to trigger Connect to SSH, but still mixed up with single clice to trigger show Panel-Node
-        const currentTime = Date.now();
-        // Check if the current tap is on the same node and within the threshold.
-        if (globalDblclickLastClick.id === node.id() && (currentTime - globalDblclickLastClick.time < globalDblClickThreshold)) {
-            // Trigger a custom 'dblclick' event on the node.
-            node.trigger("dblclick", event);
-            // Reset globalDblclickLastClick so that triple-clicks don't trigger extra dblclick events.
-            globalDblclickLastClick.time = 0;
-            globalDblclickLastClick.id = null;
+        // // aarafat-tag: 
+        // // protoype double click node to trigger Connect to SSH, but still mixed up with single clice to trigger show Panel-Node
+        // const currentTime = Date.now();
+        // // Check if the current tap is on the same node and within the threshold.
+        // if (globalDblclickLastClick.id === node.id() && (currentTime - globalDblclickLastClick.time < globalDblClickThreshold)) {
+        //     // Trigger a custom 'dblclick' event on the node.
+        //     node.trigger("dblclick", event);
+        //     // Reset globalDblclickLastClick so that triple-clicks don't trigger extra dblclick events.
+        //     globalDblclickLastClick.time = 0;
+        //     globalDblclickLastClick.id = null;
 
-            console.log(" ########### dblclick true")
+        //     console.log(" ########### dblclick true")
 
-        } else {
-            // Update globalDblclickLastClick with the current tap info.
-            globalDblclickLastClick.time = currentTime;
-            globalDblclickLastClick.id = node.id();
-            console.log(" ########### dblclick false")
-        }
-
-
-
+        // } else {
+        //     // Update globalDblclickLastClick with the current tap info.
+        //     globalDblclickLastClick.time = currentTime;
+        //     globalDblclickLastClick.id = node.id();
+        //     console.log(" ########### dblclick false")
+        // }
 
         console.info("editor Node: ", node.data("editor"));
 
         if (!node.isParent()) {
-            // Initialize the checkbox listener and store its state.
-            const checkboxSelector = '#viewport-drawer-clab-editor-content-01 .checkbox-input';
-            // const isCheckboxActive = setupCheckboxListener(checkboxSelector);
-            const isEditorCheckboxActive = setupCheckboxListener(checkboxSelector);
 
+            // Initialize the listener and get the live checker function
+            const checkboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
+            const originalEvent = event.originalEvent;
+            const extraData = node.data("extraData");
+            const isEditor = node.data("editor") === "true";
 
-            // Cache modifier keys and node properties.
-            const { ctrlKey, shiftKey, altKey, metaKey } = event.originalEvent;
-            const isChild = node.isChild();
-            // const isEditor = node.data("editor") === "true";
-            const isEditorNode = node.data("editor") === "true";
-
-
-            // Early exits based on active checkbox and key modifiers.
-            if (isEditorCheckboxActive) {
-                if (ctrlKey && isChild) {
+            if (checkboxChecked) {
+                // Orphan node: Ctrl + click on a child node
+                if (originalEvent.ctrlKey && node.isChild()) {
                     console.info(`Orphaning node: ${node.id()} from parent: ${node.parent().id()}`);
                     node.move({ parent: null });
                     console.info(`${node.id()} is now an orphan`);
-                    return;
                 }
-                if (shiftKey) {
+
+                // Start edge creation: Shift + click
+                if (originalEvent.shiftKey) {
                     console.info("Shift + Click");
-                    console.info("edgeHandler Node:", node.data("extraData").longname);
+                    console.info("edgeHandler Node: ", extraData.longname);
+
                     isEdgeHandlerActive = true;
                     eh.start(node);
                     console.info("Node is an editor node");
                     showPanelNodeEditor(node);
-                    return;
                 }
-                if (altKey && isEditorNode) {
+
+                // Delete node: Alt + click when the node is an editor
+                if (originalEvent.altKey && isEditor) {
                     console.info("Alt + Click is enabled");
-                    console.info("deleted Node:", node.data("extraData").longname);
+                    console.info("deleted Node: ", extraData.longname);
                     deleteNodeToEditorToFile(node);
-                    return;
                 }
             }
 
-            // Fallback: if the node is marked as an editor, show node its panel(node editor panel).
-            if (isEditorNode) {
+            // For editor nodes, simply show the editor panel
+            if (isEditor) {
                 showPanelNodeEditor(node);
-
             } else {
-                // If not an editor, update the display panels.
-                // Hide all overlays.
-
-                if (ctrlKey) {
-                    console.info(`${node.id()} is calling for Connect to SSH`);
-                    return;
-
+                if (originalEvent.ctrlKey) {
+                    globalSelectedNode = node.data("extraData").longname;
+                    nodeActionConnectToSSH(event)
                 } else {
-
+                    // Hide all overlay panels
                     const panelOverlays = document.getElementsByClassName("panel-overlay");
-                    for (let i = 0; i < panelOverlays.length; i++) {
-                        panelOverlays[i].style.display = "none";
-                    }
-                    console.info(node);
-                    console.info(node.data("extraData"));
+                    Array.from(panelOverlays).forEach(panel => panel.style.display = "none");
 
-                    // Helper to toggle the display of a panel by element ID.
-                    const togglePanelDisplay = (panelId) => {
-                        const panel = document.getElementById(panelId);
-                        panel.style.display = (panel.style.display === "none") ? "block" : "none";
-                    };
+                    console.info(node, extraData);
+                    const panelNode = document.getElementById("panel-node");
 
-                    // Toggle the main panel.
-                    togglePanelDisplay("panel-node");
+                    // Toggle panel-node display
+                    panelNode.style.display = (panelNode.style.display === "none") ? "block" : "none";
 
-                    // Update main panel details.
-                    const extraData = node.data("extraData");
+                    // Update panel-node content with node data
                     document.getElementById("panel-node-name").textContent = extraData.longname;
                     document.getElementById("panel-node-kind").textContent = extraData.kind;
-                    document.getElementById("panel-node-image").textContent = extraData.image;
+                    // document.getElementById("panel-node-image").textContent = extraData.image; // from socket
                     document.getElementById("panel-node-mgmtipv4").textContent = extraData.mgmtIpv4Addresss;
                     document.getElementById("panel-node-mgmtipv6").textContent = extraData.mgmtIpv6Address;
                     document.getElementById("panel-node-fqdn").textContent = extraData.fqdn;
-                    document.getElementById("panel-node-group").textContent = extraData.group;
+                    // document.getElementById("panel-node-group").textContent = extraData.group;
                     document.getElementById("panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
+                    document.getElementById("panel-node-state").textContent =  node.data("state");
+                    document.getElementById("panel-node-image").textContent =  node.data("image");
 
-                    // Set the global selection.
+
+
+                    console.log ("nodeState: ", node.data("state"))
+
+                    // Set global selected node and log details
                     globalSelectedNode = extraData.longname;
-                    console.info("internal:", globalSelectedNode);
-
-                    appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
-                    appendMessage(`"nodeClicked: " ${nodeClicked}`);
-
-                    // Toggle the secondary data display panel.
-                    togglePanelDisplay("data-display-panel-node");
-
-                    // Update data display panel details.
-                    document.getElementById("data-display-panel-node-name").textContent = extraData.longname;
-                    document.getElementById("data-display-panel-node-kind").textContent = extraData.kind;
-                    document.getElementById("data-display-panel-node-image").textContent = extraData.image;
-                    document.getElementById("data-display-panel-node-mgmtipv4").textContent = extraData.mgmtIpv4Addresss;
-                    document.getElementById("data-display-panel-node-mgmtipv6").textContent = extraData.mgmtIpv6Address;
-                    document.getElementById("data-display-panel-node-fqdn").textContent = extraData.fqdn;
-                    document.getElementById("data-display-panel-node-group").textContent = extraData.group;
-                    document.getElementById("data-display-panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
-
-                    // Again update global selection (if needed).
-                    globalSelectedNode = extraData.longname;
-                    console.info("internal:", globalSelectedNode);
+                    console.info("internal: ", globalSelectedNode);
 
                     appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
                     appendMessage(`"nodeClicked: " ${nodeClicked}`);
@@ -988,9 +841,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("isPanel01Cy: ", isPanel01Cy);
         console.info("nodeClicked: ", nodeClicked);
         console.info("edgeClicked: ", edgeClicked);
-
-
-
 
         // Remove all Overlayed Panel
         // Get all elements with the class "panel-overlay"
@@ -1010,7 +860,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
         edgeClicked = true;
-
 
         console.info("edge clicked after");
         console.info("isPanel01Cy: ", isPanel01Cy);
@@ -1038,8 +887,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Assign middle labels
         assignMiddleLabels(clickedEdge);
 
-
-
         // Usage: Initialize the listener and get a live checker function
         const isViewportDrawerClabEditorCheckboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
 
@@ -1048,7 +895,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.info("deleted Edge: ", clickedEdge.data("source"), clickedEdge.data("target"));
 
             deleteEdgeToEditorToFile(clickedEdge)
-
         }
         if (event.originalEvent.altKey && isViewportDrawerClabEditorCheckboxChecked && clickedEdge.data("editor") !== "true") {
             console.info("Alt + Click is enabled");
@@ -1059,13 +905,17 @@ document.addEventListener("DOMContentLoaded", async function () {
                 position: "top-center",
                 closeOnClick: true,
             });
-
-
         }
 
 
         if (clickedEdge.data("editor") !== "true") {
 
+
+            // set selected edge-id to global variable
+            globalSelectedEdge = clickedEdge.data("id")
+
+            console.log(`"edgeClicked: " ${globalSelectedEdge}`);
+            appendMessage(`"edgeClicked: " ${edgeClicked}`);
 
             console.log("clickedEdge.data.source 2nd:", clickedEdge.data("source"))
             console.log("clickedEdge.data.target 2nd:", clickedEdge.data("target"))
@@ -1077,32 +927,225 @@ document.addEventListener("DOMContentLoaded", async function () {
                 document.getElementById("panel-link").style.display = "none";
             }
 
-            document.getElementById("panel-link-name").textContent = `${clickedEdge.data("source")} --- ${clickedEdge.data("target")}`
+            document.getElementById("panel-link-name").innerHTML = `┌ ${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")}<br>└ ${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
             document.getElementById("panel-link-endpoint-a-name").textContent = `${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")}`
             // document.getElementById("panel-link-endpoint-a-mac-address").textContent = "getting the MAC address"
             document.getElementById("panel-link-endpoint-b-name").textContent = `${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
             // document.getElementById("panel-link-endpoint-b-mac-address").textContent = "getting the MAC address"
 
 
+            document.getElementById("endpoint-a-edgeshark").textContent = `Edgeshark :: ${clickedEdge.data("source")} :: ${clickedEdge.data("sourceEndpoint")}`
+            document.getElementById("endpoint-b-edgeshark").textContent = `Edgeshark :: ${clickedEdge.data("target")} :: ${clickedEdge.data("targetEndpoint")}`
+
+
+
+
+            //render sourceSubInterfaces
+
+            let clabSourceSubInterfacesClabData
+            if (isVscodeDeployment) {
+                try {
+                    console.log("########################################################### source subInt")
+                    const response = await sendMessageToVscodeEndpointPost("clab-link-subinterfaces", {
+                        nodeName: clickedEdge.data("extraData").clabSourceLongName,
+                        interfaceName: clickedEdge.data("extraData").clabSourcePort
+                    });
+                    clabSourceSubInterfacesClabData = response.map(item => item.name); // Output: ["e1-1-1", "e1-1-2"]
+                    console.log("Source SubInterface list:", clabSourceSubInterfacesClabData);
+
+                    if (Array.isArray(clabSourceSubInterfacesClabData) && clabSourceSubInterfacesClabData.length > 0) {
+                        // Map sub-interfaces with prefix
+                        const sourceSubInterfaces = clabSourceSubInterfacesClabData
+                        // Render sub-interfaces
+                        renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-top', 'endpoint-a-bottom', nodeName);
+                    } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
+                        console.info("No sub-interfaces found. The input data array is empty.");
+                        renderSubInterfaces(null, 'endpoint-a-top', 'endpoint-a-bottom', nodeName);
+                    } else {
+                        console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+                        renderSubInterfaces(null, 'endpoint-a-top', 'endpoint-a-bottom', nodeName);
+                    }
+
+
+
+                } catch (error) {
+                    console.error("Failed to get SubInterface list:", error);
+                }
+            } else {
+                let clabSourceSubInterfacesArgList = [
+                    clickedEdge.data("extraData").clabSourceLongName,
+                    clickedEdge.data("extraData").clabSourcePort
+                ];
+                clabSourceSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabSourceSubInterfacesArgList);
+                console.info("clabSourceSubInterfacesClabData: ", clabSourceSubInterfacesClabData);
+                if (Array.isArray(clabSourceSubInterfacesClabData) && clabSourceSubInterfacesClabData.length > 0) {
+                    // Map sub-interfaces with prefix
+                    const sourceSubInterfaces = clabSourceSubInterfacesClabData.map(
+                        item => `${item.ifname}`
+                    );
+                    // Render sub-interfaces
+                    renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-edgeshark', 'endpoint-a-clipboard', nodeName);
+                    renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-clipboard', 'endpoint-a-bottom', nodeName);
+                } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
+                    console.info("No sub-interfaces found. The input data array is empty.");
+                    renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard', nodeName);
+                    renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom', nodeName);
+                } else {
+                    console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+                    renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard', nodeName);
+                    renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom', nodeName);
+                }
+            }
+
+
+
+            //render targetSubInterfaces
+            if (isVscodeDeployment) {
+                try {
+                    console.log("########################################################### target subInt")
+                    const response = await sendMessageToVscodeEndpointPost("clab-link-subinterfaces", {
+                        nodeName: clickedEdge.data("extraData").clabTargetLongName,
+                        interfaceName: clickedEdge.data("extraData").clabTargetPort
+                    });
+                    clabTargetSubInterfacesClabData = response.map(item => item.name); // Output: ["e1-1-1", "e1-1-2"]
+                    console.log("###########################################")
+                    console.log("Target SubInterface list:", clabTargetSubInterfacesClabData);
+
+                    if (Array.isArray(clabTargetSubInterfacesClabData) && clabTargetSubInterfacesClabData.length > 0) {
+                        // Map sub-interfaces with prefix
+                        const TargetSubInterfaces = clabTargetSubInterfacesClabData
+                        // Render sub-interfaces
+                        renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-top', 'endpoint-b-bottom', nodeName);
+                    } else if (Array.isArray(clabTargetSubInterfacesClabData)) {
+                        console.info("No sub-interfaces found. The input data array is empty.");
+                        renderSubInterfaces(null, 'endpoint-b-top', 'endpoint-b-bottom', nodeName);
+                    } else {
+                        console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+                        renderSubInterfaces(null, 'endpoint-b-top', 'endpoint-b-bottom', nodeName);
+                    }
+
+                } catch (error) {
+                    console.error("Failed to get SubInterface list:", error);
+                }
+            }
+            else {
+                let clabTargetSubInterfacesArgList = [
+                    clickedEdge.data("extraData").clabTargetLongName,
+                    clickedEdge.data("extraData").clabTargetPort
+                ];
+                let clabTargetSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabTargetSubInterfacesArgList);
+                console.info("clabTargetSubInterfacesClabData: ", clabTargetSubInterfacesClabData);
+
+                if (Array.isArray(clabTargetSubInterfacesClabData) && clabTargetSubInterfacesClabData.length > 0) {
+                    // Map sub-interfaces with prefix
+                    const TargetSubInterfaces = clabTargetSubInterfacesClabData.map(
+                        item => `${item.ifname}`
+                    );
+
+                    // Render sub-interfaces
+                    renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
+                    renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-clipboard', 'endpoint-b-bottom');
+
+                } else if (Array.isArray(clabTargetSubInterfacesClabData)) {
+                    console.info("No sub-interfaces found. The input data array is empty.");
+                    renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
+                    renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
+                } else {
+                    console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
+                    renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
+                    renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
+                }
+            }
+
 
             let actualLinkMacPair
             if (isVscodeDeployment) {
+
+                // get Source MAC Address
                 try {
-                    let clabLinkMacArgsList = {
-                        clabSourceLongName: clickedEdge.data("extraData").clabSourceLongName,
-                        clabTargetLongName: clickedEdge.data("extraData").clabTargetLongName
-                    };
-                    console.log("clabLinkMacArgsList: ", clabLinkMacArgsList)
-                    const response = await sendMessageToVscodeEndpointGet("routerLinkMacaddress", clabLinkMacArgsList);
-                    console.log("############### Success from backend:", response);
-                } catch (err) {
-                    console.error("############### Backend call failed:", err);
+                    console.log("########################################################### Source MAC Address")
+                    // const response = await sendMessageToVscodeEndpointPost("clab-link-mac-address", {
+                    //     nodeName: clickedEdge.data("extraData").clabSourceLongName,
+                    //     interfaceName: clickedEdge.data("extraData").clabSourcePort
+                    // });
+                    // clabSourceMacAddress = response
+
+                    clabSourceMacAddress = clickedEdge.data("sourceMac") // aarafat-tag: get source MAC address from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Source MAC address:", clabSourceMacAddress);
+                    if (clabSourceMacAddress) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-a-mac-address").textContent = clabSourceMacAddress
+                    }
+                    console.log("clicked-edge-sourceMac", clickedEdge.data("sourceMac"))
+
+                    clabSourceMtu = clickedEdge.data("sourceMtu") // aarafat-tag: get source MTU from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Source MAC address:", clabSourceMtu);
+                    if (clabSourceMtu) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-a-mtu").textContent = clabSourceMtu
+                    }
+                    console.log("clicked-edge-sourceMtu", clickedEdge.data("sourceMtu"))
+
+                    clabSourceType = clickedEdge.data("sourceType") // aarafat-tag: get source MTU from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Source MAC address:", clabSourceType);
+                    if (clabSourceType) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-a-type").textContent = clabSourceType
+                    }
+                    console.log("clicked-edge-sourceType", clickedEdge.data("sourceType"))
+
+                } catch (error) {
+                    console.error("Failed to get SubInterface list:", error);
                 }
+
+                // get Target MAC Address
+                try {
+                    console.log("########################################################### Target MAC Address")
+                    // const response = await sendMessageToVscodeEndpointPost("clab-link-mac-address", {
+                    //     nodeName: clickedEdge.data("extraData").clabTargetLongName,
+                    //     interfaceName: clickedEdge.data("extraData").clabTargetPort
+                    // });
+                    // clabTargetMacAddress = response
+
+                    clabTargetMacAddress = clickedEdge.data("targetMac") // aarafat-tag: get target MAC address from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Target MAC address:", clabTargetMacAddress);
+                    if (clabTargetMacAddress) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-b-mac-address").textContent = clabTargetMacAddress
+                    }
+                    console.log("clicked-edge-targetMac", clickedEdge.data("targetMac"))
+
+                    clabTargetMtu = clickedEdge.data("targetMtu") // aarafat-tag: get target MTU from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Target MAC address:", clabTargetMtu);
+                    if (clabTargetMtu) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-b-mtu").textContent = clabTargetMtu
+                    }
+                    console.log("clicked-edge-targetMtu", clickedEdge.data("targetMtu"))
+
+                    clabTargetType = clickedEdge.data("targetType") // aarafat-tag: get target MTU from the edge data; suplied by the backend socket
+                    console.log("###########################################")
+                    console.log("Target MAC address:", clabTargetType);
+                    if (clabTargetType) {
+                        // render MAC address
+                        document.getElementById("panel-link-endpoint-b-type").textContent = clabTargetType
+                    }
+                    console.log("clicked-edge-targetType", clickedEdge.data("targetType"))
+
+                } catch (error) {
+                    console.error("Failed to get SubInterface list:", error);
+                }
+
+
             } else {
                 // setting MAC address endpoint-a values by getting the data from clab via /clab-link-mac GET API
                 clabLinkMacArgsList = [`${clickedEdge.data("extraData").clabSourceLongName}`, `${clickedEdge.data("extraData").clabTargetLongName}`]
                 actualLinkMacPair = await sendRequestToEndpointGetV3("/clab-link-macaddress", clabLinkMacArgsList)
-
 
 
                 console.info("actualLinkMacPair: ", actualLinkMacPair)
@@ -1138,7 +1181,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                         item.sourceIfName === sourceIfName &&
                         item.targetIfName === targetIfName
                     );
-
                     if (result) {
                         return {
                             sourceIfMac: result.sourceIfMac,
@@ -1149,27 +1191,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                     }
                 }
             }
-
-
-            // // Setting default impairment values for endpoint A
-            // let clabSourceLinkArgsList = [
-            //     clickedEdge.data("extraData").clabSourceLongName,
-            //     clickedEdge.data("extraData").clabSourcePort
-            // ];
-
-
-            // let clabSourceLinkImpairmentClabData
-            // if (isVscodeDeployment) {
-            //     try {
-            //         const response = await sendMessageToVscodeEndpointGet("routerLinkImpairment", clabSourceLinkArgsList);
-            //         console.log("############### Success from backend:", response);
-            //     } catch (err) {
-            //         console.error("############### Backend call failed:", err);
-            //     }
-            // } else {
-            //     clabSourceLinkImpairmentClabData = await sendRequestToEndpointGetV3("/clab-link-impairment", clabSourceLinkArgsList);
-            // }
-
 
             let clabSourceLinkImpairmentClabData
             if (isVscodeDeployment) {
@@ -1196,8 +1217,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 ];
                 clabSourceLinkImpairmentClabData = await sendRequestToEndpointGetV3("/clab-link-impairment", clabSourceLinkArgsList)
             }
-
-
 
 
 
@@ -1247,67 +1266,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.info("Empty or invalid JSON response received for endpoint B");
             }
 
-            //render sourceSubInterfaces
-            let clabSourceSubInterfacesArgList = [
-                clickedEdge.data("extraData").clabSourceLongName,
-                clickedEdge.data("extraData").clabSourcePort
-            ];
-            let clabSourceSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabSourceSubInterfacesArgList);
-            console.info("clabSourceSubInterfacesClabData: ", clabSourceSubInterfacesClabData);
-
-            if (Array.isArray(clabSourceSubInterfacesClabData) && clabSourceSubInterfacesClabData.length > 0) {
-                // Map sub-interfaces with prefix
-                const sourceSubInterfaces = clabSourceSubInterfacesClabData.map(
-                    item => `${item.ifname}`
-                );
-
-                // Render sub-interfaces
-                renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-                renderSubInterfaces(sourceSubInterfaces, 'endpoint-a-clipboard', 'endpoint-a-bottom');
-
-            } else if (Array.isArray(clabSourceSubInterfacesClabData)) {
-                console.info("No sub-interfaces found. The input data array is empty.");
-                renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-                renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
-            } else {
-                console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
-                renderSubInterfaces(null, 'endpoint-a-edgeshark', 'endpoint-a-clipboard');
-                renderSubInterfaces(null, 'endpoint-a-clipboard', 'endpoint-a-bottom');
-            }
-
-
-            //render targetSubInterfaces
-            let clabTargetSubInterfacesArgList = [
-                clickedEdge.data("extraData").clabTargetLongName,
-                clickedEdge.data("extraData").clabTargetPort
-            ];
-            let clabTargetSubInterfacesClabData = await sendRequestToEndpointGetV3("/clab-link-subinterfaces", clabTargetSubInterfacesArgList);
-            console.info("clabTargetSubInterfacesClabData: ", clabTargetSubInterfacesClabData);
-
-            if (Array.isArray(clabTargetSubInterfacesClabData) && clabTargetSubInterfacesClabData.length > 0) {
-                // Map sub-interfaces with prefix
-                const TargetSubInterfaces = clabTargetSubInterfacesClabData.map(
-                    item => `${item.ifname}`
-                );
-
-                // Render sub-interfaces
-                renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
-                renderSubInterfaces(TargetSubInterfaces, 'endpoint-b-clipboard', 'endpoint-b-bottom');
-
-            } else if (Array.isArray(clabTargetSubInterfacesClabData)) {
-                console.info("No sub-interfaces found. The input data array is empty.");
-                renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
-                renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
-            } else {
-                console.info("No sub-interfaces found. The input data is null, undefined, or not an array.");
-                renderSubInterfaces(null, 'endpoint-b-edgeshark', 'endpoint-b-clipboard');
-                renderSubInterfaces(null, 'endpoint-b-clipboard', 'endpoint-b-bottom');
-            }
-
-
             // set selected edge-id to global variable
             globalSelectedEdge = clickedEdge.data("id")
 
+            console.log(`"edgeClicked: " ${globalSelectedEdge}`);
             appendMessage(`"edgeClicked: " ${edgeClicked}`);
         }
 
@@ -1529,13 +1491,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             console.info(`Expanded parallel edges for ${groupId}`);
-            bulmaToast.toast({
-                message: `Expanded parallel edges for ${groupId}`,
-                type: "is-warning is-size-6 p-3",
-                duration: 4000,
-                position: "top-center",
-                closeOnClick: true,
-            });
+            // bulmaToast.toast({
+            //     message: `Expanded parallel edges for ${groupId}`,
+            //     type: "is-warning is-size-6 p-3",
+            //     duration: 4000,
+            //     position: "top-center",
+            //     closeOnClick: true,
+            // });
 
         } else {
             // Collapse parallel edges except the clicked one
@@ -1553,13 +1515,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             console.info(`Collapsed parallel edges for ${groupId}`);
-            bulmaToast.toast({
-                message: `Collapsed parallel edges for ${groupId}`,
-                type: "is-warning is-size-6 p-3",
-                duration: 4000,
-                position: "top-center",
-                closeOnClick: true,
-            });
+            // bulmaToast.toast({
+            //     message: `Collapsed parallel edges for ${groupId}`,
+            //     type: "is-warning is-size-6 p-3",
+            //     duration: 4000,
+            //     position: "top-center",
+            //     closeOnClick: true,
+            // });
         }
     }
 
@@ -2017,16 +1979,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 ////  - re-create log-messages
 ////  - re-create viewport
 
-async function initEnv() {
-    environments = await getEnvironments();
-    globalLabName = await environments["clab-name"]
-    deploymentType = await environments["deployment-type"]
-
-    console.info("Lab-Name: ", globalLabName)
-    console.info("DeploymentType: ", deploymentType)
-    return environments, globalLabName
-}
-
 async function changeTitle() {
     environments = await getEnvironments();
     globalLabName = await environments["clab-name"]
@@ -2035,45 +1987,87 @@ async function changeTitle() {
     document.title = `TopoViewer::${globalLabName}`;
 }
 
-async function sshWebBased(event) {
-    console.info("sshWebBased: ", globalSelectedNode)
+async function nodeActionConnectToSSH(event) {
+    console.info("nodeActionConnectToSSH: ", globalSelectedNode)
     var routerName = globalSelectedNode
 
     if (isVscodeDeployment) {
-
         try {
-            const response = await sendMessageToVscodeEndpointPost("ssh-to-node", routerName);
+            const response = await sendMessageToVscodeEndpointPost("clab-node-connect-ssh", routerName);
             console.log("############### response from backend:", response);
-
         } catch (err) {
             console.error("############### Backend call failed:", err);
         }
-
-
     } else {
         try {
             environments = await getEnvironments(event);
-            console.info("sshWebBased - environments: ", environments)
+            console.info("nodeActionConnectToSSH - environments: ", environments)
             cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
             routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
-
-            console.info("sshWebBased: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
-
+            console.info("nodeActionConnectToSSH: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
             window.open(`${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`);
         } catch (error) {
             console.error('Error executing restore configuration:', error);
         }
     }
+}
 
+async function nodeActionAttachShell(event) {
+    console.info("nodeActionAttachShell: ", globalSelectedNode)
+    var routerName = globalSelectedNode
 
+    if (isVscodeDeployment) {
+        try {
+            const response = await sendMessageToVscodeEndpointPost("clab-node-attach-shell", routerName);
+            console.log("############### response from backend:", response);
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
+    } else {
+        try {
+            environments = await getEnvironments(event);
+            console.info("nodeActionAttachShell - environments: ", environments)
+            cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
+            routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
+            console.info("nodeActionAttachShell: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
+            window.open(`${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`);
+        } catch (error) {
+            console.error('Error executing restore configuration:', error);
+        }
+    }
+}
+
+async function nodeActionViewLogs(event) {
+    console.info("nodeActionViewLogs: ", globalSelectedNode)
+    var routerName = globalSelectedNode
+
+    if (isVscodeDeployment) {
+        try {
+            const response = await sendMessageToVscodeEndpointPost("clab-node-view-logs", routerName);
+            console.log("############### response from backend:", response);
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
+    } else {
+        try {
+            environments = await getEnvironments(event);
+            console.info("nodeActionViewLogs - environments: ", environments)
+            cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
+            routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
+            console.info("nodeActionViewLogs: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
+            window.open(`${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`);
+        } catch (error) {
+            console.error('Error executing restore configuration:', error);
+        }
+    }
 }
 
 async function sshCliCommandCopy(event) {
-    console.info("sshWebBased: ", globalSelectedNode)
+    console.info("nodeActionConnectToSSH: ", globalSelectedNode)
     var routerName = globalSelectedNode
     try {
         environments = await getEnvironments(event);
-        console.info("sshWebBased - environments: ", environments)
+        console.info("nodeActionConnectToSSH - environments: ", environments)
 
         cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
         clabServerAddress = environments["clab-server-address"]
@@ -2116,11 +2110,11 @@ async function sshCliCommandCopy(event) {
             }
             document.body.removeChild(textArea);
         }
-
     } catch (error) {
         console.error('Error executing restore configuration:', error);
     }
 }
+
 
 
 async function linkImpairmentClab(event, impairDirection) {
@@ -2189,254 +2183,255 @@ async function linkImpairmentClab(event, impairDirection) {
     }
 }
 
-
 async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
-    console.info("linkWireshark - globalSelectedEdge: ", globalSelectedEdge)
-    console.info("linkWireshark - option: ", option)
-    console.info("linkWireshark - endpoint: ", endpoint)
-    console.info("linkWireshark - referenceElementAfterId: ", referenceElementAfterId)
+    console.info("linkWireshark - globalSelectedEdge: ", globalSelectedEdge);
+    console.info("linkWireshark - option: ", option);
+    console.info("linkWireshark - endpoint: ", endpoint);
+    console.info("linkWireshark - referenceElementAfterId: ", referenceElementAfterId);
 
+    // Helper function to extract the namespace ID from the response string
+    const extractNamespaceId = (namespaceIdStr) => {
+        const start = namespaceIdStr.indexOf("[") + 1;
+        const end = namespaceIdStr.indexOf("]");
+        return namespaceIdStr.slice(start, end);
+    };
 
-    var edgeId = globalSelectedEdge
-    try {
-        environments = await getEnvironments(event);
-        console.info("linkWireshark - environments: ", environments)
+    // Helper function to copy text to the clipboard and show a toast message
+    const copyToClipboard = async (text, successMessage = "Hey, now you can paste the link to your terminal console. 😎") => {
+        const toastOptions = {
+            message: successMessage,
+            type: "is-warning is-size-6 p-3",
+            duration: 4000,
+            position: "top-center",
+            closeOnClick: true,
+        };
 
-        var deploymentType = environments["deployment-type"]
-
-        cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
-        edgeData = findCytoElementById(cytoTopologyJson, edgeId)
-
-        console.info("linkWireshark- edgeData: ", edgeData)
-        console.info("linkWireshark- edgeSource: ", edgeData["data"]["source"])
-
-        clabUser = edgeData["data"]["extraData"]["clabServerUsername"]
-
-        clabAllowedHostname = environments["clab-allowed-hostname"]
-
-        clabAllowedHostname01 = environments["clab-allowed-hostname01"]
-        if (clabAllowedHostname01 == "") {
-            clabAllowedHostname01 = clabAllowedHostname
-        }
-
-        clabServerAddress = environments["clab-server-address"]
-
-        clabSourceLongName = edgeData["data"]["extraData"]["clabSourceLongName"]
-        clabSourcePort = edgeData["data"]["extraData"]["clabSourcePort"]
-
-        clabTargetLongName = edgeData["data"]["extraData"]["clabTargetLongName"]
-        clabTargetPort = edgeData["data"]["extraData"]["clabTargetPort"]
-
-        if (option == "app") {
-            if (endpoint == "source") {
-                wiresharkHref = `clab-capture://${clabUser}@${clabServerAddress}?${clabSourceLongName}?${clabSourcePort}`
-                console.info("linkWireshark- wiresharkHref: ", wiresharkHref)
-
-            } else if (endpoint == "target") {
-                wiresharkHref = `clab-capture://${clabUser}@${clabServerAddress}?${clabTargetLongName}?${clabTargetPort}`
-                console.info("linkWireshark- wiresharkHref: ", wiresharkHref)
-            }
-            window.open(wiresharkHref);
-
-        } else if (option == "edgeSharkInterface") {
-            if (endpoint == "source") {
-                baseUrl = `packetflix:ws://${clabAllowedHostname01}:5001/capture?`;
-
-                netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", argsList = [clabSourceLongName])
-                console.info("linkWireshark - netNsSource: ", netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]")))
-                netNsIdSource = netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]"))
-
-                urlParams = `container={"netns":${netNsIdSource},"network-interfaces":["${clabSourcePort}"],"name":"${clabSourceLongName.toLocaleLowerCase()}","type":"docker","prefix":""}&nif=${clabSourcePort}`;
-                edgeSharkHref = baseUrl + urlParams;
-                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref)
-                window.open(edgeSharkHref);
-
-            } else if (endpoint == "target") {
-                baseUrl = `packetflix:ws://${clabAllowedHostname01}:5001/capture?`;
-
-                netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", argsList = [clabTargetLongName])
-                console.info("linkWireshark - netNsSource: ", netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]")))
-                netNsIdTarget = netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]"))
-
-                urlParams = `container={"netns":${netNsIdTarget},"network-interfaces":["${clabTargetPort}"],"name":"${clabTargetLongName.toLocaleLowerCase()}","type":"docker","prefix":""}&nif=${clabTargetPort}`;
-                edgeSharkHref = baseUrl + urlParams;
-                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref)
-                window.open(edgeSharkHref);
-            }
-
-        } else if (option == "edgeSharkSubInterface") {
-            if (referenceElementAfterId == "endpoint-a-edgeshark") {
-                baseUrl = `packetflix:ws://${clabAllowedHostname01}:5001/capture?`;
-
-                netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", argsList = [clabSourceLongName])
-                console.info("linkWireshark - netNsSource: ", netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]")))
-                netNsIdSource = netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]"))
-
-                urlParams = `container={"netns":${netNsIdSource},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLocaleLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
-                edgeSharkHref = baseUrl + urlParams;
-                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref)
-                window.open(edgeSharkHref);
-            }
-            if (referenceElementAfterId == "endpoint-b-edgeshark") {
-                console.info("linkWireshark - endpoint-b-edgeshark")
-                baseUrl = `packetflix:ws://${clabAllowedHostname01}:5001/capture?`;
-
-                netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", argsList = [clabTargetLongName])
-                console.info("linkWireshark - netNsSource: ", netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]")))
-                netNsIdTarget = netNsResponse.namespace_id.slice(netNsResponse.namespace_id.indexOf("[") + 1, netNsResponse.namespace_id.indexOf("]"))
-
-                urlParams = `container={"netns":${netNsIdTarget},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLocaleLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
-                edgeSharkHref = baseUrl + urlParams;
-                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref)
-                window.open(edgeSharkHref);
-            }
-            if (referenceElementAfterId == "endpoint-a-clipboard") {
-                console.info("linkWireshark - endpoint-a-clipboard")
-                if (deploymentType == "container") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`
-                } else if (deploymentType == "colocated") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`
-                }
-                // Check if the clipboard API is available
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(wiresharkSshCommand).then(function () {
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
-                    }).catch(function (error) {
-                        console.error('Could not copy text: ', error);
-                    });
-                } else {
-                    // Fallback method for older browsers
-                    let textArea = document.createElement('textarea');
-                    textArea.value = wiresharkSshCommand;
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    try {
-                        document.execCommand('copy');
-                        // alert('Text copied to clipboard');
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
-                    } catch (err) {
-                        console.error('Fallback: Oops, unable to copy', err);
-                    }
-                    document.body.removeChild(textArea);
-                }
-            }
-            if (referenceElementAfterId == "endpoint-b-clipboard") {
-                console.info("linkWireshark - endpoint-b-clipboard")
-                if (deploymentType == "container") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`
-                } else if (deploymentType == "colocated") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`
-                }
-                // Check if the clipboard API is available
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(wiresharkSshCommand).then(function () {
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
-                    }).catch(function (error) {
-                        console.error('Could not copy text: ', error);
-                    });
-                } else {
-                    // Fallback method for older browsers
-                    let textArea = document.createElement('textarea');
-                    textArea.value = wiresharkSshCommand;
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    try {
-                        document.execCommand('copy');
-                        // alert('Text copied to clipboard');
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
-                    } catch (err) {
-                        console.error('Fallback: Oops, unable to copy', err);
-                    }
-                    document.body.removeChild(textArea);
-                }
-            }
-
-
-        } else if (option == "copy") {
-            if (endpoint == "source") {
-                if (deploymentType == "container") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${clabSourcePort} -w -" | wireshark -k -i -`
-                } else if (deploymentType == "colocated") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${clabSourcePort} -w -" | wireshark -k -i -`
-                }
-            } else if (endpoint == "target") {
-                if (deploymentType == "container") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${clabTargetPort} -w -" | wireshark -k -i -`
-                } else if (deploymentType == "colocated") {
-                    wiresharkSshCommand = `ssh ${clabUser}@${clabAllowedHostname} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${clabTargetPort} -w -" | wireshark -k -i -`
-                }
-            }
-
-            console.info("linkWireshark- wiresharkSShCommand: ", wiresharkSshCommand)
-
-            // Check if the clipboard API is available
+        try {
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(wiresharkSshCommand).then(function () {
-                    bulmaToast.toast({
-                        message: `Hey, now you can paste the link to your terminal console. 😎`,
-                        type: "is-warning is-size-6 p-3",
-                        duration: 4000,
-                        position: "top-center",
-                        closeOnClick: true,
-                    });
-                }).catch(function (error) {
-                    console.error('Could not copy text: ', error);
-                });
+                await navigator.clipboard.writeText(text);
+                bulmaToast.toast(toastOptions);
             } else {
-                // Fallback method for older browsers
-                let textArea = document.createElement('textarea');
-                textArea.value = wiresharkSshCommand;
+                // Fallback for older browsers
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
                 document.body.appendChild(textArea);
                 textArea.focus();
                 textArea.select();
-                try {
-                    document.execCommand('copy');
-                    // alert('Text copied to clipboard');
-                    bulmaToast.toast({
-                        message: `Hey, now you can paste the link to your terminal console. 😎`,
-                        type: "is-warning is-size-6 p-3",
-                        duration: 4000,
-                        position: "top-center",
-                        closeOnClick: true,
-                    });
-                } catch (err) {
-                    console.error('Fallback: Oops, unable to copy', err);
-                }
+                document.execCommand("copy");
+                bulmaToast.toast(toastOptions);
                 document.body.removeChild(textArea);
             }
+        } catch (error) {
+            console.error("Error copying text to clipboard:", error);
+        }
+    };
 
+    const edgeId = globalSelectedEdge;
+
+    console.log("edgeId: ", edgeId);
+
+    try {
+
+        let environments
+        let deploymentType
+        let cytoTopologyJson
+        let edgeData
+        let clabUser
+        let edgesharkHostUrl
+        let clabServerAddress
+        let clabSourceLongName
+        let clabSourcePort
+        let clabTargetLongName
+        let clabTargetPort
+
+        if (isVscodeDeployment) {
+
+            // call backend to get hostname
+
+            environments = await getEnvironments(event);
+            console.info("linkWireshark - environments: ", environments);
+
+            // edgesharkHostUrl = await sendMessageToVscodeEndpointPost("clab-host-get-hostname", routerName);
+            // console.log("############### endpoint clab-host-get-hostname response from backend:", edgesharkHostUrl);
+
+            edgesharkHostUrl = environments["clab-allowed-hostname01"] || environments["clab-allowed-hostname"]; // used for edgeshark
+            console.log("############### endpoint clab-host-get-hostname response from backend:", edgesharkHostUrl);
+
+            cytoTopologyJson = environments["EnvCyTopoJsonBytes"];
+            edgeData = findCytoElementById(cytoTopologyJson, edgeId);
+            console.log("edgeData: ", edgeData);
+
+            clabSourceLongName = edgeData.data.extraData.clabSourceLongName; // used for edgeshark
+            console.log("edgeData.data.extraData.clabSourceLongName: ", clabSourceLongName);
+
+            clabSourcePort = edgeData.data.extraData.clabSourcePort; // used for edgeshark
+            console.log("edgeData.data.extraData.clabSourcePort: ", clabSourcePort);
+
+            clabTargetLongName = edgeData.data.extraData.clabTargetLongName; // used for edgeshark
+            console.log("edgeData.data.extraData.clabTargetLongName: ", clabTargetLongName);
+
+            clabTargetPort = edgeData.data.extraData.clabTargetPort; // used for edgeshark
+            console.log("edgeData.data.extraData.clabTargetPort: ", clabTargetPort);
+
+
+        } else {
+            environments = await getEnvironments(event);
+            console.info("linkWireshark - environments: ", environments);
+
+            deploymentType = environments["deployment-type"];
+            cytoTopologyJson = environments["EnvCyTopoJsonBytes"];
+            edgeData = findCytoElementById(cytoTopologyJson, edgeId);
+
+            console.info("linkWireshark- edgeData: ", edgeData);
+            console.info("linkWireshark- edgeSource: ", edgeData.data.source);
+
+            clabUser = edgeData.data.extraData.clabServerUsername;
+            edgesharkHostUrl = environments["clab-allowed-hostname01"] || environments["clab-allowed-hostname"]; // used for edgeshark
+            clabServerAddress = environments["clab-server-address"]; // used for edgeshark
+            clabSourceLongName = edgeData.data.extraData.clabSourceLongName; // used for edgeshark
+            clabSourcePort = edgeData.data.extraData.clabSourcePort; // used for edgeshark
+            clabTargetLongName = edgeData.data.extraData.clabTargetLongName; // used for edgeshark
+            clabTargetPort = edgeData.data.extraData.clabTargetPort; // used for edgeshark
         }
 
+        let wiresharkHref, baseUrl, urlParams, netNsResponse, netNsId, wiresharkSshCommand;
+
+        switch (option) {
+            case "app":
+                if (endpoint === "source") {
+                    wiresharkHref = `clab-capture://${clabUser}@${clabServerAddress}?${clabSourceLongName}?${clabSourcePort}`;
+                } else if (endpoint === "target") {
+                    wiresharkHref = `clab-capture://${clabUser}@${clabServerAddress}?${clabTargetLongName}?${clabTargetPort}`;
+                }
+                console.info("linkWireshark- wiresharkHref: ", wiresharkHref);
+                window.open(wiresharkHref);
+                break;
+
+            case "edgeSharkInterface": {
+                baseUrl = `packetflix:ws://${edgesharkHostUrl}:5001/capture?`;
+                if (endpoint === "source") {
+                    if (isVscodeDeployment) {
+                        try {
+                            const response = await sendMessageToVscodeEndpointPost("clab-link-capture", {
+                                nodeName: clabSourceLongName,
+                                interfaceName: clabSourcePort
+                            });
+                            console.info("External URL opened successfully:", response);
+                        } catch (error) {
+                            console.error("Failed to open external URL:", error);
+                        }
+                    } else {
+                        netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabSourceLongName]);
+                        netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                        console.info("linkWireshark - netNsSource: ", netNsId);
+
+                        urlParams = `container={"netns":${netNsId},"network-interfaces":["${clabSourcePort}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${clabSourcePort}`;
+                    }
+                } else if (endpoint === "target") {
+                    if (isVscodeDeployment) {
+                        try {
+                            const response = await sendMessageToVscodeEndpointPost("link-capture", {
+                                nodeName: clabTargetLongName,
+                                interfaceName: clabTargetPort
+                            });
+                            console.info("External URL opened successfully:", response);
+                        } catch (error) {
+                            console.error("Failed to open external URL:", error);
+                        }
+                    } else {
+                        netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabTargetLongName]);
+                        netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                        console.info("linkWireshark - netNsTarget: ", netNsId);
+                        urlParams = `container={"netns":${netNsId},"network-interfaces":["${clabTargetPort}"],"name":"${clabTargetLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${clabTargetPort}`;
+                    }
+                }
+                const edgeSharkHref = baseUrl + urlParams;
+                console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref);
+
+                // window.open(edgeSharkHref);
+
+                if (isVscodeDeployment) {
+                } else {
+                    window.open(edgeSharkHref);
+                }
+                break;
+            }
+
+            case "edgeSharkSubInterface":
+                if (referenceElementAfterId === "endpoint-a-top" || referenceElementAfterId === "endpoint-b-top") {
+                    baseUrl = `packetflix:ws://${edgesharkHostUrl}:5001/capture?`;
+                    if (isVscodeDeployment) {
+                        if (referenceElementAfterId === "endpoint-a-top") {
+                            console.info("linkWireshark - endpoint-b-subInterface");
+                            try {
+                                const response = await sendMessageToVscodeEndpointPost("clab-link-capture", {
+                                    nodeName: clabSourceLongName,
+                                    interfaceName: clabSourcePort
+                                });
+                                console.info("External URL opened successfully:", response);
+                            } catch (error) {
+                                console.error("Failed to open external URL:", error);
+                            }
+                        } else if (referenceElementAfterId === "endpoint-b-top") {
+                            console.info("linkWireshark - endpoint-b-subInterface");
+                            try {
+                                const response = await sendMessageToVscodeEndpointPost("link-capture", {
+                                    nodeName: clabTargetLongName,
+                                    interfaceName: clabTargetPort
+                                });
+                                console.info("External URL opened successfully:", response);
+                            } catch (error) {
+                                console.error("Failed to open external URL:", error);
+                            }
+
+                        }
+
+                    } else {
+                        if (referenceElementAfterId === "endpoint-a-edgeshark") {
+                            netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabSourceLongName]);
+                            netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                            urlParams = `container={"netns":${netNsId},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
+                        } else {
+                            console.info("linkWireshark - endpoint-b-edgeshark");
+                            netNsResponse = await sendRequestToEndpointGetV3("/clab-node-network-namespace", [clabTargetLongName]);
+                            netNsId = extractNamespaceId(netNsResponse.namespace_id);
+                            urlParams = `container={"netns":${netNsId},"network-interfaces":["${endpoint}"],"name":"${clabSourceLongName.toLowerCase()}","type":"docker","prefix":""}&nif=${endpoint}`;
+                        }
+                        const edgeSharkHref = baseUrl + urlParams;
+                        console.info("linkWireshark - edgeSharkHref: ", edgeSharkHref);
+                        window.open(edgeSharkHref);
+                    }
+
+                } else if (referenceElementAfterId === "endpoint-a-clipboard" || referenceElementAfterId === "endpoint-b-clipboard") {
+                    console.info(`linkWireshark - ${referenceElementAfterId}`);
+                    const targetLongName = referenceElementAfterId === "endpoint-a-clipboard" ? clabSourceLongName : clabTargetLongName;
+                    const targetPort = referenceElementAfterId === "endpoint-a-clipboard" ? clabSourcePort : clabTargetPort;
+
+                    // Both container and colocated use the same command in this case.
+                    wiresharkSshCommand = `ssh ${clabUser}@${environments["clab-allowed-hostname"]} "sudo -S /sbin/ip netns exec ${targetLongName} tcpdump -U -nni ${endpoint} -w -" | wireshark -k -i -`;
+                    await copyToClipboard(wiresharkSshCommand);
+                }
+                break;
+
+            case "copy":
+                if (endpoint === "source") {
+                    wiresharkSshCommand = `ssh ${clabUser}@${environments["clab-allowed-hostname"]} "sudo -S /sbin/ip netns exec ${clabSourceLongName} tcpdump -U -nni ${clabSourcePort} -w -" | wireshark -k -i -`;
+                } else if (endpoint === "target") {
+                    wiresharkSshCommand = `ssh ${clabUser}@${environments["clab-allowed-hostname"]} "sudo -S /sbin/ip netns exec ${clabTargetLongName} tcpdump -U -nni ${clabTargetPort} -w -" | wireshark -k -i -`;
+                }
+                console.info("linkWireshark- wiresharkSshCommand: ", wiresharkSshCommand);
+                await copyToClipboard(wiresharkSshCommand);
+                break;
+
+            default:
+                console.warn("linkWireshark - Unknown option provided:", option);
+                break;
+        }
     } catch (error) {
-        console.error('Error executing linkImpairment configuration:', error);
+        console.error("Error executing linkWireshark configuration:", error);
     }
 }
+
 
 async function showPanelLogMessages(event) {
     document.getElementById("panel-log-messages").style.display = "block";
@@ -2669,10 +2664,8 @@ function viewportNodeFindEvent(event) {
 }
 
 async function layoutAlgoChange(event) {
-
     try {
         console.info("layoutAlgoChange clicked");
-
         var selectElement = document.getElementById("select-layout-algo");
         var selectedOption = selectElement.value;
 
@@ -2771,8 +2764,17 @@ async function layoutAlgoChange(event) {
             // console.info(document.getElementById("viewport-drawer-geo-map-reset-start"))
 
             viewportDrawerLayoutGeoMap()
-        }
 
+        } else if (selectedOption === "Preset") {
+            console.info("Preset algo selected");
+
+            var layoutAlgoPanels = document.getElementsByClassName("layout-algo");
+            // Loop through each element and set its display to 'none'
+            for (var i = 0; i < layoutAlgoPanels.length; i++) {
+                layoutAlgoPanels[i].style.display = "none";
+            }
+            viewportDrawerPreset()
+        }
     } catch (error) {
         console.error("Error occurred:", error);
         // Handle errors as needed
@@ -2834,326 +2836,37 @@ function viewportButtonsLabelEndpoint() {
 function viewportButtonContainerStatusVisibility() {
     if (globalNodeContainerStatusVisibility) {
         globalNodeContainerStatusVisibility = false;
-        console.info(
-            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
-        );
-        appendMessage(
-            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
-        );
-        bulmaToast.toast({
-            message: `Alright, mission control, we're standing down. 🛑🔍 Container status probing aborted. Stay chill, folks. 😎👨‍💻`,
-            type: "is-warning is-size-6 p-3",
-            duration: 4000,
-            position: "top-center",
-            closeOnClick: true,
-        });
+        // console.info(
+        //     "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
+        // );
+        // appendMessage(
+        //     "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
+        // );
+        // bulmaToast.toast({
+        //     message: `Alright, mission control, we're standing down. 🛑🔍 Container status probing aborted. Stay chill, folks. 😎👨‍💻`,
+        //     type: "is-warning is-size-6 p-3",
+        //     duration: 4000,
+        //     position: "top-center",
+        //     closeOnClick: true,
+        // });
     } else {
         globalNodeContainerStatusVisibility = true;
-        console.info(
-            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
-        );
-        appendMessage(
-            "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
-        );
-        bulmaToast.toast({
-            message: `🕵️‍♂️ Bro, we're currently on a mission to probe that container status! Stay tuned for the results. 🔍🚀👨‍💻`,
-            type: "is-warning is-size-6 p-3",
-            duration: 4000,
-            position: "top-center",
-            closeOnClick: true,
-        });
+        // console.info(
+        //     "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
+        // );
+        // appendMessage(
+        //     "globalNodeContainerStatusVisibility: " + globalNodeContainerStatusVisibility,
+        // );
+        // bulmaToast.toast({
+        //     message: `🕵️‍♂️ Bro, we're currently on a mission to probe that container status! Stay tuned for the results. 🔍🚀👨‍💻`,
+        //     type: "is-warning is-size-6 p-3",
+        //     duration: 4000,
+        //     position: "top-center",
+        //     closeOnClick: true,
+        // });
     }
 }
 
-
-
-// function viewportDrawerLayoutForceDirectedRadial() {
-
-//     // Disable GeoMap, in case it is active
-//     viewportDrawerDisableGeoMap()
-
-//     edgeLengthSlider = document.getElementById("force-directed-radial-slider-link-lenght");
-//     const edgeLengthValue = parseFloat(edgeLengthSlider.value);
-//     console.info("edgeLengthValue", edgeLengthValue);
-
-//     nodeGapSlider = document.getElementById("force-directed-radial-slider-node-gap");
-//     const nodeGapValue = parseFloat(nodeGapSlider.value);
-//     console.info("edgeLengthValue", nodeGapValue);
-
-//     // Map TopoViewerGroupLevel to weights (lower levels = higher weight)	
-//     const nodeWeights = {};
-//     cy.nodes().forEach((node) => {
-//         const level = node.data('extraData')?.labels?.TopoViewerGroupLevel ?
-//             parseInt(node.data('extraData').labels.TopoViewerGroupLevel) :
-//             1; // Default level to 1 if missing
-//         nodeWeights[node.id()] = 1 / level; // Higher weight for lower levels
-//     });
-
-//     // Adjust edge styles to avoid overlaps
-//     cy.edges().forEach((edge) => {
-//         edge.style({
-//             'curve-style': 'bezier', // Use curved edges
-//             'control-point-step-size': 20, // Distance for control points
-//         });
-//     });
-
-//     // Apply Cola layout with weights and better edge handling
-//     cy.layout({
-//         name: 'cola',
-//         fit: true, // Automatically fit the layout to the viewport
-//         nodeSpacing: nodeGapValue, // Gap between nodes
-//         edgeLength: (edge) => {
-//             const sourceWeight = nodeWeights[edge.source().id()] || 1;
-//             const targetWeight = nodeWeights[edge.target().id()] || 1;
-//             return (1 * edgeLengthValue) / (sourceWeight + targetWeight); // Shorter edges for higher-weight nodes
-//         },
-//         edgeSymDiffLength: 10, // Symmetrical edge separation to reduce overlaps
-//         nodeDimensionsIncludeLabels: true, // Adjust layout considering node labels
-//         animate: true,
-//         maxSimulationTime: 2000,
-//         avoidOverlap: true, // Prevents node overlaps
-//     }).run();
-
-//     var cyExpandCollapse = cy.expandCollapse({
-//         layoutBy: null,
-//         undoable: false,
-//         fisheye: true,
-//         animationDuration: 10, // when animate is true, the duration in milliseconds of the animation
-//         animate: true
-//     });
-
-//     // Example collapse/expand after some time:
-//     setTimeout(function () {
-//         var parent = cy.$('#parent');
-//         cyExpandCollapse.collapse(parent);
-
-//         setTimeout(function () {
-//             cyExpandCollapse.expand(parent);
-//         }, 2000);
-//     }, 2000);
-// }
-
-// function viewportDrawerLayoutVertical() {
-
-//     // Disable GeoMap, in case it is active
-//     viewportDrawerDisableGeoMap()
-
-//     // Retrieve the sliders for node and group vertical gaps
-//     const nodevGap = document.getElementById("vertical-layout-slider-node-v-gap");
-//     const groupvGap = document.getElementById("vertical-layout-slider-group-v-gap");
-
-//     // Parse the slider values for horizontal and vertical gaps
-//     const nodevGapValue = parseFloat(nodevGap.value); // Gap between child nodes within a parent
-//     const groupvGapValue = parseFloat(groupvGap.value); // Gap between parent nodes
-
-//     const delay = 100; // Delay to ensure layout updates after rendering
-
-//     setTimeout(() => {
-//         // Step 1: Position child nodes within their respective parents
-//         cy.nodes().forEach(function (node) {
-//             if (node.isParent()) {
-//                 const children = node.children(); // Get the children of the current parent node
-//                 const cellWidth = node.width() / children.length; // Calculate the width for each child node
-
-//                 // Position child nodes evenly spaced within the parent node
-//                 children.forEach(function (child, index) {
-//                     const xPos = index * (cellWidth + nodevGapValue); // Horizontal position for the child
-//                     const yPos = 0; // Keep child nodes on the same vertical level
-
-//                     child.position({
-//                         x: xPos,
-//                         y: yPos
-//                     });
-//                 });
-//             }
-//         });
-
-//         // Step 2: Sort parent nodes by their group level and ID for vertical stacking
-//         const sortedParents = cy.nodes()
-//             .filter(node => node.isParent()) // Only process parent nodes
-//             .sort((a, b) => {
-//                 // Extract group levels for primary sorting
-//                 const groupLevelA = parseInt(a.data('extraData')?.topoViewerGroupLevel || 0, 10);
-//                 const groupLevelB = parseInt(b.data('extraData')?.topoViewerGroupLevel || 0, 10);
-
-//                 if (groupLevelA !== groupLevelB) {
-//                     return groupLevelA - groupLevelB; // Sort by group level in ascending order
-//                 }
-//                 // Secondary sorting by node ID (alphabetical order)
-//                 return a.data('id').localeCompare(b.data('id'));
-//             });
-
-//         let yPos = 0; // Starting vertical position for parent nodes
-//         let maxWidth = 0; // Initialize variable to store the maximum parent width
-//         const centerX = 0; // Define the horizontal center reference
-
-//         // Step 3: Find the widest parent node
-//         cy.nodes().forEach(function (node) {
-//             if (node.isParent()) {
-//                 const width = node.width();
-//                 if (width > maxWidth) {
-//                     maxWidth = width; // Update maxWidth with the widest parent node's width
-//                     console.info("ParentMaxWidth: ", maxWidth);
-//                 }
-//             }
-//         });
-
-//         // Calculate division factor for aligning parent nodes
-//         const divisionFactor = maxWidth / 2;
-//         console.info("Division Factor: ", divisionFactor);
-
-//         // Step 4: Position parent nodes vertically and align them relative to the widest parent node
-//         sortedParents.forEach(function (parentNode) {
-//             const parentWidth = parentNode.width();
-
-//             // Calculate horizontal position relative to the widest parent
-//             const xPos = centerX - parentWidth / divisionFactor;
-
-//             // Position the parent node
-//             parentNode.position({
-//                 x: xPos,
-//                 y: yPos
-//             });
-
-//             console.info(`Parent Node '${parentNode.id()}' positioned at x: ${xPos}, y: ${yPos}`);
-
-//             // Increment vertical position for the next parent
-//             yPos += groupvGapValue;
-//         });
-
-//         // Step 5: Adjust the viewport to fit the updated layout
-//         cy.fit();
-
-//     }, delay);
-
-//     // Step 6: Expand/collapse functionality for parent nodes (optional)
-//     const cyExpandCollapse = cy.expandCollapse({
-//         layoutBy: null, // Use the existing layout
-//         undoable: false, // Disable undo functionality
-//         fisheye: false, // Disable fisheye view for expanded/collapsed nodes
-//         animationDuration: 10, // Duration of animations in milliseconds
-//         animate: true // Enable animation for expand/collapse
-//     });
-
-//     // Example: Demonstrate expand/collapse behavior with a specific parent node
-//     setTimeout(function () {
-//         const parent = cy.$('#parent'); // Replace '#parent' with the actual parent node ID if needed
-//         cyExpandCollapse.collapse(parent); // Collapse the parent node
-
-//         setTimeout(function () {
-//             cyExpandCollapse.expand(parent); // Re-expand the parent node after a delay
-//         }, 2000); // Wait 2 seconds before expanding
-//     }, 2000);
-// }
-
-// function viewportDrawerLayoutHorizontal() {
-//     // Retrieve the sliders for node and group horizontal gaps
-//     const nodehGap = document.getElementById("horizontal-layout-slider-node-h-gap");
-//     const grouphGap = document.getElementById("horizontal-layout-slider-group-h-gap");
-
-//     // Parse the slider values for horizontal and vertical gaps
-//     const nodehGapValue = parseFloat(nodehGap.value) * 10; // Gap between child nodes within a parent
-//     const grouphGapValue = parseFloat(grouphGap.value); // Gap between parent nodes
-
-//     const delay = 100; // Delay to ensure layout updates after rendering
-
-//     setTimeout(() => {
-//         // Step 1: Position child nodes within their respective parents
-//         cy.nodes().forEach(function (node) {
-//             if (node.isParent()) {
-//                 const children = node.children(); // Get the children of the current parent node
-//                 const cellHeight = node.height() / children.length; // Calculate the height for each child node
-
-//                 // Position child nodes evenly spaced within the parent node
-//                 children.forEach(function (child, index) {
-//                     const xPos = 0; // Keep child nodes on the same horizontal level
-//                     const yPos = index * (cellHeight + nodehGapValue); // Vertical position for the child
-
-//                     child.position({
-//                         x: xPos,
-//                         y: yPos
-//                     });
-//                 });
-//             }
-//         });
-
-//         // Step 2: Sort parent nodes by their group level and ID for horizontal stacking
-//         const sortedParents = cy.nodes()
-//             .filter(node => node.isParent()) // Only process parent nodes
-//             .sort((a, b) => {
-//                 // Extract group levels for primary sorting
-//                 const groupLevelA = parseInt(a.data('extraData')?.topoViewerGroupLevel || 0, 10);
-//                 const groupLevelB = parseInt(b.data('extraData')?.topoViewerGroupLevel || 0, 10);
-
-//                 if (groupLevelA !== groupLevelB) {
-//                     return groupLevelA - groupLevelB; // Sort by group level in ascending order
-//                 }
-//                 // Secondary sorting by node ID (alphabetical order)
-//                 return a.data('id').localeCompare(b.data('id'));
-//             });
-
-//         let xPos = 0; // Starting horizontal position for parent nodes
-//         let maxHeight = 0; // Initialize variable to store the maximum parent height
-//         const centerY = 0; // Define the vertical center reference
-
-//         // Step 3: Find the tallest parent node
-//         cy.nodes().forEach(function (node) {
-//             if (node.isParent()) {
-//                 const height = node.height();
-//                 if (height > maxHeight) {
-//                     maxHeight = height; // Update maxHeight with the tallest parent node's height
-//                     console.info("ParentMaxHeight: ", maxHeight);
-//                 }
-//             }
-//         });
-
-//         // Calculate division factor for aligning parent nodes
-//         const divisionFactor = maxHeight / 2;
-//         console.info("Division Factor: ", divisionFactor);
-
-//         // Step 4: Position parent nodes horizontally and align them relative to the tallest parent node
-//         sortedParents.forEach(function (parentNode) {
-//             const parentHeight = parentNode.height();
-
-//             // Calculate vertical position relative to the tallest parent
-//             const yPos = centerY - parentHeight / divisionFactor;
-
-//             // Position the parent node
-//             parentNode.position({
-//                 x: xPos,
-//                 y: yPos
-//             });
-
-//             console.info(`Parent Node '${parentNode.id()}' positioned at x: ${xPos}, y: ${yPos}`);
-
-//             // Increment horizontal position for the next parent
-//             xPos += grouphGapValue;
-//         });
-
-//         // Step 5: Adjust the viewport to fit the updated layout
-//         cy.fit();
-
-//     }, delay);
-
-//     // Step 6: Expand/collapse functionality for parent nodes (optional)
-//     const cyExpandCollapse = cy.expandCollapse({
-//         layoutBy: null, // Use the existing layout
-//         undoable: false, // Disable undo functionality
-//         fisheye: false, // Disable fisheye view for expanded/collapsed nodes
-//         animationDuration: 10, // Duration of animations in milliseconds
-//         animate: true // Enable animation for expand/collapse
-//     });
-
-//     // Example: Demonstrate expand/collapse behavior with a specific parent node
-//     setTimeout(function () {
-//         const parent = cy.$('#parent'); // Replace '#parent' with the actual parent node ID if needed
-//         cyExpandCollapse.collapse(parent); // Collapse the parent node
-
-//         setTimeout(function () {
-//             cyExpandCollapse.expand(parent); // Re-expand the parent node after a delay
-//         }, 2000); // Wait 2 seconds before expanding
-//     }, 2000);
-// }
 
 function viewportDrawerCaptureFunc() {
     console.info("viewportDrawerCaptureButton() - clicked")
@@ -3293,13 +3006,13 @@ async function captureAndSaveViewportAsDrawIo(cy) {
     a.download = "filename.drawio";
     document.body.appendChild(a);
 
-    bulmaToast.toast({
-        message: `Brace yourselves for a quick snapshot, folks! 📸 Capturing the viewport in 3... 2... 1... 🚀💥`,
-        type: "is-warning is-size-6 p-3",
-        duration: 2000,
-        position: "top-center",
-        closeOnClick: true,
-    });
+    // bulmaToast.toast({
+    //     message: `Brace yourselves for a quick snapshot, folks! 📸 Capturing the viewport in 3... 2... 1... 🚀💥`,
+    //     type: "is-warning is-size-6 p-3",
+    //     duration: 2000,
+    //     position: "top-center",
+    //     closeOnClick: true,
+    // });
     await sleep(2000);
 
     // Simulate a click to trigger the download
@@ -3333,8 +3046,6 @@ function viewportButtonsClabEditor() {
     viewportDrawerClabEditorContent02.style.display = "block"
 
     console.log("viewportDrawerClabEditorContent02", viewportDrawerClabEditorContent02)
-
-
 }
 
 function viewportButtonsGeoMapPan() {
@@ -3356,6 +3067,20 @@ function viewportButtonsGeoMapEdit() {
 }
 
 
+async function viewportButtonsReloadTopo() {
+    if (isVscodeDeployment) {
+        try {
+            const response = await sendMessageToVscodeEndpointPost("reload-viewport", "Empty Payload");
+            console.log("############### response from backend:", response);
+            sleep(1000)
+            // Re-Init load data.
+            fetchAndLoadData()
+
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
+    }
+}
 
 // Define a function to get the checkbox state and attach the event listener
 function setupCheckboxListener(checkboxSelector) {
@@ -3495,7 +3220,6 @@ function insertAndColorSvg(containerId, color) {
 
 
 function avoidEdgeLabelOverlap(cy) {
-
     console.info("avoidEdgeLabelOverlap called");
     // Helper function to calculate edge length
     function calculateEdgeLength(edge) {
@@ -3553,7 +3277,28 @@ function avoidEdgeLabelOverlap(cy) {
 
 
 
-
+/**
+ * Loads and applies Cytoscape styles to nodes, edges, and parent nodes based on deployment context,
+ * user preferences, and global state flags.
+ *
+ * This function performs the following operations:
+ * 1. Removes any existing styles from all nodes and edges.
+ * 2. Detects the user's preferred color scheme (light or dark) and logs the preference along with the current
+ *    multi-layer viewport state.
+ * 3. Depending on the deployment context:
+ *    - If running in VS Code (`isVscodeDeployment` is true), it applies a predefined set of Cytoscape styles.
+ *    - Otherwise, it fetches styles from a local JSON file and applies them. If the multi-layer viewport state is active,
+ *      a custom SVG background is set for parent nodes.
+ * 4. Adjusts edge label opacity if `globalLinkEndpointVisibility` is disabled.
+ * 5. If a geographical map is initialized (`globalIsGeoMapInitialized` is true), applies style multipliers to nodes,
+ *    edges, and parent nodes to adjust dimensions and font sizes.
+ * 6. Restores dynamic styles (if enabled via `globalToggleOnChangeCytoStyle`) and updates socket bindings.
+ *
+ * @async
+ * @function loadCytoStyle
+ * @param {cytoscape.Core} cy - The Cytoscape instance to style.
+ * @returns {Promise<void>} A promise that resolves once the styles have been applied.
+ */
 function loadCytoStyle(cy) {
     cy.nodes().removeStyle();
     cy.edges().removeStyle();
@@ -3566,193 +3311,11 @@ function loadCytoStyle(cy) {
     // VS-CODE start 
     let jsonFileUrl;
 
-    if (colorScheme === "dark") {
-        jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
-    } else {
-        jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
-    }
-
-
-    // // Your SVG string
-    // const svgNodeStringRouter = `
-    //    <svg
-    //         xmlns:xlink="http://www.w3.org/1999/xlink"
-    //         xmlns="http://www.w3.org/2000/svg"
-    //         xml:space="preserve"
-    //         style="enable-background:new 0 0 120 120;"
-    //         viewBox="0 0 120 120"
-    //         y="0px"
-    //         x="0px"
-    //         id="Layer_1"
-    //         version="1.1"
-    //         width="120px"
-    //         height="120px"
-    //         fill="none"
-    //     >
-    //         <style type="text/css">
-    //             .st0 { fill: #001135; }
-    //             .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
-    //         </style>
-    //         <rect height="120" width="120" class="st0" />
-    //         <g>
-    //             <g>
-    //                 <path d="M71.7,19.7V48h28" class="st1" />
-    //                 <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
-    //             </g>
-    //             <g>
-    //                 <path d="M20,47.8h28.4v-28" class="st1" />
-    //                 <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
-    //             </g>
-    //             <g>
-    //                 <path d="M48,100.3V72H20" class="st1" />
-    //                 <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
-    //             </g>
-    //             <g>
-    //                 <path d="M100,71.9H71.6v28" class="st1" />
-    //                 <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
-    //             </g>
-    //         </g>
-    //     </svg>
-    // `;
-
-    // // // Encode SVG for Cytoscape background-image
-    // // const encodedSVGRouter = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgNodeStringRouter);
-
-    // function generateEncodedSVG(nodeType, fillColor) {
-    //     let svgString = "";
-
-    //     switch (nodeType) {
-    //         case "pe":  // Provider Edge Router
-    //             svgString = `
-    //             <svg
-    //                     xmlns:xlink="http://www.w3.org/1999/xlink"
-    //                     xmlns="http://www.w3.org/2000/svg"
-    //                     xml:space="preserve"
-    //                     style="enable-background:new 0 0 120 120;"
-    //                     viewBox="0 0 120 120"
-    //                     y="0px"
-    //                     x="0px"
-    //                     id="Layer_1"
-    //                     version="1.1"
-    //                     width="120px"
-    //                     height="120px"
-    //                     fill="none"
-    //                 >
-    //                     <style type="text/css">
-    //                         .st0 { fill: ${fillColor}; }
-    //                         .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
-    //                     </style>
-    //                     <rect height="120" width="120" class="st0" />
-    //                     <g>
-    //                         <g>
-    //                             <path d="M71.7,19.7V48h28" class="st1" />
-    //                             <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M20,47.8h28.4v-28" class="st1" />
-    //                             <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M48,100.3V72H20" class="st1" />
-    //                             <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M100,71.9H71.6v28" class="st1" />
-    //                             <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
-    //                         </g>
-    //                     </g>
-    //                 </svg>`
-    //             break;
-
-    //         case "leaf":  // Leaf Node
-    //             svgString = `
-    //             <svg
-    //                     xmlns:xlink="http://www.w3.org/1999/xlink"
-    //                     xmlns="http://www.w3.org/2000/svg"
-    //                     xml:space="preserve"
-    //                     style="enable-background:new 0 0 120 120;"
-    //                     viewBox="0 0 120 120"
-    //                     y="0px"
-    //                     x="0px"
-    //                     id="Layer_1"
-    //                     version="1.1"
-    //                     width="120px"
-    //                     height="120px"
-    //                     fill="none"
-    //                 >
-    //                     <style type="text/css">
-    //                         .st0 { fill: ${fillColor}; }
-    //                         .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
-    //                     </style>
-    //                     <rect height="120" width="120" class="st0" />
-    //                     <g>
-    //                         <g>
-    //                             <path d="M71.7,19.7V48h28" class="st1" />
-    //                             <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M20,47.8h28.4v-28" class="st1" />
-    //                             <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M48,100.3V72H20" class="st1" />
-    //                             <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M100,71.9H71.6v28" class="st1" />
-    //                             <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
-    //                         </g>
-    //                     </g>
-    //                 </svg>`;
-    //             break;
-
-    //         default:
-    //             console.warn(`Unknown nodeType: ${nodeType}, using default PE SVG.`);
-    //             svgString = `
-    //             <svg
-    //                     xmlns:xlink="http://www.w3.org/1999/xlink"
-    //                     xmlns="http://www.w3.org/2000/svg"
-    //                     xml:space="preserve"
-    //                     style="enable-background:new 0 0 120 120;"
-    //                     viewBox="0 0 120 120"
-    //                     y="0px"
-    //                     x="0px"
-    //                     id="Layer_1"
-    //                     version="1.1"
-    //                     width="120px"
-    //                     height="120px"
-    //                     fill="none"
-    //                 >
-    //                     <style type="text/css">
-    //                         .st0 { fill: ${fillColor}; }
-    //                         .st1 { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 10; }
-    //                     </style>
-    //                     <rect height="120" width="120" class="st0" />
-    //                     <g>
-    //                         <g>
-    //                             <path d="M71.7,19.7V48h28" class="st1" />
-    //                             <path d="M91.2,38.5l7.5,7.6c1.3,1.3,1.3,3.1,0,4.3L91.1,58" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M20,47.8h28.4v-28" class="st1" />
-    //                             <path d="M38.8,28.3l7.6-7.5c1.3-1.3,3.1-1.3,4.3,0l7.7,7.6" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M48,100.3V72H20" class="st1" />
-    //                             <path d="M28.5,81.5L21,73.9c-1.3-1.3-1.3-3.1,0-4.3l7.6-7.7" class="st1" />
-    //                         </g>
-    //                         <g>
-    //                             <path d="M100,71.9H71.6v28" class="st1" />
-    //                             <path d="M81.2,91.4l-7.6,7.5c-1.3,1.3-3.1,1.3-4.3,0l-7.7-7.6" class="st1" />
-    //                         </g>
-    //                     </g>
-    //                 </svg>`;
-    //     }
-
-    //     // Encode the final selected SVG for Cytoscape.js
-    //     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svgString);
+    // if (colorScheme === "dark") {
+    //     jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
+    // } else {
+    //     jsonFileUrl = window.jsonFileUrlDataCytoStyleDark;
     // }
-
 
     const cytoscapeStylesForVscode = [
         {
@@ -3783,7 +3346,7 @@ function loadCytoStyle(cy) {
                 "text-background-opacity": 0.7,
                 "text-background-shape": "roundrectangle",
                 "text-background-padding": "1px",
-                "overlay-padding": "0.3px",
+                // "overlay-padding": "0.3px",
                 "z-index": "2"
             }
         },
@@ -3813,8 +3376,6 @@ function loadCytoStyle(cy) {
                 "background-opacity": "0.2",
                 "color": "#EBECF0",
                 "text-outline-color": "#000000",
-                "width": "3px",
-                "height": "3x",
                 "font-size": "8px",
                 "z-index": "1"
             }
@@ -3904,8 +3465,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"pon\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("pon", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3913,8 +3474,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"dcgw\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("dcgw", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3922,17 +3483,26 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"leaf\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("leaf", "#001135")}`,
+                "background-fit": "cover"
+            }
+        },
+        {
+            "selector": "node[topoViewerRole=\"switch\"]",
+            "style": {
+                "width": "14",
+                "height": "14",
+                "background-image": `${generateEncodedSVG("switch", "#001135")}`,
                 "background-fit": "cover"
             }
         },
         {
             "selector": "node[topoViewerRole=\"rgw\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("rgw", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3940,8 +3510,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"super-spine\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("super-spine", "#005AFF")}`,
                 "background-fit": "cover"
             }
@@ -3949,8 +3519,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"spine\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("spine", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3958,8 +3528,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"server\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("server", "#001135")}`,
                 "background-fit": "cover"
             }
@@ -3967,9 +3537,18 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"bridge\"]",
             "style": {
-                "width": "8",
-                "height": "8",
+                "width": "14",
+                "height": "14",
                 "background-image": `${generateEncodedSVG("bridge", "#001135")}`,
+                "background-fit": "cover"
+            }
+        },
+        {
+            "selector": "node[topoViewerRole=\"client\"]",
+            "style": {
+                "width": "14",
+                "height": "14",
+                "background-image": `${generateEncodedSVG("client", "#001135")}`,
                 "background-fit": "cover"
             }
         },
@@ -4021,8 +3600,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"pon\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-pon-dark-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -4032,8 +3611,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"dcgw\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-dcgw-dark-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -4061,8 +3640,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"super-spine\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-spine-dark-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -4072,8 +3651,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"spine\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-spine-light-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -4083,8 +3662,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"server\"][editor=\"true\"]",
             "style": {
-                "width": "12",
-                "height": "12",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-server-dark-blue.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -4094,8 +3673,8 @@ function loadCytoStyle(cy) {
         {
             "selector": "node[topoViewerRole=\"bridge\"][editor=\"true\"]",
             "style": {
-                "width": "8",
-                "height": "8",
+                "width": "14",
+                "height": "14",
                 "background-image": `${window.imagesUrl}/clab-bridge-light-grey.png`,
                 "background-fit": "cover",
                 "border-width": "0.5px",
@@ -4115,16 +3694,20 @@ function loadCytoStyle(cy) {
                 "arrow-scale": "0.5",
                 "source-text-color": "#000000",
                 "target-text-color": "#000000",
+
+                // 'source-text-background-color': '#CACBCC',
+                // 'target-text-background-color': '#00CBCC',
+
                 "text-outline-width": "0.3px",
                 "text-outline-color": "#FFFFFF",
                 "text-background-color": "#CACBCC",
                 "text-opacity": 1,
-                "text-background-opacity": 0.7,
+                "text-background-opacity": 1,
                 "text-background-shape": "roundrectangle",
                 "text-background-padding": "1px",
                 "curve-style": "bezier",
                 "control-point-step-size": 20,
-                "opacity": "1",
+                "opacity": "0.7",
                 "line-color": "#969799",
                 "width": "1.5",
                 "label": " ",
@@ -4206,33 +3789,18 @@ function loadCytoStyle(cy) {
             "style": {
                 "opacity": 0
             }
-        },
-
-
-
-        { "selector": "edge[group=\"coexp\"]", "style": { "line-color": "#d0b7d5" } },
-        { "selector": "edge[group=\"coloc\"]", "style": { "line-color": "#a0b3dc" } },
-        { "selector": "edge[group=\"gi\"]", "style": { "line-color": "#90e190" } },
-        { "selector": "edge[group=\"path\"]", "style": { "line-color": "#9bd8de" } },
-        { "selector": "edge[group=\"pi\"]", "style": { "line-color": "#eaa2a2" } },
-        { "selector": "edge[group=\"predict\"]", "style": { "line-color": "#f6c384" } },
-        { "selector": "edge[group=\"spd\"]", "style": { "line-color": "#dad4a2" } },
-        { "selector": "edge[group=\"spd_attr\"]", "style": { "line-color": "#D0D0D0" } },
-        { "selector": "edge[group=\"reg\"]", "style": { "line-color": "#D0D0D0" } },
-        { "selector": "edge[group=\"reg_attr\"]", "style": { "line-color": "#D0D0D0" } },
-        { "selector": "edge[group=\"user\"]", "style": { "line-color": "#f0ec86" } }
+        }
     ]
 
     if (isVscodeDeployment) {
         // Apply the styles defined in the constant
-        cy.style().fromJson(cytoscapeStylesForVscode).update();
+        cy.style().fromJson(cytoscapeStylesForVscode).update(); // cytoscapeStylesForVscode is defined in the cytoscapeStyle.js file
         console.log("Cytoscape styles applied successfully.");
+
     } else {
         // // Load and apply Cytoscape styles from cy-style.json using fetch
         if (colorScheme == "light") {
-
             fetch("css/cy-style-dark.json")
-
                 .then((response) => response.json())
                 .then((styles) => {
                     cy.style().fromJson(styles).update();
@@ -4253,10 +3821,8 @@ function loadCytoStyle(cy) {
 
         } else if (colorScheme == "dark") {
             fetch("css/cy-style-dark.json")
-
                 .then((response) => response.json())
                 .then((styles) => {
-
                     console.log("globalIsGeoMapInitialized", globalIsGeoMapInitialized);
                     cy.style().fromJson(styles).update();
                     if (multiLayerViewPortState) {
@@ -4274,7 +3840,6 @@ function loadCytoStyle(cy) {
                     );
                 });
         }
-
     }
 
 
@@ -4400,8 +3965,26 @@ function loadCytoStyle(cy) {
             parent.style('border-color', "rgba(76, 82, 97, 1)");
         });
     }
+
+    // Restore dynamic styles only if enabled.
+    if (globalToggleOnChangeCytoStyle) {
+        restoreDynamicStyles();
+    }
+
+    // Ensure the socket event binding reflects the current toggle.
+    updateSocketBinding();
 }
 
+/**
+ * Toggles the multi-layer viewport state and reloads the Cytoscape style.
+ *
+ * This function checks the current state of `multiLayerViewPortState`. If it is `false`, the state is set to `true`;
+ * otherwise, it is set to `false`. After toggling, it logs the new state to the console and calls `loadCytoStyle(cy)`
+ * to update the Cytoscape style accordingly.
+ *
+ * @function viewportButtonsMultiLayerViewPortToggle
+ * @returns {void}
+ */
 function viewportButtonsMultiLayerViewPortToggle() {
     if (multiLayerViewPortState == false) {
         multiLayerViewPortState = true; // toggle
@@ -4416,64 +3999,91 @@ function viewportButtonsMultiLayerViewPortToggle() {
     }
 }
 
-// // Function to process the data
-// function assignMissingLatLng(dataArray) {
-//     // Arrays to store existing lat and lng values
-//     const existingLats = [];
-//     const existingLngs = [];
+/**
+ * Updates node positions and sends the topology data to the backend.
+ *
+ * This asynchronous function iterates over each node in the provided Cytoscape instance (`cy`),
+ * updating each node's "position" property with its current coordinates. If a node contains extra
+ * label data under `node.data.extraData.labels`, it also updates the "graph-posX" and "graph-posY" labels
+ * with the node's current x and y positions, respectively. The updated nodes are then sent to a backend
+ * endpoint ("topo-viewport-save") via the `sendMessageToVscodeEndpointPost` function, but only if the
+ * deployment is detected to be within VS Code.
+ *
+ * Note: If the global Cytoscape instance (`window.cy`) is not defined, the function logs an error and
+ * returns without performing further operations.
+ *
+ * @async
+ * @function viewportButtonsSaveTopo
+ * @param {cytoscape.Core} cy - The Cytoscape instance containing the graph elements.
+ * @returns {Promise<void>} A promise that resolves once the topology data has been processed and sent.
+ */
+async function viewportButtonsSaveTopo(cy) {
+    if (isVscodeDeployment) {
+        try {
+            console.log("viewportButtonsSaveTopo triggered");
+            // Ensure our Cytoscape instance is available
+            if (!window.cy) {
+                console.error('Cytoscape instance "cy" is not defined.');
+                return;
+            }
+            // Process nodes: update each node's "position" property with the current position.
+            const updatedNodes = cy.nodes().map(function (node) {
+                const nodeJson = node.json();
+                nodeJson.position = node.position(); // Update position property
 
-//     // First pass: Collect existing lat and lng values
-//     dataArray.forEach(item => {
-//         const data = item.data;
-//         if (data.lat && data.lat.trim() !== "") {
-//             const lat = parseFloat(data.lat);
-//             if (!isNaN(lat)) {
-//                 existingLats.push(lat);
-//             }
-//         }
-//         if (data.lng && data.lng.trim() !== "") {
-//             const lng = parseFloat(data.lng);
-//             if (!isNaN(lng)) {
-//                 existingLngs.push(lng);
-//             }
-//         }
-//     });
+                // Check if extraData and labels exist before modifying
+                if (nodeJson.data?.extraData?.labels) {
+                    nodeJson.data.extraData.labels["graph-posX"] = nodeJson.position.x.toString();
+                    nodeJson.data.extraData.labels["graph-posY"] = nodeJson.position.y.toString();
+                }
+                return nodeJson;
+            });
 
-//     // Compute the average (mean) of existing lat and lng
-//     const averageLat = existingLats.length > 0 ? existingLats.reduce((a, b) => a + b, 0) / existingLats.length : 0;
-//     const averageLng = existingLngs.length > 0 ? existingLngs.reduce((a, b) => a + b, 0) / existingLngs.length : 0;
+            // Combine nodes into one array (edges could be added here if needed)
+            const updatedElements = updatedNodes;
 
-//     // Second pass: Assign missing lat and lng
-//     dataArray.forEach(item => {
-//         const data = item.data;
+            // Convert the updated elements to a JSON string (pretty printed)
+            const jsonString = JSON.stringify(updatedElements, null, 2);
 
-//         // Check and assign missing latitude
-//         if (!data.lat || data.lat.trim() === "") {
-//             // Assign normalized lat + random value between 0 and 0.1
-//             const newLat = averageLat + Math.random() * 0.9;
-//             data.lat = newLat.toFixed(15).toString(); // Convert back to string with precision
-//             console.log(`Assigned new lat for ID ${data.id}: ${data.lat}`);
-//         } else {
-//             // Optionally, normalize existing lat
-//             const normalizedLat = parseFloat(data.lat);
-//             data.lat = normalizedLat.toFixed(15).toString();
-//         }
+            const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
+            console.log("############### response from backend:", response);
+        } catch (err) {
+            console.error("############### Backend call failed:", err);
+        }
+    }
+}
 
-//         // Check and assign missing longitude
-//         if (!data.lng || data.lng.trim() === "") {
-//             // Assign normalized lng + random value between 0 and 0.1
-//             const newLng = averageLng + Math.random() * 0.9;
-//             data.lng = newLng.toFixed(15).toString(); // Convert back to string with precision
-//             console.log(`Assigned new lng for ID ${data.id}: ${data.lng}`);
-//         } else {
-//             // Optionally, normalize existing lng
-//             const normalizedLng = parseFloat(data.lng);
-//             data.lng = normalizedLng.toFixed(15).toString();
-//         }
-//     });
 
-//     return dataArray;
-// }
+/**
+ * toggleSocketEdgeUpdates()
+ * Flips the globalToggleOnChangeCytoStyle variable and then calls updateSocketBinding()
+ * so that the socket event handler is attached or detached accordingly.
+ * This function can be bound to a button in your webview.
+ */
+function viewportButtonsLinkOperState() {
+    console.log(`globalToggleOnChangeCytoStyle is now: ${globalToggleOnChangeCytoStyle}`);
+    globalToggleOnChangeCytoStyle = !globalToggleOnChangeCytoStyle;
+    // if (globalToggleOnChangeCytoStyle) {
+    //     bulmaToast.toast({
+    //         message: `🕵️‍♂️ Bro, we're currently on a mission to probe that link status! Stay tuned for the results. 🔍🚀👨‍💻`,
+    //         type: "is-warning is-size-6 p-3",
+    //         duration: 4000,
+    //         position: "top-center",
+    //         closeOnClick: true,
+    //     });
+    // } else {
+    //     bulmaToast.toast({
+    //         message: `Alright, mission control, we're standing down. 🛑🔍 link status probing aborted. Stay chill, folks. 😎👨‍💻`,
+    //         type: "is-warning is-size-6 p-3",
+    //         duration: 4000,
+    //         position: "top-center",
+    //         closeOnClick: true,
+    //     });
+    // }
+    loadCytoStyle(cy);
+    console.log(`globalToggleOnChangeCytoStyle is become: ${globalToggleOnChangeCytoStyle}`);
+}
+
 
 // Enhanced Function to Process the Data
 function assignMissingLatLng(dataArray) {
@@ -4578,8 +4188,6 @@ function assignMissingLatLng(dataArray) {
 }
 
 
-
-
 /**
  * Fetches data from the JSON file, processes it, and loads it into the Cytoscape instance.
  * This integrated function appends a timestamp to bypass caching, fetches the JSON data,
@@ -4588,48 +4196,54 @@ function assignMissingLatLng(dataArray) {
  *
  * @returns {void}
  */
-function fetchAndLoadData() {
+async function fetchAndLoadData() {
+    try {
+        if (isVscodeDeployment) {
+            jsonFileUrlDataCytoMarshall = window.jsonFileUrlDataCytoMarshall;
+        } else {
+            jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json";
+        }
 
-    if (isVscodeDeployment) {
-        jsonFileUrlDataCytoMarshall = window.jsonFileUrlDataCytoMarshall
-    } else {
-        jsonFileUrlDataCytoMarshall = "dataCytoMarshall.json"
-    }
+        console.log(`#####  fetchAndLoadData called`);
+        console.log(`#####  fetchAndLoadData jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`);
 
+        // Optionally, append a timestamp to avoid caching:
+        // const fetchUrl = jsonFileUrlDataCytoMarshall + '?t=' + new Date().getTime();
+        const fetchUrl = jsonFileUrlDataCytoMarshall;
 
-    console.log(`fetchAndLoadData() called`)
-    console.log(`jsonFileUrlDataCytoMarshall: ${jsonFileUrlDataCytoMarshall}`)
-    // Append a timestamp to avoid caching.
-    //var fetchUrl = jsonFileUrlDataCytoMarshall + '?t=' + new Date().getTime();
+        // Fetch the JSON data.
+        const response = await fetch(fetchUrl);
+        if (!response.ok) {
+            throw new Error("Network response was not ok: " + response.statusText);
+        }
+        const elements = await response.json();
 
-    var fetchUrl = jsonFileUrlDataCytoMarshall;
+        // Process the data (assign missing lat/lng values).
+        const updatedElements = assignMissingLatLng(elements);
 
+        console.log("Updated Elements:", updatedElements);
 
-    fetch(fetchUrl)
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok: " + response.statusText);
-            }
-            return response.json();
-        })
-        .then((elements) => {
-            // Process the data (assign missing lat/lng values).
-            var updatedElements = assignMissingLatLng(elements);
-            console.log("Updated Elements:", updatedElements);
+        // Clear current Cytoscape elements.
+        cy.json({ elements: [] });
 
-            // Clear current Cytoscape elements.
-            // cy.elements().remove();
-            cy.json({ elements: [] });
+        // Determine whether data is wrapped in an object with an "elements" property or is directly an array.
+        const elementsToAdd = (updatedElements.elements && Array.isArray(updatedElements.elements))
+            ? updatedElements.elements
+            : updatedElements;
 
+        // Add new elements.
+        cy.add(elementsToAdd);
 
-            // Determine whether data is wrapped in an object with an "elements" property or is directly an array.
-            var elementsToAdd = (updatedElements.elements && Array.isArray(updatedElements.elements))
-                ? updatedElements.elements
-                : updatedElements;
-
-            // Add new elements.
-            cy.add(elementsToAdd);
-
+        if (globalIsPresetLayout) {
+            // Run the preset layout.
+            const layout = cy.layout({
+                name: "preset",
+                animate: true,
+                randomize: false,
+                maxSimulationTime: 500
+            });
+            layout.run();
+        } else {
             // Run the layout.
             const layout = cy.layout({
                 name: "cola",
@@ -4640,35 +4254,176 @@ function fetchAndLoadData() {
                 maxSimulationTime: 1500
             });
             layout.run();
+        }
+        // Remove specific nodes by name if they exist.
+        cy.filter('node[name = "topoviewer"]').remove();
+        cy.filter('node[name = "TopoViewer:1"]').remove();
 
-            // Remove specific nodes by name if they exist.
-            cy.filter('node[name = "topoviewer"]').remove();
-            cy.filter('node[name = "TopoViewer:1"]').remove();
-
-            // Setup expand/collapse functionality using the extension.
-            var cyExpandCollapse = cy.expandCollapse({
-                layoutBy: null,      // null uses the current layout
-                undoable: false,
-                fisheye: false,
-                animationDuration: 10, // duration in milliseconds
-                animate: true
-            });
-
-            // Example collapse/expand for a node with id 'parent'.
-            setTimeout(function () {
-                var parent = cy.$('#parent'); // Adjust based on your data
-                if (parent.nonempty()) {
-                    cyExpandCollapse.collapse(parent);
-                    setTimeout(function () {
-                        cyExpandCollapse.expand(parent);
-                    }, 2000);
-                }
-            }, 2000);
-        })
-        .catch((error) => {
-            console.error("Error loading graph data:", error);
+        // Setup expand/collapse functionality using the extension.
+        const cyExpandCollapse = cy.expandCollapse({
+            layoutBy: null,      // null uses the current layout
+            undoable: false,
+            fisheye: false,
+            animationDuration: 10, // duration in milliseconds
+            animate: true
         });
+
+        // Example collapse/expand for a node with id 'parent'.
+        setTimeout(() => {
+            const parent = cy.$('#parent'); // Adjust based on your data
+            if (parent.nonempty()) {
+                cyExpandCollapse.collapse(parent);
+                setTimeout(() => {
+                    cyExpandCollapse.expand(parent);
+                }, 2000);
+            }
+        }, 2000);
+    } catch (error) {
+        console.error("Error loading graph data:", error);
+    }
 }
+
+
+
+async function renderSubInterfaces(subInterfaces, referenceElementAfterId, referenceElementBeforeId, nodeName) {
+    console.log("##### renderSubInterfaces is called")
+    console.log("##### subInterfaces: ", subInterfaces)
+
+    const containerSelectorId = 'panel-link-action-dropdown-menu-dropdown-content';
+
+    const onClickHandler = (event, subInterface) => {
+        console.info(`Clicked on: ${subInterface}`);
+        linkWireshark(event, "edgeSharkSubInterface", subInterface, referenceElementAfterId);
+    };
+
+    // Validate container
+    const containerElement = document.getElementById(containerSelectorId);
+    if (!containerElement) {
+        console.error(`Container element with ID "${containerSelectorId}" not found.`);
+        return;
+    }
+
+    // Validate reference elements
+    const referenceElementAfter = document.getElementById(referenceElementAfterId);
+    const referenceElementBefore = document.getElementById(referenceElementBeforeId);
+    if (!referenceElementAfter || !referenceElementBefore) {
+        console.error(`Reference elements not found: afterId="${referenceElementAfterId}", beforeId="${referenceElementBeforeId}".`);
+        return;
+    }
+
+    // Remove all elements between referenceElementAfter and referenceElementBefore
+    let currentNode = referenceElementAfter.nextSibling;
+    while (currentNode && currentNode !== referenceElementBefore) {
+        const nextNode = currentNode.nextSibling;
+        currentNode.remove(); // Remove the current node
+        currentNode = nextNode;
+    }
+
+    // Handle case when subInterfaces is null
+    if (!subInterfaces) {
+        console.info("Sub-interfaces is null. Cleared existing items and performed no further actions.");
+        // Optionally, you could display a placeholder message or take other actions:
+        // const placeholder = document.createElement("div");
+        // placeholder.textContent = "No sub-interfaces available.";
+        // placeholder.style.textAlign = "center";
+        // insertAfter(placeholder, referenceElementAfter);
+        return;
+    }
+
+    // Add new sub-interface items
+    subInterfaces.forEach(subInterface => {
+        const a = document.createElement("a");
+        a.className = "dropdown-item label has-text-weight-normal is-small py-0";
+        a.style.display = "flex";
+        a.style.justifyContent = "flex-end";
+        a.textContent = `└ sub-interface :: ${nodeName} :: ${subInterface}`;
+        a.onclick = (event) => onClickHandler(event, subInterface);
+
+        insertAfter(a, referenceElementAfter);
+    });
+}
+
+
+// Helper function to insert an element after a reference element
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+function addSvgIcon(targetHtmlId, svgIcon, altName, position, size) {
+    // Find the target node
+    const targetNode = document.getElementById(targetHtmlId);
+    if (!targetNode) {
+        console.error(`Target node with ID "${targetHtmlId}" not found.`);
+        return;
+    }
+
+    // Ensure the target node uses flexbox for alignment
+    targetNode.style.display = "flex";
+    targetNode.style.alignItems = "center";
+
+    // Create the <img> element for the SVG icon
+    const imgIcon = document.createElement("img");
+    imgIcon.src = svgIcon;
+    imgIcon.alt = altName; // Accessible description
+    imgIcon.style.width = size;
+    imgIcon.style.height = size;
+    imgIcon.style.marginLeft = position === "after" ? "4px" : "0"; // Add spacing between the label and the icon if "after"
+    imgIcon.style.marginRight = position === "before" ? "4px" : "0"; // Add spacing if "before"
+
+    // Add CSS class for gradient animation
+    imgIcon.classList.add("gradient-animation");
+
+    // Insert the image based on the position
+    if (position === "after") {
+        // Append the image after the label
+        targetNode.append(imgIcon);
+    } else if (position === "before") {
+        // Insert the image before the label
+        targetNode.prepend(imgIcon);
+    } else {
+        console.error(
+            `Invalid position "${position}" specified. Use "after" or "before".`
+        );
+        return;
+    }
+
+    // Add dynamic style for gradient animation
+    const style = document.createElement("style");
+    style.textContent = `
+        @keyframes gradientColorChange {
+            0% { filter: invert(100%); } /* White */
+            20% { filter: invert(85%); } /* Light Grey */
+            40% { filter: invert(60%); } /* Dark Grey */
+            60% { filter: invert(40%); } /* Very Dark Grey */
+            80% { filter: invert(60%); } /* Back to Dark Grey */
+            100% { filter: invert(100%); } /* Back to White */
+        }
+        .gradient-animation {
+            animation: gradientColorChange 3600s infinite;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+
+
+// if (isVscodeDeployment) {
+
+//     console.log(`image-URI is ${window.imagesUrl}`)
+//     addSvgIcon("endpoint-a-edgeshark", `${window.imagesUrl}svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-edgeshark", `${window.imagesUrl}/svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-a-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
+//     addSvgIcon("panel-link-action-impairment-B->A", `${window.imagesUrl}/svg-impairment.svg`, "Impairment Icon", "before", "15px");
+// } else {
+//     addSvgIcon("endpoint-a-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
+//     addSvgIcon("endpoint-a-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
+//     addSvgIcon("endpoint-b-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
+//     addSvgIcon("panel-link-action-impairment-B->A", "images/svg-impairment.svg", "Impairment Icon", "before", "15px");
+// }
+
+
 
 // aarafat-tag:
 //// REFACTOR END
@@ -4872,142 +4627,5 @@ function sleep(ms) {
 }
 
 
-
-async function renderSubInterfaces(subInterfaces, referenceElementAfterId, referenceElementBeforeId, edgeSharkClipboardToggle) {
-    const containerSelectorId = 'panel-link-action-dropdown-menu-dropdown-content';
-
-    const onClickHandler = (event, subInterface) => {
-        console.info(`Clicked on: ${subInterface}`);
-        linkWireshark(event, "edgeSharkSubInterface", subInterface, referenceElementAfterId);
-    };
-
-    // Validate container
-    const containerElement = document.getElementById(containerSelectorId);
-    if (!containerElement) {
-        console.error(`Container element with ID "${containerSelectorId}" not found.`);
-        return;
-    }
-
-    // Validate reference elements
-    const referenceElementAfter = document.getElementById(referenceElementAfterId);
-    const referenceElementBefore = document.getElementById(referenceElementBeforeId);
-    if (!referenceElementAfter || !referenceElementBefore) {
-        console.error(`Reference elements not found: afterId="${referenceElementAfterId}", beforeId="${referenceElementBeforeId}".`);
-        return;
-    }
-
-    // Remove all elements between referenceElementAfter and referenceElementBefore
-    let currentNode = referenceElementAfter.nextSibling;
-    while (currentNode && currentNode !== referenceElementBefore) {
-        const nextNode = currentNode.nextSibling;
-        currentNode.remove(); // Remove the current node
-        currentNode = nextNode;
-    }
-
-    // Handle case when subInterfaces is null
-    if (!subInterfaces) {
-        console.info("Sub-interfaces is null. Cleared existing items and performed no further actions.");
-        // Optionally, you could display a placeholder message or take other actions:
-        // const placeholder = document.createElement("div");
-        // placeholder.textContent = "No sub-interfaces available.";
-        // placeholder.style.textAlign = "center";
-        // insertAfter(placeholder, referenceElementAfter);
-        return;
-    }
-
-    // Add new sub-interface items
-    subInterfaces.forEach(subInterface => {
-        const a = document.createElement("a");
-        a.className = "dropdown-item label has-text-weight-normal is-small py-0";
-        a.style.display = "flex";
-        a.style.justifyContent = "flex-end";
-        a.textContent = `└ Sub-Interface ${subInterface}`;
-        a.onclick = (event) => onClickHandler(event, subInterface);
-
-        insertAfter(a, referenceElementAfter);
-    });
-}
-
-
-
-
-// Helper function to insert an element after a reference element
-function insertAfter(newNode, referenceNode) {
-    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-}
-
-function addSvgIcon(targetHtmlId, svgIcon, altName, position, size) {
-    // Find the target node
-    const targetNode = document.getElementById(targetHtmlId);
-    if (!targetNode) {
-        console.error(`Target node with ID "${targetHtmlId}" not found.`);
-        return;
-    }
-
-    // Ensure the target node uses flexbox for alignment
-    targetNode.style.display = "flex";
-    targetNode.style.alignItems = "center";
-
-    // Create the <img> element for the SVG icon
-    const imgIcon = document.createElement("img");
-    imgIcon.src = svgIcon;
-    imgIcon.alt = altName; // Accessible description
-    imgIcon.style.width = size;
-    imgIcon.style.height = size;
-    imgIcon.style.marginLeft = position === "after" ? "4px" : "0"; // Add spacing between the label and the icon if "after"
-    imgIcon.style.marginRight = position === "before" ? "4px" : "0"; // Add spacing if "before"
-
-    // Add CSS class for gradient animation
-    imgIcon.classList.add("gradient-animation");
-
-    // Insert the image based on the position
-    if (position === "after") {
-        // Append the image after the label
-        targetNode.append(imgIcon);
-    } else if (position === "before") {
-        // Insert the image before the label
-        targetNode.prepend(imgIcon);
-    } else {
-        console.error(
-            `Invalid position "${position}" specified. Use "after" or "before".`
-        );
-        return;
-    }
-
-    // Add dynamic style for gradient animation
-    const style = document.createElement("style");
-    style.textContent = `
-        @keyframes gradientColorChange {
-            0% { filter: invert(100%); } /* White */
-            20% { filter: invert(85%); } /* Light Grey */
-            40% { filter: invert(60%); } /* Dark Grey */
-            60% { filter: invert(40%); } /* Very Dark Grey */
-            80% { filter: invert(60%); } /* Back to Dark Grey */
-            100% { filter: invert(100%); } /* Back to White */
-        }
-        .gradient-animation {
-            animation: gradientColorChange 3600s infinite;
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-
-
-if (isVscodeDeployment) {
-
-    console.log(`image-URI is ${window.imagesUrl}`)
-    addSvgIcon("endpoint-a-edgeshark", `${window.imagesUrl}svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
-    addSvgIcon("endpoint-b-edgeshark", `${window.imagesUrl}/svg-wireshark.svg`, "Wireshark Icon", "before", "20px");
-    addSvgIcon("endpoint-a-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
-    addSvgIcon("endpoint-b-clipboard", `${window.imagesUrl}/svg-copy.svg`, "Clipboard Icon", "before", "20px");
-    addSvgIcon("panel-link-action-impairment-B->A", `${window.imagesUrl}/svg-impairment.svg`, "Impairment Icon", "before", "15px");
-} else {
-    addSvgIcon("endpoint-a-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
-    addSvgIcon("endpoint-b-edgeshark", "images/svg-wireshark.svg", "Wireshark Icon", "before", "20px");
-    addSvgIcon("endpoint-a-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
-    addSvgIcon("endpoint-b-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
-    addSvgIcon("panel-link-action-impairment-B->A", "images/svg-impairment.svg", "Impairment Icon", "before", "15px");
-}
-
 // ASAD
+

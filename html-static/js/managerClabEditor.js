@@ -25,10 +25,6 @@ let monacoEditorReady = new Promise((resolve) => {
 	});
 });
 
-
-
-
-
 function showPanelContainerlabEditor(event) {
 	// Wait until the Monaco Editor is initialized
 	monacoEditorReady;
@@ -71,7 +67,6 @@ function clabEditorLoadFile() {
 			// Set the content of the Monaco Editor
 			window.monacoEditor.setValue(event.target.result);
 		};
-
 		reader.readAsText(file);
 	};
 }

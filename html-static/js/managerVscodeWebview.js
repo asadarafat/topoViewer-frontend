@@ -1,13 +1,13 @@
 // Check globalVariables.js for initiation
 
 
-if (isVscodeDeployment) {
-    // aarafat-tag:
-    // In a VS Code webview, the global function `acquireVsCodeApi()` is available.
-    // Call it to obtain the VS Code API object, which facilitates communication
-    // between the webview and the extension host.
-    vsCode = acquireVsCodeApi();
-}
+// if (isVscodeDeployment) {
+//     // aarafat-tag:
+//     // In a VS Code webview, the global function `acquireVsCodeApi()` is available.
+//     // Call it to obtain the VS Code API object, which facilitates communication
+//     // between the webview and the extension host.
+//     vsCode = acquireVsCodeApi();
+// }
 
 // Map to track pending requests: requestId -> {resolve, reject}
 const pendingRequests = new Map();
