@@ -571,13 +571,7 @@ async function viewportDrawerPreset() {
     }
     const elements = await response.json();
 
-    // // Process the data (assign missing lat/lng values).
-    // const updatedElements = assignMissingLatLng(elements);
-
-
     const updatedElements = elements;
-
-
     console.log("Updated Elements:", updatedElements);
 
     // Clear current Cytoscape elements.
@@ -591,30 +585,11 @@ async function viewportDrawerPreset() {
     // Add new elements.
     cy.add(elementsToAdd);
 
-    // Use the 'preset' layout to set node positions based on the node data's "position" property
-    // cy.layout({
-    //     name: 'preset',
-    //     fit: false,
-    //     positions: function (node) {
-    //         // Retrieve the "position" object from the node's data
-    //         var pos = node.data("position");
-
-    //         // Check if the "position" object exists and has valid numeric x and y values
-    //         if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
-    //             // Return the parsed position
-    //             return { x: pos.x, y: pos.y };
-    //         }
-    //         // Fallback: if no valid "position" is found, use the node's current position
-    //         return node.position();
-    //     }
-    // }).run();
-
     cy.layout({
         name: 'preset'
     }).run();
 
     // Adjust the viewport to fit the updated layout
     cy.fit();
-
     console.log("Preset layout applied using node data positions.");
 }

@@ -840,6 +840,87 @@ return `
       </div> <!-- End .panel-tabContainer -->
     </section>
 
+
+
+    <!-- Node Parent Properties Editor Panel with Improved Semantic Markup & Responsive Design -->
+    <section class="panel is-link" id="panel-node-editor-parent" aria-labelledby="node-panel-heading"
+      style="display: none;">
+      <header class="panel-heading is-size-7" id="node-panel-heading">
+        Group Properties
+      </header>
+      <div class="panel-tabContainer">
+        <div class="panel-block p-0">
+          <div class="column px-0">
+            <!-- Group Id -->
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">Id</label>
+                  </div>
+                  <div class="column is-8 p-1 pl-3"><label
+                      class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-node-editor-parent-graph-group-id">group-id-placeholder</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Graph Group -->
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">Graph Group</label>
+                  </div>
+                  <div class="column is-8 p-1 pl-3">
+                    <input
+                      class="input is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-node-editor-parent-graph-group">
+                    </input>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Graph Level -->
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">Graph Level</label>
+                  </div>
+                  <div class="column is-8 p-1 pl-3">
+                    <input
+                      class="input is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-node-editor-parent-graph-level">
+                    </input>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns py-auto">
+                  <div class="column is-4 p-1"></div>
+                  <div class="column is-8 p-1 pl-3">
+                    <div class="field">
+                      <div class="control">
+                        <input type="file" id="panel-clab-editor-file-input" class="file-input">
+                        <button class="button is-link is-outlined is-small" onclick="nodeParentPropertiesUpdate()">Update
+                        </button>
+                        <button class="button is-link is-outlined is-small"
+                          id="panel-node-editor-parent-close-button" onclick="nodeParentPropertiesUpdateClose()">Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- End .columns -->
+        </div> <!-- End .panel-block -->
+      </div> <!-- End .panel-tabContainer -->
+    </section>
+
     <div class="panel is-link" id="panel-node-editor" style="display: none;">
       <p class="panel-heading is-size-7">Node Properties Editor</p>
       <div class="panel-tabContainer">
@@ -1597,6 +1678,8 @@ return `
     <script src="${jsUri}/managerVscodeWebview.js?ver=1"></script>
     <script src="${jsUri}/managerSvg.js?ver=1"></script>
     <script src="${jsUri}/managerLayoutAlgo.js?ver=1"></script>
+    <script src="${jsUri}/managerGroupEditor.js?ver=1"></script>
+
 
     <script src="${jsUri}/backupRestore.js?ver=1"></script>
     <script src="${jsUri}/managerClabEditor.js?ver=1"></script>

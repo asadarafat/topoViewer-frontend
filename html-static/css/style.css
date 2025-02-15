@@ -362,6 +362,17 @@ body {
   z-index: 21;
 }
 
+#panel-node-editor-parent {
+  bottom: 10px;
+  left: 40px;
+  width: 340px;
+  max-height: 700px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: fixed;
+  z-index: 21;
+}
+
 #panel-node-kind-dropdown-content {
   max-height: 120px;
   /* Adjust height to show about 5 items */

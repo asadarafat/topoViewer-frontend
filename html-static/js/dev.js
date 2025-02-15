@@ -353,7 +353,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Drag-and-Drop logic
     cy.on('dragfree', 'node', (event) => {
-        const isViewportDrawerClabEditorCheckboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
+        // const isViewportDrawerClabEditorCheckboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
+        const isViewportDrawerClabEditorCheckboxChecked = true;
+
         if (isViewportDrawerClabEditorCheckboxChecked) {
             const draggedNode = event.target;
 
@@ -373,7 +375,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     parent: assignedParent.id()
                 });
                 console.info(`${draggedNode.id()} became a child of ${assignedParent.id()}`);
-                showPanelNodeEditor(draggedNode)
+                // showPanelNodeEditor(draggedNode)
             }
             // to release the node from the parent, alt + shift + click on the node.
         }
@@ -654,6 +656,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
     // Listen for tap or click on the Cytoscape canvas
+    // editor mode true - Shift + click/tap to add a new node
     cy.on('click', async (event) => {
         // Usage: Initialize the listener and get a live checker function
         const isViewportDrawerClabEditorCheckboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
@@ -701,138 +704,363 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
-    // Click event listener for nodes
+    // // editor mode fase - Shift + click/tap to add a new parent
+    // cy.on('click', async (event) => {
+    //     // Usage: Initialize the listener and get a live checker function
+    //     if (event.target === cy && shiftKeyDown) { // Ensures Shift + click/tap 
+    //         const pos = event.position;
+    //         const newNodeId = 'groupName-' + (cy.nodes().length + 1);
+    //         // Add the new node to the graph
+    //         cy.add({
+    //             group: 'nodes',
+    //             data: {
+    //                 "id": newNodeId,
+    //                 "weight": "30",
+    //                 "name": newNodeId,
+    //                 "parent": "",
+    //                 "topoViewerRole": "group",
+    //                 "sourceEndpoint": "",
+    //                 "targetEndpoint": "",
+    //                 "containerDockerExtraAttribute": {
+    //                     "state": "",
+    //                     "status": "",
+    //                 },
+    //                 "extraData": {
+    //                     "kind": "container",
+    //                     "longname": "",
+    //                     "image": "",
+    //                     "mgmtIpv4Addresss": "",
+    //                 },
+    //             },
+    //             position: {
+    //                 x: pos.x,
+    //                 y: pos.y
+    //             }
+    //         });
+
+    //         var cyNode = cy.$id(newNodeId); // Get cytoscpe node object id
+
+    //         // await showPanelContainerlabEditor(event)
+    //         // // sleep (1000)
+    //         // await showPanelNodeEditor(cyNode)
+    //         // // sleep (100)
+    //         // await saveNodeToEditorToFile()
+    //     } else {
+    //         loadCytoStyle(cy)
+    //     }
+    // });
+
+    // // Click event listener for nodes
+    // cy.on("click", "node", async function (event) {
+
+    //     const node = event.target;
+
+    //     console.info("node clicked init");
+    //     console.info("isPanel01Cy: ", isPanel01Cy);
+    //     console.info("nodeClicked: ", nodeClicked);
+    //     console.info("edgeClicked: ", edgeClicked);
+
+    //     nodeClicked = true;
+
+    //     console.info("node clicked after");
+    //     console.info("isPanel01Cy: ", isPanel01Cy);
+    //     console.info("nodeClicked: ", nodeClicked);
+    //     console.info("edgeClicked: ", edgeClicked);
+
+    //     console.info("isEdgeHandlerActive after node click: ", isEdgeHandlerActive);
+
+    //     environments = await getEnvironments(event);
+    //     console.info("nodeActionConnectToSSH - environments: ", environments)
+
+    //     cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
+    //     clabServerAddress = environments["clab-server-address"]
+
+    //     // Ignore the click event if edge handler is active
+    //     if (isEdgeHandlerActive) {
+    //         return;
+    //     }
+
+
+    //     // // aarafat-tag: 
+    //     // // protoype double click node to trigger Connect to SSH, but still mixed up with single clice to trigger show Panel-Node
+    //     // const currentTime = Date.now();
+    //     // // Check if the current tap is on the same node and within the threshold.
+    //     // if (globalDblclickLastClick.id === node.id() && (currentTime - globalDblclickLastClick.time < globalDblClickThreshold)) {
+    //     //     // Trigger a custom 'dblclick' event on the node.
+    //     //     node.trigger("dblclick", event);
+    //     //     // Reset globalDblclickLastClick so that triple-clicks don't trigger extra dblclick events.
+    //     //     globalDblclickLastClick.time = 0;
+    //     //     globalDblclickLastClick.id = null;
+
+    //     //     console.log(" ########### dblclick true")
+
+    //     // } else {
+    //     //     // Update globalDblclickLastClick with the current tap info.
+    //     //     globalDblclickLastClick.time = currentTime;
+    //     //     globalDblclickLastClick.id = node.id();
+    //     //     console.log(" ########### dblclick false")
+    //     // }
+
+    //     console.info("editor Node: ", node.data("editor"));
+
+    //     if (!node.isParent()) {
+
+    //         // Initialize the listener and get the live checker function
+    //         const checkboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
+    //         const originalEvent = event.originalEvent;
+    //         const extraData = node.data("extraData");
+    //         const isEditor = node.data("editor") === "true";
+
+    //         if (checkboxChecked) {
+    //             // Orphan node: Ctrl + click on a child node
+    //             if (originalEvent.ctrlKey && node.isChild()) {
+    //                 console.info(`Orphaning node: ${node.id()} from parent: ${node.parent().id()}`);
+    //                 node.move({ parent: null });
+    //                 console.info(`${node.id()} is now an orphan`);
+    //             }
+
+    //             // Start edge creation: Shift + click
+    //             if (originalEvent.shiftKey) {
+    //                 console.info("Shift + Click");
+    //                 console.info("edgeHandler Node: ", extraData.longname);
+
+    //                 isEdgeHandlerActive = true;
+    //                 eh.start(node);
+    //                 console.info("Node is an editor node");
+    //                 showPanelNodeEditor(node);
+    //             }
+
+    //             // Delete node: Alt + click when the node is an editor
+    //             if (originalEvent.altKey && isEditor) {
+    //                 console.info("Alt + Click is enabled");
+    //                 console.info("deleted Node: ", extraData.longname);
+    //                 deleteNodeToEditorToFile(node);
+    //             }
+    //         }
+
+    //         // For editor nodes, simply show the editor panel
+    //         if (isEditor) {
+    //             showPanelNodeEditor(node);
+    //         } else {
+    //             if (originalEvent.ctrlKey) {
+    //                 console.info("Ctrl + Click");
+
+    //                 globalSelectedNode = node.data("extraData").longname;
+    //                 nodeActionConnectToSSH(event)
+
+    //             } else if (originalEvent.shiftKey && node.parent().empty()) { // aarafat-tag: Shift + Click to create a new parent 
+    //                 console.info("Shift + Click"); 
+
+    //                 // Use the clicked node's position (you might adjust the position if desired)
+    //                 const pos = node.position();
+    //                 const newParentId = `groupName${(cy.nodes().length + 1)}:1`;
+
+    //                 // Add the new parent node to the graph
+    //                 cy.add({
+    //                     group: 'nodes',
+    //                     data: {
+    //                         id: newParentId,
+    //                         weight: "1000",
+    //                         name: newParentId.split(":")[0],
+    //                         parent: "", // As a top-level container
+    //                         topoViewerRole: "group",
+    //                         extraData: {
+    //                             clabServerUsername: "asad",
+    //                             weight: "2",
+    //                             name: "",
+    //                             topoViewerGroup: "",
+    //                             topoViewerGroupLevel: newParentId.split(":")[1]
+    //                         },
+    //                     },
+    //                     position: {
+    //                         x: pos.x,
+    //                         y: pos.y
+    //                     }
+    //                 });
+
+    //                 // Reparent the clicked node using move().
+    //                 node.move({ parent: newParentId });
+
+    //                 // Optionally update the data attribute if you want to keep it in sync.
+    //                 node.data('parent', newParentId);
+
+    //                 // Display the node editor panel
+    //                 const nodeEditorParentPanel = document.getElementById("panel-node-editor-parent");
+    //                 if (nodeEditorParentPanel) {
+    //                     nodeEditorParentPanel.style.display = "block";
+
+    //                     // Set graph-group in the panel parent node editor
+    //                     const nodeEditorParentGraphGroup = document.getElementById("panel-node-editor-parent-graph-group");
+    //                     if (nodeEditorParentGraphGroup) {
+    //                         nodeEditorParentGraphGroup.value = newParentId.split(":")[0];
+    //                     }
+
+    //                     const nodeEditorParentGraphLevel = document.getElementById("panel-node-editor-parent-graph-level");
+    //                     if (nodeEditorParentGraphLevel) {
+    //                         nodeEditorParentGraphLevel.value = newParentId.split(":")[1];
+    //                     }
+    //                 }
+
+
+    //             } else {
+    //                 // Hide all overlay panels
+    //                 const panelOverlays = document.getElementsByClassName("panel-overlay");
+    //                 Array.from(panelOverlays).forEach(panel => panel.style.display = "none");
+
+    //                 console.info(node, extraData);
+    //                 const panelNode = document.getElementById("panel-node");
+
+    //                 // Toggle panel-node display
+    //                 panelNode.style.display = (panelNode.style.display === "none") ? "block" : "none";
+
+    //                 // Update panel-node content with node data
+    //                 document.getElementById("panel-node-name").textContent = extraData.longname;
+    //                 document.getElementById("panel-node-kind").textContent = extraData.kind;
+    //                 // document.getElementById("panel-node-image").textContent = extraData.image; // from socket
+    //                 document.getElementById("panel-node-mgmtipv4").textContent = extraData.mgmtIpv4Addresss;
+    //                 document.getElementById("panel-node-mgmtipv6").textContent = extraData.mgmtIpv6Address;
+    //                 document.getElementById("panel-node-fqdn").textContent = extraData.fqdn;
+    //                 // document.getElementById("panel-node-group").textContent = extraData.group;
+    //                 document.getElementById("panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
+    //                 document.getElementById("panel-node-state").textContent = node.data("state");
+    //                 document.getElementById("panel-node-image").textContent = node.data("image");
+
+    //                 console.log("nodeState: ", node.data("state"))
+
+    //                 // Set global selected node and log details
+    //                 globalSelectedNode = extraData.longname;
+    //                 console.info("internal: ", globalSelectedNode);
+
+    //                 appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
+    //                 appendMessage(`"nodeClicked: " ${nodeClicked}`);
+    //             }
+    //         }
+    //     }
+    // });
+
+
     cy.on("click", "node", async function (event) {
-
-        console.info("node clicked init");
-        console.info("isPanel01Cy: ", isPanel01Cy);
-        console.info("nodeClicked: ", nodeClicked);
-        console.info("edgeClicked: ", edgeClicked);
-
+        const node = event.target;
         nodeClicked = true;
 
-        console.info("node clicked after");
-        console.info("isPanel01Cy: ", isPanel01Cy);
-        console.info("nodeClicked: ", nodeClicked);
-        console.info("edgeClicked: ", edgeClicked);
+        console.info("Node clicked:", node.id());
+        console.info("isPanel01Cy:", isPanel01Cy);
+        console.info("nodeClicked:", nodeClicked);
+        console.info("edgeClicked:", edgeClicked);
+        console.info("isEdgeHandlerActive:", isEdgeHandlerActive);
 
-        console.info("isEdgeHandlerActive after node click: ", isEdgeHandlerActive);
+        // Fetch environments and log details
+        const environments = await getEnvironments(event);
+        console.info("Environments:", environments);
 
-        environments = await getEnvironments(event);
-        console.info("nodeActionConnectToSSH - environments: ", environments)
-
-        cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
-        clabServerAddress = environments["clab-server-address"]
+        const { EnvCyTopoJsonBytes: cytoTopologyJson, "clab-server-address": clabServerAddress } = environments;
 
         // Ignore the click event if edge handler is active
         if (isEdgeHandlerActive) {
             return;
         }
-        const node = event.target;
 
+        const originalEvent = event.originalEvent;
+        const extraData = node.data("extraData");
+        const isNodeInEditMode = node.data("editor") === "true";
+        const checkboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
 
-
-        // // aarafat-tag: 
-        // // protoype double click node to trigger Connect to SSH, but still mixed up with single clice to trigger show Panel-Node
-        // const currentTime = Date.now();
-        // // Check if the current tap is on the same node and within the threshold.
-        // if (globalDblclickLastClick.id === node.id() && (currentTime - globalDblclickLastClick.time < globalDblClickThreshold)) {
-        //     // Trigger a custom 'dblclick' event on the node.
-        //     node.trigger("dblclick", event);
-        //     // Reset globalDblclickLastClick so that triple-clicks don't trigger extra dblclick events.
-        //     globalDblclickLastClick.time = 0;
-        //     globalDblclickLastClick.id = null;
-
-        //     console.log(" ########### dblclick true")
-
-        // } else {
-        //     // Update globalDblclickLastClick with the current tap info.
-        //     globalDblclickLastClick.time = currentTime;
-        //     globalDblclickLastClick.id = node.id();
-        //     console.log(" ########### dblclick false")
-        // }
-
-        console.info("editor Node: ", node.data("editor"));
-
-        if (!node.isParent()) {
-
-            // Initialize the listener and get the live checker function
-            const checkboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
-            const originalEvent = event.originalEvent;
-            const extraData = node.data("extraData");
-            const isEditor = node.data("editor") === "true";
-
-            if (checkboxChecked) {
-                // Orphan node: Ctrl + click on a child node
-                if (originalEvent.ctrlKey && node.isChild()) {
+        if (checkboxChecked) {
+            // Handle node modification actions based on keyboard modifiers
+            switch (true) {
+                case originalEvent.ctrlKey && node.isChild():
                     console.info(`Orphaning node: ${node.id()} from parent: ${node.parent().id()}`);
                     node.move({ parent: null });
-                    console.info(`${node.id()} is now an orphan`);
-                }
+                    break;
 
-                // Start edge creation: Shift + click
-                if (originalEvent.shiftKey) {
-                    console.info("Shift + Click");
-                    console.info("edgeHandler Node: ", extraData.longname);
-
+                case originalEvent.shiftKey:
+                    console.info("Starting edge creation from node:", extraData.longname);
                     isEdgeHandlerActive = true;
                     eh.start(node);
-                    console.info("Node is an editor node");
                     showPanelNodeEditor(node);
-                }
+                    break;
 
-                // Delete node: Alt + click when the node is an editor
-                if (originalEvent.altKey && isEditor) {
-                    console.info("Alt + Click is enabled");
-                    console.info("deleted Node: ", extraData.longname);
+                case originalEvent.altKey && isNodeInEditMode:
+                    console.info("Deleting node:", extraData.longname);
                     deleteNodeToEditorToFile(node);
-                }
+                    break;
             }
+        }
 
-            // For editor nodes, simply show the editor panel
-            if (isEditor) {
-                showPanelNodeEditor(node);
-            } else {
-                if (originalEvent.ctrlKey) {
-                    globalSelectedNode = node.data("extraData").longname;
-                    nodeActionConnectToSSH(event)
-                } else {
-                    // Hide all overlay panels
+        // Handle actions for editor nodes
+        if (isNodeInEditMode) {
+            showPanelNodeEditor(node);
+        } else {
+            // Handle actions for non-editor nodes
+            switch (true) {
+                case originalEvent.ctrlKey:
+                    console.info("Connecting to SSH for node:", extraData.longname);
+                    globalSelectedNode = extraData.longname;
+                    nodeActionConnectToSSH(event);
+                    break;
+
+                case originalEvent.shiftKey && node.parent().empty():
+                    console.info("Creating a new parent node");
+                    const pos = node.position();
+                    const newParentId = `groupName${(cy.nodes().length + 1)}:1`;
+
+                    cy.add({
+                        group: 'nodes',
+                        data: {
+                            id: newParentId,
+                            weight: "1000",
+                            name: newParentId.split(":")[0],
+                            parent: "",
+                            topoViewerRole: "group",
+                            extraData: {
+                                clabServerUsername: "asad",
+                                weight: "2",
+                                name: "",
+                                topoViewerGroup: "",
+                                topoViewerGroupLevel: newParentId.split(":")[1]
+                            },
+                        },
+                        position: { x: pos.x, y: pos.y }
+                    });
+
+                    node.move({ parent: newParentId });
+                    node.data('parent', newParentId);
+
+                    const nodeEditorParentPanel = document.getElementById("panel-node-editor-parent");
+                    if (nodeEditorParentPanel) {
+                        nodeEditorParentPanel.style.display = "block";
+                        document.getElementById("panel-node-editor-parent-graph-group-id").textContent = newParentId;
+                        document.getElementById("panel-node-editor-parent-graph-group").value = newParentId.split(":")[0];
+                        document.getElementById("panel-node-editor-parent-graph-level").value = newParentId.split(":")[1];
+                    }
+                    break;
+
+                default:
+                    // Toggle panel-node display and update content
                     const panelOverlays = document.getElementsByClassName("panel-overlay");
                     Array.from(panelOverlays).forEach(panel => panel.style.display = "none");
 
-                    console.info(node, extraData);
                     const panelNode = document.getElementById("panel-node");
-
-                    // Toggle panel-node display
                     panelNode.style.display = (panelNode.style.display === "none") ? "block" : "none";
 
-                    // Update panel-node content with node data
                     document.getElementById("panel-node-name").textContent = extraData.longname;
                     document.getElementById("panel-node-kind").textContent = extraData.kind;
-                    // document.getElementById("panel-node-image").textContent = extraData.image; // from socket
                     document.getElementById("panel-node-mgmtipv4").textContent = extraData.mgmtIpv4Addresss;
                     document.getElementById("panel-node-mgmtipv6").textContent = extraData.mgmtIpv6Address;
                     document.getElementById("panel-node-fqdn").textContent = extraData.fqdn;
-                    // document.getElementById("panel-node-group").textContent = extraData.group;
                     document.getElementById("panel-node-topoviewerrole").textContent = node.data("topoViewerRole");
-                    document.getElementById("panel-node-state").textContent =  node.data("state");
-                    document.getElementById("panel-node-image").textContent =  node.data("image");
+                    document.getElementById("panel-node-state").textContent = node.data("state");
+                    document.getElementById("panel-node-image").textContent = node.data("image");
 
-
-
-                    console.log ("nodeState: ", node.data("state"))
-
-                    // Set global selected node and log details
                     globalSelectedNode = extraData.longname;
-                    console.info("internal: ", globalSelectedNode);
+                    console.info("Global selected node:", globalSelectedNode);
 
-                    appendMessage(`"isPanel01Cy-cy: " ${isPanel01Cy}`);
-                    appendMessage(`"nodeClicked: " ${nodeClicked}`);
-                }
+                    appendMessage(`isPanel01Cy: ${isPanel01Cy}`);
+                    appendMessage(`nodeClicked: ${nodeClicked}`);
             }
         }
     });
+
 
     // Click event listener for edges
     cy.on("click", "edge", async function (event) {
@@ -4029,13 +4257,26 @@ async function viewportButtonsSaveTopo(cy) {
             // Process nodes: update each node's "position" property with the current position.
             const updatedNodes = cy.nodes().map(function (node) {
                 const nodeJson = node.json();
-                nodeJson.position = node.position(); // Update position property
 
+                nodeJson.position = node.position(); // Update position property
                 // Check if extraData and labels exist before modifying
                 if (nodeJson.data?.extraData?.labels) {
                     nodeJson.data.extraData.labels["graph-posX"] = nodeJson.position.x.toString();
                     nodeJson.data.extraData.labels["graph-posY"] = nodeJson.position.y.toString();
                 }
+
+                nodeJson.parent = node.parent().id(); // Update parent property
+                // Check if extraData and labels exist before modifying
+                if (nodeJson.data?.extraData?.labels) {
+
+
+                    if (nodeJson.parent) {
+                        nodeJson.data.extraData.labels["graph-group"] = nodeJson.parent.split(":")[0]
+                        nodeJson.data.extraData.labels["graph-level"] = nodeJson.parent.split(":")[1];
+                    }
+
+                }
+
                 return nodeJson;
             });
 
@@ -4044,6 +4285,7 @@ async function viewportButtonsSaveTopo(cy) {
 
             // Convert the updated elements to a JSON string (pretty printed)
             const jsonString = JSON.stringify(updatedElements, null, 2);
+
 
             const response = await sendMessageToVscodeEndpointPost("topo-viewport-save", updatedElements);
             console.log("############### response from backend:", response);
