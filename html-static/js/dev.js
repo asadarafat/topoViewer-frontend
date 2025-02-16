@@ -563,7 +563,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.body.appendChild(hoverText);
 
 
-    let shiftKeyDown = false;
+    var shiftKeyDown = false;
     // Detect when Shift is pressed or released
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Shift') {
@@ -577,7 +577,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
-    let altKeyDown = false;
+    var altKeyDown = false;
     // Detect when Alt is pressed or released
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Alt') {
@@ -591,7 +591,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
-    let ctrlKeyDown = false;
+    var ctrlKeyDown = false;
     // Detect when Control is pressed or released
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Control') {
@@ -953,7 +953,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         const environments = await getEnvironments(event);
         console.info("Environments:", environments);
 
-        const { EnvCyTopoJsonBytes: cytoTopologyJson, "clab-server-address": clabServerAddress } = environments;
+        cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
+        clabServerAddress = environments["clab-server-address"]
 
         // Ignore the click event if edge handler is active
         if (isEdgeHandlerActive) {
@@ -993,13 +994,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         } else {
             // Handle actions for non-editor nodes
             switch (true) {
-                case originalEvent.ctrlKey:
+                case originalEvent.ctrlKey: { // Ctrl + Click to connect to SSH
                     console.info("Connecting to SSH for node:", extraData.longname);
                     globalSelectedNode = extraData.longname;
                     nodeActionConnectToSSH(event);
                     break;
+                }
 
-                case originalEvent.shiftKey && node.parent().empty():
+                case originalEvent.shiftKey && node.parent().empty() && !node.isParent(): {  // Shift + Click to create a new parent
                     console.info("Creating a new parent node");
                     const pos = node.position();
                     const newParentId = `groupName${(cy.nodes().length + 1)}:1`;
@@ -1034,8 +1036,39 @@ document.addEventListener("DOMContentLoaded", async function () {
                         document.getElementById("panel-node-editor-parent-graph-level").value = newParentId.split(":")[1];
                     }
                     break;
+                }
 
-                default:
+                case originalEvent.shiftKey && node.isParent(): // Shift + Click to edit an existing parent
+                    {
+                        console.info("Editing existing parent node");
+
+                        const currentParentId = node.id();  // Get the current parent ID
+                        const nodeEditorParentPanel = document.getElementById("panel-node-editor-parent");
+                        if (nodeEditorParentPanel) {
+                            nodeEditorParentPanel.style.display = "block";
+                            document.getElementById("panel-node-editor-parent-graph-group-id").textContent = currentParentId;
+                            document.getElementById("panel-node-editor-parent-graph-group").value = currentParentId.split(":")[0];
+                            document.getElementById("panel-node-editor-parent-graph-level").value = currentParentId.split(":")[1];
+                        }
+                    }
+                    break;
+
+
+                case originalEvent.altKey && node.parent() && !node.isParent(): { // Alt + Click to orphaning a child node
+                    console.info("Orphaning child node");
+                    
+                    const currentParentId = node.parent().id();
+                    const formerParentNode = cy.getElementById(currentParentId);
+
+                    node.move({ parent: null }); // Orphan the child node
+
+                    if (formerParentNode.isChildless()) {
+                        console.info("Removing empty parent node");
+                        formerParentNode.remove(); // Remove the empty parent node
+                    }
+                    break;
+                }
+                case !originalEvent.altKey && !originalEvent.ctrlKey && !node.isParent(): {
                     // Toggle panel-node display and update content
                     const panelOverlays = document.getElementsByClassName("panel-overlay");
                     Array.from(panelOverlays).forEach(panel => panel.style.display = "none");
@@ -1057,6 +1090,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                     appendMessage(`isPanel01Cy: ${isPanel01Cy}`);
                     appendMessage(`nodeClicked: ${nodeClicked}`);
+
+                    break;
+                }
+                default:
+                    break;
             }
         }
     });

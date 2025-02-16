@@ -44,9 +44,16 @@ return `
   <nav class="level m-0 px-3 py-1 has-background-4a">
 
     <div class="is-flex is-justify-content-flex-start">
-      <div class="pt-1 pr-2">
+      <!-- <div class="pt-1 pr-2">
         <img id="nokia-logo-img" src="${imagesUri}/containerlab.svg" alt="Containerlab Logo" class="logo-image">
+      </div> -->
+
+      <div class="pt-1 pr-2">
+        <a href="https://containerlab.dev/" target="_blank" rel="noopener noreferrer">
+          <img id="nokia-logo-img" src="${imagesUri}/containerlab.svg" alt="Containerlab Logo" class="logo-image">
+        </a>
       </div>
+      
       <div class="p-0 is-flex is-justify-content-space-evenly is-flex-direction-column">
         <p class="title    m-0 px-1 py-0   is-4 is-unselectable has-text-weight-normal has-text-white"> containerlab</p>
         <p class="subtitle m-0 px-1 py-0   is-6                 has-text-weight-light  has-text-white"
