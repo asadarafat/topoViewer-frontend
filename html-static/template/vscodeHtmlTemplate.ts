@@ -33,6 +33,12 @@ return `
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="${cssUri}/cytoscape-leaflet.css?ver=1" />
 
+  <!-- Quill CSS (Snow theme) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
+
+  <!-- highlight.js style -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
   <!-- JS Assets -->
   <script src="${jsUri}/library/fontawesome-6-7-2.min.js?ver=1"></script>
   <script src="${jsUri}/library/bulma-slider.min.js?ver=1"></script>
@@ -53,7 +59,7 @@ return `
           <img id="nokia-logo-img" src="${imagesUri}/containerlab.svg" alt="Containerlab Logo" class="logo-image">
         </a>
       </div>
-      
+
       <div class="p-0 is-flex is-justify-content-space-evenly is-flex-direction-column">
         <p class="title    m-0 px-1 py-0   is-4 is-unselectable has-text-weight-normal has-text-white"> containerlab</p>
         <p class="subtitle m-0 px-1 py-0   is-6                 has-text-weight-light  has-text-white"
@@ -912,10 +918,11 @@ return `
                     <div class="field">
                       <div class="control">
                         <input type="file" id="panel-clab-editor-file-input" class="file-input">
-                        <button class="button is-link is-outlined is-small" onclick="nodeParentPropertiesUpdate()">Update
-                        </button>
                         <button class="button is-link is-outlined is-small"
-                          id="panel-node-editor-parent-close-button" onclick="nodeParentPropertiesUpdateClose()">Close
+                          onclick="nodeParentPropertiesUpdate()">Update
+                        </button>
+                        <button class="button is-link is-outlined is-small" id="panel-node-editor-parent-close-button"
+                          onclick="nodeParentPropertiesUpdateClose()">Close
                         </button>
                       </div>
                     </div>
@@ -1498,15 +1505,30 @@ return `
                 </p>
                 <ul>
                   <li>Click on nodes and links to explore your network.</li>
-                  <li>Use the settings menu to show/hide link endpoint labels.</li>
+                  <li>Navigate the viewport menu to fine-tune your topology view.</li>
+                  <li>Modifier key combinations and node behavior:</li>
+                  <ul>
+                    <li><strong>Ctrl + Click:</strong> Connects the user to the node via SSH.</li>
+                    <li><strong>Shift + Click (non-group):</strong> Creates a new group and reassigns the clickednode to
+                      this group.</li>
+                    <li><strong>Shift + Click (group):</strong> Opens the editor panel to modify an existing group.</li>
+                    <li><strong>Alt + Click:</strong> Release node from its group and potentially removes an empty
+                      group.</li>
+                    <li><strong>Regular Click:</strong> Toggles the display of node properties in the UI.</li>
+                    <li><strong>Assign Node to Group:</strong> Drag the node into the desired group.</li>
+                  </ul>
+
+
                   <li>
-                    Visit GitHub repository for more details
-                    <a href="https://github.com/asadarafat/topoViewer">https://github.com/asadarafat/topoViewer</a>.
+                    Visit the GitHub repository for more details:
+                    <a href="https://github.com/asadarafat/topoViewer"
+                      target="_blank">https://github.com/asadarafat/topoViewer</a>
                   </li>
+
                 </ul>
-                <p>
-                  We hope you find TopoViewer a valuable tool for your network needs. If you have any questions or
-                  feedback, please don't hesitate to reach out to me.
+
+                We hope you find TopoViewer a valuable tool for your network needs. If you have any questions or
+                feedback, please don't hesitate to reach out to me.
                 </p>
                 <p>
                   Special Thanks:
@@ -1633,6 +1655,11 @@ return `
 
     <script src="https://unpkg.com/leaflet@1.7.1"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- 3) Quill (v2 beta) -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+
     <script src="${jsUri}/library/lodash.min.js?ver=1"></script>
 
     <script src="${jsUri}/library/cola.min.js?ver=1"></script>
@@ -1647,6 +1674,13 @@ return `
     <script src="${jsUri}/library/cytoscape-grid-guide.min.js?ver=1"></script>
     <script src="${jsUri}/library/cytoscape-edgehandles.min.js?ver=1"></script>
     <script src="${jsUri}/library/cytoscape-expand-collapse.min.js"></script>
+
+        <!-- custom textbox with rich text editor -->
+
+    <script src="${jsUri}/library/highlight-11-9-0.min.js"></script>
+    <script src="${jsUri}/library/quill-2-0-3.min.js"></script>
+    <script src="${jsUri}/managerCyTextBox.js?ver=1"></script>
+
     <script src="${jsUri}/library/socket.io.min.js?ver=1"></script>
 
     <script src="https://unpkg.com/@floating-ui/core@1.5.0"></script>
@@ -1674,13 +1708,16 @@ return `
     <!-- Inject allowedHostname number as a global variable -->
     <script> window.socketAssignedPort = "${socketAssignedPort}"; </script>
 
-    <script src="${jsUri}/common.js?ver=1"></script>
 
+
+
+    <script src="${jsUri}/common.js?ver=1"></script>
     <script src="${jsUri}/dev.js?ver=1"></script>
 
     <!-- clabTreeProviderData provided to below script using socket.io -->
     <script src="${jsUri}/managerOnChangeFramework.js?ver=1"></script>
     <script src="${jsUri}/managerSocketDataEnrichment.js?ver=1"></script>
+
 
     <script src="${jsUri}/managerVscodeWebview.js?ver=1"></script>
     <script src="${jsUri}/managerSvg.js?ver=1"></script>

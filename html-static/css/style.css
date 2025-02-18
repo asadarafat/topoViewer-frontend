@@ -622,3 +622,90 @@ body {
     background-color: white;
   }
 }
+
+/* Overlay container (textbox overlay) */
+/* Overlay container (textbox overlay) */
+/* Overlay container (textbox overlay) */
+
+
+/* Overlay container (textbox overlay) */
+.html-label {
+  position: absolute;
+  pointer-events: none;
+  /* let events pass through by default (read-only mode) */
+  background: #eee;
+  width: 550px;
+  /* default overlay width */
+  height: 200px;
+  /* default overlay height */
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Quill toolbar container, initially hidden */
+[id^="toolbar-container-"] {
+  display: none;
+  margin-bottom: 0.5rem;
+  pointer-events: auto;
+  /* ensure the toolbar can be clicked */
+}
+
+/* Editor area */
+[id^="editor-"] {
+  flex: 1;
+  overflow: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+/* Button row styling */
+.button-row {
+  margin-top: 0.5rem;
+}
+
+/* Resize handles */
+.resize-handle {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  pointer-events: auto;
+  /* so we can grab the handle */
+  background: rgba(0, 0, 0, 0);
+  /* transparent, but you could style it differently */
+}
+
+.resize-handle.bottom-right {
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+}
+
+.resize-handle.bottom-center {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: s-resize;
+}
+
+.resize-handle.right-center {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  cursor: e-resize;
+}
+
+/* Disable text selection while resizing */
+.no-select {
+  user-select: none;
+}
+
+/* Ensure buttons and dropdowns capture events (while editing) */
+button,
+select {
+  pointer-events: auto;
+}
