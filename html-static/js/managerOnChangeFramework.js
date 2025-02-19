@@ -33,27 +33,35 @@
 // Below is a textual illustration of how these pieces connect:
 
 // ```
-// +----------------------------------------------------------+
-// |               Config (monitorConfigs)                    |
-// |  ------------------------------------------------------  |
-// |  useCase: "interfaceState",                              |
-// |  mapping: onChangeRuleInterfaceOperState,                |
-// |  handler: onChangeHandlerInterfaceOperState              |
-// +-----------------------------+----------------------------+
-//                               |
-//                               | (passed to)
-//                               v
-// +----------------------------------------------------------+
-// |               stateMonitorEngine(labData, configs)       |
-// |                                                          |
-// |    1) Call mapping() to produce current state map        |
-// |    2) Compare with previousStateByUseCase[useCase]       |
-// |    3) If different, call handler(updateMessage)          |
-// +---------+------------------------------------------+-----+
-//           |                                          |
-//           | calls                                    | calls
-//           v                                          v
-// +-------------------------------------+   +-------------------------------------+
+//    +---------------------------------------------------+
+//    | Socket.io Feed: "clab-tree-provider-data"         |-----------+
+//    |  (Extension Backend sends lab data via socket.io) |           |
+//    +---------------------------------------------------+           |
+//                                                                    |
+//                                                                    |
+//                                                                    |
+//                                                                    |
+// +----------------------------------------------------------+       |
+// |               Config (monitorConfigs)                    |       |
+// |  ------------------------------------------------------  |       |
+// |  useCase: "interfaceState",                              |       |
+// |  mapping: onChangeRuleInterfaceOperState,                |       |
+// |  handler: onChangeHandlerInterfaceOperState              |       |
+// +-----------------------------+----------------------------+       |
+//                               |                                    |
+//                               | (passed to)                        | (passed to)
+//                               v                                    |
+// +----------------------------------------------------------+       |
+// |               stateMonitorEngine(labData, configs)       |       |
+// |                                                          |<------+
+// |    1) Call mapping() to produce current state map        |       
+// |    2) Compare with previousStateByUseCase[useCase]       |       
+// |    3) If different, call handler(updateMessage)          |       
+// +---------+------------------------------------------+-----+       
+//           |                                          |             
+//           | calls                                    | calls       
+//           v                                          v                        
+// +-------------------------------------+   +-------------------------------------+  
 // | mapping:                            |   | handler:                            |
 // | onChangeRuleInterfaceOperState      |   | onChangeHandlerInterfaceOperState   |
 // | (Derives Up/Down from raw lab data) |   | (Updates Cytoscape edges)           |
@@ -284,41 +292,6 @@ const monitorConfigs = [
  * Listens for raw lab data from the backend on the "clab-tree-provider-data" event.
  * When received, the stateMonitorEngine is invoked with the global monitorConfigs.
  */
-// socket.on("clab-tree-provider-data", (labData) => {
-//     console.log("Received clab-tree-provider-data:", labData);
-//     stateMonitorEngine(labData, monitorConfigs);
-//     socketDataEncrichmentLink(labData);
-// });
-
-
-// // -----------------------------------------------------------------------------
-// // SOCKET BINDING CONTROL // SOCKET.IO EVENT LISTENER (ENTRY POINT)
-// // -----------------------------------------------------------------------------
-
-// /**
-//  * updateSocketBinding()
-//  *
-//  * Unbinds any previous listener for "clab-tree-provider-data" and, if the global toggle is enabled,
-//  * binds an inline listener that processes the lab data using the generic state monitor engine.
-//  */
-// function updateSocketBinding() {
-//     // Unbind previous "clab-tree-provider-data" listeners.
-//     socket.off('clab-tree-provider-data');
-
-//     if (globalToggleOnChangeCytoStyle) {
-//         socket.on('clab-tree-provider-data', (labData) => {
-//             console.log("Received clab-tree-provider-data - globalToggleOnChangeCytoStyl:", labData);
-//             // Use the global monitorConfigs defined below.
-//             stateMonitorEngine(labData, monitorConfigs);
-//             socketDataEncrichmentLink(labData);
-//             socketDataEncrichmentNode(labData)
-
-//         });
-//         console.log("Socket 'clab-tree-provider-data' event bound.");
-//     } else {
-//         console.log("Socket 'clab-tree-provider-data' event unbound.");
-//     }
-// }
 
 
 // -----------------------------------------------------------------------------

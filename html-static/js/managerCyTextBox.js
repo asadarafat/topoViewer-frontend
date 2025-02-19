@@ -1,16 +1,15 @@
-
 // We'll keep references to all textbox overlays here if needed:
 const textboxOverlays = {};
 
 /**
- * Create a new Cytoscape node with topoViewerRole="textbox"
- * and link it to a custom overlay with Quill.
- *
- * @param {Object} cy The Cytoscape instance
- * @param {string} nodeId A unique ID for this new node (e.g. "textbox123")
- * @param {Object} position The (x, y) coordinates for the new node
- * @returns {Object} The newly created node
- */
+* Create a new Cytoscape node with topoViewerRole="textbox"
+* and link it to a custom overlay with Quill.
+*
+* @param {Object} cy The Cytoscape instance
+* @param {string} nodeId A unique ID for this new node (e.g. "textbox123")
+* @param {Object} position The (x, y) coordinates for the new node
+* @returns {Object} The newly created node
+*/
 // export function createTextboxNode(cy, nodeId, position = { x: 150, y: 100 }) {
 function createTextboxNode(cy, nodeId, position = { x: 20, y: 20 }) {
 
@@ -21,7 +20,7 @@ function createTextboxNode(cy, nodeId, position = { x: 20, y: 20 }) {
       id: nodeId,
       topoViewerRole: "textbox",
       label: "",
-      textEditorData: "",
+      textBoxData: "",
     },
     position,
   });
@@ -38,16 +37,16 @@ function createTextboxNode(cy, nodeId, position = { x: 20, y: 20 }) {
 
 
 /**
- * Build the HTML overlay + Quill editor for a "textbox" node.
- * Has logic for resizing, editing, saving/canceling, etc.
- *
- * @param {Object} cy The Cytoscape instance
- * @param {Object} node The Cytoscape node for which we want an overlay
- * @returns {{section: HTMLElement, quill: Quill}} Some references
- */
+* Build the HTML overlay + Quill editor for a "textbox" node.
+* Has logic for resizing, editing, saving/canceling, etc.
+*
+* @param {Object} cy The Cytoscape instance
+* @param {Object} node The Cytoscape node for which we want an overlay
+* @returns {{section: HTMLElement, quill: Quill}} Some references
+*/
 function createTextboxOverlay(cy, node) {
   // Make a unique DOM container with the node's ID
-  const section = document.createElement("section");
+  const section = document.createElement("div");
   section.className = "html-label columns is-mobile is-multiline";
   section.id = `overlay-${node.id()}`; // e.g. "overlay-textbox123"
 
@@ -57,75 +56,90 @@ function createTextboxOverlay(cy, node) {
   const editBtnId = `editBtn-${node.id()}`;
   const saveBtnId = `saveBtn-${node.id()}`;
   const cancelBtnId = `cancelBtn-${node.id()}`;
+  const closeBtnId = `closeBtnId-${node.id()}`;
+
 
   // Insert the HTML (Quill toolbar, resize handles, etc.)
   section.innerHTML = `
-    <!-- Quill toolbar container -->
-    <div id="${toolbarId}" style="display: none; pointer-events: auto;">
-      <span class="ql-formats">
-        <select class="ql-font"></select>
-        <select class="ql-size"></select>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-bold"></button>
-        <button class="ql-italic"></button>
-        <button class="ql-underline"></button>
-        <button class="ql-strike"></button>
-      </span>
-      <span class="ql-formats">
-        <select class="ql-color"></select>
-        <select class="ql-background"></select>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-script" value="sub"></button>
-        <button class="ql-script" value="super"></button>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-header" value="1"></button>
-        <button class="ql-header" value="2"></button>
-        <button class="ql-blockquote"></button>
-        <button class="ql-code-block"></button>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-list" value="ordered"></button>
-        <button class="ql-list" value="bullet"></button>
-        <button class="ql-indent" value="-1"></button>
-        <button class="ql-indent" value="+1"></button>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-direction" value="rtl"></button>
-        <select class="ql-align"></select>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-link"></button>
-        <button class="ql-image"></button>
-        <button class="ql-video"></button>
-        <button class="ql-formula"></button>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-clean"></button>
-      </span>
-    </div>
+  <!-- Buttons row -->
+  <div>
+    <p class="control">
+      <button id="${closeBtnId}" class="button is-text is-small is-pulled-left is-flex" style="display: block; pointer-events: auto;">
+        <span class="icon is-small">
+          <i class="fa-solid fa-circle-xmark"></i>
+        </span>
+      </button>
+      <button id="${editBtnId}" class="button is-text is-small is-pulled-right is-flex" style="display: block; pointer-events: auto;">
+        <span class="icon is-small is-flex">
+          <i class="fa-solid fa-pen"></i>
+        </span>
+      </button>
+    </p>
+  </div>
 
-    <!-- Editor area -->
-    <div id="${editorId}" style="
-      flex: 1; overflow: auto;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-top: 0.5rem;">
-    </div>
+  <!-- Quill toolbar container -->
+  <div id="${toolbarId}" style="display: none; pointer-events: auto; margin: 0.5rem;">
 
-    <!-- Resize handles -->
-    <div class="resize-handle bottom-right"></div>
-    <div class="resize-handle bottom-center"></div>
-    <div class="resize-handle right-center"></div>
+    <span class="ql-formats">
+      <select class="ql-font"></select>
+      <select class="ql-size"></select>
+    </span>
+    <span class="ql-formats">
+      <button class="ql-bold"></button>
+      <button class="ql-italic"></button>
+      <button class="ql-underline"></button>
+      <button class="ql-strike"></button>
+    </span>
+    <span class="ql-formats">
+      <select class="ql-color"></select>
+      <select class="ql-background"></select>
+    </span>
+    <span class="ql-formats">
+      <button class="ql-script" value="sub"></button>
+      <button class="ql-script" value="super"></button>
+    </span>
+    <span class="ql-formats">
+      <button class="ql-blockquote"></button>
+      <button class="ql-code-block"></button>
+    </span>
+    <span class="ql-formats">
+      <button class="ql-list" value="ordered"></button>
+      <button class="ql-list" value="bullet"></button>
+      <button class="ql-indent" value="-1"></button>
+      <button class="ql-indent" value="+1"></button>
+    </span>
+    <span class="ql-formats">
+      <button class="ql-direction" value="rtl"></button>
+      <select class="ql-align"></select>
+    </span>
+    <span class="ql-formats">
+      <button class="ql-link"></button>
+      <button class="ql-image"></button>
+    </span>
+    <span class="ql-formats">
+      <button class="ql-clean"></button>
+    </span>
+  </div>
 
-    <!-- Buttons row -->
-    <div class="button-row" style="margin-top: 0.5rem;">
-      <button id="${editBtnId}" class="button is-link is-small">Edit</button>
-      <button id="${saveBtnId}" class="button is-link is-small" style="display: none;">Save</button>
-      <button id="${cancelBtnId}" class="button is-link is-small" style="display: none;">Cancel</button>
-    </div>
+  <!-- Editor area -->
+  <div id="${editorId}" style="
+        flex: 1; overflow: auto;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin: 0.5rem;">
+
+  </div>
+
+  <!-- Resize handles -->
+  <div class="resize-handle bottom-right"></div>
+  <div class="resize-handle bottom-center"></div>
+  <div class="resize-handle right-center"></div>
+
+  <!-- Buttons row -->
+  <div class="is-flex" style="margin: 0.5rem;">
+    <button id="${saveBtnId}" class="button button-quill is-outlined is-white is-small mr-2" style="display: none;">Save</button>
+    <button id="${cancelBtnId}" class="button button-quill is-outlined is-white is-small mr-2" style="display: none;">Cancel</button>
+  </div>
   `;
 
   // Append to document body
@@ -148,8 +162,14 @@ function createTextboxOverlay(cy, node) {
   const Delta = Quill.import("delta");
   quill.setContents(
     new Delta()
-      .insert('console.log("Hello from Quill");')
-      .insert('\n', { "code-block": true })
+      .insert(' Every success has its network! ',
+        {
+          'color': '#ffffff',
+          'size': 'huge',
+          'background': '#6b24b2'
+        })
+      .insert('\n')
+
   );
 
   // Grab references
@@ -194,7 +214,7 @@ function createTextboxOverlay(cy, node) {
   }
 
 
-  
+
   let updateTimeout = null;
   function debounceUpdateOverlay() {
     if (updateTimeout) clearTimeout(updateTimeout);
@@ -276,10 +296,15 @@ function createTextboxOverlay(cy, node) {
   editBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     quill.enable(true);
+
+    saveBtn.classList.add("is-flex"); // flex is added to align middle
+    cancelBtn.classList.add("is-flex");
+
     toolbarEl.style.display = "block";
     editBtn.style.display = "none";
-    saveBtn.style.display = "inline-block";
-    cancelBtn.style.display = "inline-block";
+    saveBtn.style.display = "block";
+    cancelBtn.style.display = "block";
+
     quill.focus();
     updateOverlay();
     section.style.pointerEvents = "auto";
@@ -288,12 +313,16 @@ function createTextboxOverlay(cy, node) {
   saveBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     savedDelta = quill.getContents();
-    node.data("textEditorData", savedDelta);
+    node.data("textBoxData", savedDelta);
     quill.enable(false);
     toolbarEl.style.display = "none";
-    editBtn.style.display = "inline-block";
+    editBtn.style.display = "block";
     saveBtn.style.display = "none";
     cancelBtn.style.display = "none";
+
+    saveBtn.classList.remove("is-flex"); // flex is removed as is conflict with quill custom style pointer-events: auto
+    cancelBtn.classList.remove("is-flex"); // flex is removed as is conflict with quill custom style pointer-events: auto
+
     updateOverlay();
     section.style.pointerEvents = "none";
   });
@@ -301,13 +330,17 @@ function createTextboxOverlay(cy, node) {
   cancelBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     // Revert to last saved
-    const revertDelta = node.data("textEditorData") || quill.getContents();
+    const revertDelta = node.data("textBoxData") || quill.getContents();
     quill.setContents(revertDelta);
     quill.enable(false);
     toolbarEl.style.display = "none";
-    editBtn.style.display = "inline-block";
+    editBtn.style.display = "block";
     saveBtn.style.display = "none";
     cancelBtn.style.display = "none";
+
+    saveBtn.classList.remove("is-flex"); // flex is removed as is conflict with quill custom style pointer-events: auto
+    cancelBtn.classList.remove("is-flex"); // flex is removed as is conflict with quill custom style pointer-events: auto
+
     updateOverlay();
     section.style.pointerEvents = "none";
   });

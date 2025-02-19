@@ -302,6 +302,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       },
     },],
     boxSelectionEnabled: true,
+    wheelSensitivity: 0.2,
     selectionType: 'additive' // Allow additive selection
   });
 
@@ -758,6 +759,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     } else {
       // Handle actions for non-editor nodes
       switch (true) {
+
         case originalEvent.ctrlKey: { // Ctrl + Click to connect to SSH
           console.info("Connecting to SSH for node:", extraData.longname);
           globalSelectedNode = extraData.longname;
@@ -817,7 +819,6 @@ document.addEventListener("DOMContentLoaded", async function () {
           }
           break;
 
-
         case originalEvent.altKey && node.parent() && !node.isParent(): { // Alt + Click to orphaning a child node
           console.info("Orphaning child node");
 
@@ -832,6 +833,11 @@ document.addEventListener("DOMContentLoaded", async function () {
           }
           break;
         }
+
+        case (node.data("topoViewerRole") == "textbox"): {
+          break;
+        }
+
         case !originalEvent.altKey && !originalEvent.ctrlKey && !node.isParent(): {
           // Toggle panel-node display and update content
           const panelOverlays = document.getElementsByClassName("panel-overlay");
@@ -2635,12 +2641,26 @@ function viewportButtonsZoomToFit() {
 
   console.log("###### createTextboxNode")
 
-  createTextboxNode(cy, "textbox1", { x: 1200, y: 200 });
+
 
 
   // globalCytoscapeLeafletLeaf instance map to fit nodes
   globalCytoscapeLeafletLeaf.fit();
   console.log("globalCytoscapeLeafletLeaf.fit()")
+}
+
+function viewportButtonsAddNodeTextbox(cy) {
+
+  // Filter existing nodes with TopoViewerRole === 'textbox'
+  const textBoxNodes = cy.nodes().filter(node => node.data('topoViewerRole') === 'textbox');
+
+  // Calculate the new count (length + 1)
+  const newCount = textBoxNodes.length + 1;
+
+  // Format the new id as "textbox-XX" with a two-digit counter (e.g., textbox-01, textbox-02, etc.)
+  const newId = `textbox-${newCount.toString().padStart(2, '0')}`;
+
+  createTextboxNode(cy, newId, { x: 120, y: 200 });
 }
 
 
@@ -3595,11 +3615,16 @@ function loadCytoStyle(cy) {
     {
       "selector": "node[topoViewerRole=\"textbox\"]",
       "style": {
-        "background-color": "#222",
+        'background-color': '#000', // the color won't be visible since opacity is 0
+        'background-opacity': 0,
         "width": 40,
         "height": 40,
         "shape": "round-rectangle",
         "label": "",
+        "text-outline-color": "#000000",
+        "text-outline-width": "0.3px",
+        "text-background-color": "#000000",
+        "text-background-opacity": 1,
       },
     },
 

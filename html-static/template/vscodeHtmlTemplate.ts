@@ -34,7 +34,9 @@ return `
   <link rel="stylesheet" href="${cssUri}/cytoscape-leaflet.css?ver=1" />
 
   <!-- Quill CSS (Snow theme) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"> -->
+  <link rel="stylesheet" href="${cssUri}/quill.css?ver=1" />
+
 
   <!-- highlight.js style -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
@@ -218,6 +220,15 @@ return `
             </span>
           </a>
         </p>
+
+        <!-- <p class="control p-0">
+          <a id="viewport-add-node-texbox" href="Add Texbox" onclick="viewportButtonsAddNodeTextbox(cy)"
+            class="button px-4 py-4 is-smallest-element" style="outline: none;">
+            <span class="icon is-small">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </span>
+          </a>
+        </p> -->
 
 
         <!-- <p class="control p-0">
