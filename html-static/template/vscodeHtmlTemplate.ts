@@ -204,6 +204,15 @@ return `
                 -->
 
         <p class="control p-0">
+          <a id="viewport-reload-topo" href="Add Group" onclick="viewportButtonsAddGroup()"
+            class="button px-4 py-4 is-smallest-element" style="outline: none;">
+            <span class="icon is-small">
+              <i class="fa-solid fa-notes-medical"></i>
+            </span>
+          </a>
+        </p>
+
+        <p class="control p-0">
           <a id="viewport-reload-topo" href="Reload TopoViewer" onclick="viewportButtonsReloadTopo()"
             class="button px-4 py-4 is-smallest-element" style="outline: none;">
             <span class="icon is-small">
@@ -741,6 +750,10 @@ return `
                             class="dropdown-item label has-text-weight-normal is-small py-0"
                             id="panel-node-action-ssh-web-based">View Logs
                           </a>
+                          <a onclick="nodeActionRemoveFromParent(event);"
+                            class="dropdown-item label has-text-weight-normal is-small py-0"
+                            id="panel-node-action-ssh-web-based">Release From Group
+                          </a>
 
                           <!--   aarafat-tag: vs-code
 
@@ -867,7 +880,7 @@ return `
 
 
     <!-- Node Parent Properties Editor Panel with Improved Semantic Markup & Responsive Design -->
-    <section class="panel is-link" id="panel-node-editor-parent" aria-labelledby="node-panel-heading"
+    <section class="panel panel-overlay is-link" id="panel-node-editor-parent" aria-labelledby="node-panel-heading"
       style="display: none;">
       <header class="panel-heading is-size-7" id="node-panel-heading">
         Group Properties
@@ -889,6 +902,50 @@ return `
                 </div>
               </div>
             </div>
+          </div> <!-- End .columns -->
+        </div> <!-- End .panel-block -->
+
+        <div class="panel-block p-0">
+          <div class="column px-0">
+            <!-- Label Position -->
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline">
+                  <div class="column is-4 p-1">
+                    <label class="label is-size-7 has-text-right has-text-weight-medium px-auto">
+                      Label Position
+                    </label>
+                  </div>
+                  <div class="column is-8 p-1 pl-3">
+                    <!-- Dropdown Markup -->
+                    <div class="dropdown" id="panel-node-editor-parent-label-dropdown">
+                      <div class="dropdown-trigger">
+                        <button class="button is-size-7 is-fullwidth" aria-haspopup="true"
+                          aria-controls="panel-node-editor-parent-label-dropdown-menu"
+                          onclick="panelNodeEditorParentToggleDropdown()">
+                          <span id="panel-node-editor-parent-label-dropdown-button-text">Select Position</span>
+                          <span class="icon is-small">
+                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                          </span>
+                        </button>
+                      </div>
+                      <div class="dropdown-menu is-fullwidth" id="panel-node-editor-parent-label-dropdown-menu"
+                        role="menu">
+                        <div class="dropdown-content" style="max-height: 5rem; overflow-y: auto;">
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">top-center</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">top-left</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">top-right</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">bottom-center</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">bottom-left</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">bottom-right</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Graph Group -->
             <div class="column my-auto is-11">
               <div class="panel-content">
@@ -921,19 +978,26 @@ return `
                 </div>
               </div>
             </div>
+
+
+          </div> <!-- End .columns -->
+        </div> <!-- End .panel-block -->
+
+        <div class="panel-block p-0">
+          <div class="column px-0">
             <div class="column my-auto is-11">
               <div class="panel-content">
                 <div class="columns py-auto">
                   <div class="column is-4 p-1"></div>
                   <div class="column is-8 p-1 pl-3">
-                    <div class="field">
+                    <div class="field is-grouped is-grouped-right">
                       <div class="control">
                         <input type="file" id="panel-clab-editor-file-input" class="file-input">
+                        <!-- <button class="button is-link is-outlined is-small" id="panel-node-editor-parent-close-button"
+                          onclick="nodeParentPropertiesUpdateClose()">Close
+                        </button> -->
                         <button class="button is-link is-outlined is-small"
                           onclick="nodeParentPropertiesUpdate()">Update
-                        </button>
-                        <button class="button is-link is-outlined is-small" id="panel-node-editor-parent-close-button"
-                          onclick="nodeParentPropertiesUpdateClose()">Close
                         </button>
                       </div>
                     </div>
@@ -1520,12 +1584,10 @@ return `
                   <li>Modifier key combinations and node behavior:</li>
                   <ul>
                     <li><strong>Ctrl + Click:</strong> Connects the user to the node via SSH.</li>
-                    <li><strong>Shift + Click (non-group):</strong> Creates a new group and reassigns the clickednode to
+                    <li><strong>Shift + Click:</strong> Creates a new group and reassigns the clickednode to
                       this group.</li>
-                    <li><strong>Shift + Click (group):</strong> Opens the editor panel to modify an existing group.</li>
                     <li><strong>Alt + Click:</strong> Release node from its group and potentially removes an empty
                       group.</li>
-                    <li><strong>Regular Click:</strong> Toggles the display of node properties in the UI.</li>
                     <li><strong>Assign Node to Group:</strong> Drag the node into the desired group.</li>
                   </ul>
 
@@ -1686,7 +1748,7 @@ return `
     <script src="${jsUri}/library/cytoscape-edgehandles.min.js?ver=1"></script>
     <script src="${jsUri}/library/cytoscape-expand-collapse.min.js"></script>
 
-        <!-- custom textbox with rich text editor -->
+    <!-- custom textbox with rich text editor -->
 
     <script src="${jsUri}/library/highlight-11-9-0.min.js"></script>
     <script src="${jsUri}/library/quill-2-0-3.min.js"></script>
@@ -1733,7 +1795,8 @@ return `
     <script src="${jsUri}/managerVscodeWebview.js?ver=1"></script>
     <script src="${jsUri}/managerSvg.js?ver=1"></script>
     <script src="${jsUri}/managerLayoutAlgo.js?ver=1"></script>
-    <script src="${jsUri}/managerGroupEditor.js?ver=1"></script>
+    <script src="${jsUri}/managerGroupManagement.js?ver=1"></script>
+
 
 
     <script src="${jsUri}/backupRestore.js?ver=1"></script>

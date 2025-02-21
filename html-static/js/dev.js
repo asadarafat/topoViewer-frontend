@@ -352,34 +352,50 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Drag-and-Drop logic
   cy.on('dragfree', 'node', (event) => {
-    // const isViewportDrawerClabEditorCheckboxChecked = setupCheckboxListener('#viewport-drawer-clab-editor-content-01 .checkbox-input');
+    // Assuming the checkbox is always true in your test
     const isViewportDrawerClabEditorCheckboxChecked = true;
 
     if (isViewportDrawerClabEditorCheckboxChecked) {
       const draggedNode = event.target;
 
-      // Check all parent nodes to see if the dragged node is inside
-      const parents = cy.nodes(':parent');
+      // Check all parent nodes to see if the dragged node is inside one
       let assignedParent = null;
-
-      parents.forEach((parent) => {
+      cy.nodes(':parent').forEach((parent) => {
         if (isNodeInsideParent(draggedNode, parent)) {
           assignedParent = parent;
         }
       });
 
       if (assignedParent) {
-        // If dragged inside a parent, move the node to the parent
+        // If dragged inside a parent, reassign the node to that parent
         draggedNode.move({
           parent: assignedParent.id()
         });
         console.info(`${draggedNode.id()} became a child of ${assignedParent.id()}`);
-        // showPanelNodeEditor(draggedNode)
-      }
-      // to release the node from the parent, alt + shift + click on the node.
-    }
 
-  })
+        // Get the dummy child node using your naming convention
+        const dummyChild = cy.getElementById(`${assignedParent.id()}:dummyChild`);
+
+        // Only proceed if the dummy child exists
+        if (dummyChild.length > 0) {
+          // Get all children of the parent except the dummy child
+          const realChildren = assignedParent.children().not(dummyChild);
+
+          console.log("realChildren: ", realChildren);
+
+          // If there is at least one non-dummy child, remove the dummy
+          if (realChildren.length > 0) {
+            dummyChild.remove();
+            console.log("Dummy child removed");
+          } else {
+            console.log("No real children present, dummy child remains");
+          }
+        }
+      }
+      // To release the node from the parent, alt + shift + click on the node.
+    }
+  });
+
 
   // Initialize edgehandles with configuration
   const eh = cy.edgehandles({
@@ -769,45 +785,15 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         case originalEvent.shiftKey && node.parent().empty() && !node.isParent(): {  // Shift + Click to create a new parent
           console.info("Creating a new parent node");
-          const pos = node.position();
-          const newParentId = `groupName${(cy.nodes().length + 1)}:1`;
-
-          cy.add({
-            group: 'nodes',
-            data: {
-              id: newParentId,
-              weight: "1000",
-              name: newParentId.split(":")[0],
-              parent: "",
-              topoViewerRole: "group",
-              extraData: {
-                clabServerUsername: "asad",
-                weight: "2",
-                name: "",
-                topoViewerGroup: "",
-                topoViewerGroupLevel: newParentId.split(":")[1]
-              },
-            },
-            position: { x: pos.x, y: pos.y }
-          });
-
-          node.move({ parent: newParentId });
-          node.data('parent', newParentId);
-
-          const nodeEditorParentPanel = document.getElementById("panel-node-editor-parent");
-          if (nodeEditorParentPanel) {
-            nodeEditorParentPanel.style.display = "block";
-            document.getElementById("panel-node-editor-parent-graph-group-id").textContent = newParentId;
-            document.getElementById("panel-node-editor-parent-graph-group").value = newParentId.split(":")[0];
-            document.getElementById("panel-node-editor-parent-graph-level").value = newParentId.split(":")[1];
-          }
+          createNewParent({ nodeToReparent: node, createDummyChild: false });
           break;
         }
 
-        case originalEvent.shiftKey && node.isParent(): // Shift + Click to edit an existing parent
+        // case originalEvent.shiftKey && node.isParent(): // Shift + Click to edit an existing parent
+        case node.isParent(): // Shift + Click to edit an existing parent
+
           {
             console.info("Editing existing parent node");
-
             const currentParentId = node.id();  // Get the current parent ID
             const nodeEditorParentPanel = document.getElementById("panel-node-editor-parent");
             if (nodeEditorParentPanel) {
@@ -821,20 +807,19 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         case originalEvent.altKey && node.parent() && !node.isParent(): { // Alt + Click to orphaning a child node
           console.info("Orphaning child node");
-
-          const currentParentId = node.parent().id();
-          const formerParentNode = cy.getElementById(currentParentId);
-
-          node.move({ parent: null }); // Orphan the child node
-
-          if (formerParentNode.isChildless()) {
-            console.info("Removing empty parent node");
-            formerParentNode.remove(); // Remove the empty parent node
+          console.info("node data: ", node.data("topoViewerRole"));
+          orphaningNode(node)
+          if (node.data("topoViewerRole") == "dummyChild") {
+            node.remove()
           }
           break;
         }
 
         case (node.data("topoViewerRole") == "textbox"): {
+          break;
+        }
+
+        case (node.data("topoViewerRole") == "dummyChild"): {
           break;
         }
 
@@ -1981,7 +1966,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
       } else {
         // Perform your action based on the selected options
-        // Perform your action based on the selected options
         if (selectedOptions.join(", ") == "option01") {
           captureAndSaveViewportAsPng(cy);
           modal.classList.remove("is-active");
@@ -2149,6 +2133,31 @@ async function sshCliCommandCopy(event) {
   } catch (error) {
     console.error('Error executing restore configuration:', error);
   }
+}
+
+async function nodeActionRemoveFromParent(event) {
+
+  console.log("globalSelectedNode: ", globalSelectedNode)
+  // var node = cy.getElementById(globalSelectedNode);
+
+  var node = cy.nodes().filter(ele => ele.data('extraData')?.longname === globalSelectedNode)[0];
+
+
+  console.log("node: ", node)
+
+
+
+  const currentParentId = node.parent().id();
+  console.log("currentParentId: ", currentParentId)
+  const formerParentNode = cy.getElementById(currentParentId);
+
+  node.move({ parent: null }); // Orphan the child node
+
+  if (formerParentNode.isChildless()) {
+    console.info("Removing empty parent node");
+    formerParentNode.remove(); // Remove the empty parent node
+  }
+
 }
 
 
@@ -2664,7 +2673,13 @@ function viewportButtonsAddNodeTextbox(cy) {
 }
 
 
+function viewportButtonsAddGroup() {
+  console.log("###### viewportButtonsAddGroup")
 
+  const newParentId = createNewParent({ createDummyChild: true });
+  console.log("Parent node created:", newParentId);
+  cy.fit();
+}
 
 
 function viewportButtonsLayoutAlgo() {
@@ -3432,11 +3447,78 @@ function loadCytoStyle(cy) {
         "border-width": "0.5px",
         "border-color": "#DDDDDD",
         "background-color": "#d9d9d9",
+        "width": "80px",
+        "height": "80x",
         "background-opacity": "0.2",
         "color": "#EBECF0",
         "text-outline-color": "#000000",
         "font-size": "8px",
         "z-index": "1"
+      }
+    },
+    {
+      selector: "node:parent.top-center",
+      style: {
+        "text-halign": "center",
+        "text-valign": "top",
+        "text-margin-y": -2,
+      }
+    },
+    {
+      selector: "node:parent.top-left",
+      style: {
+        "text-halign": "right",
+        "text-valign": "top",
+        "text-margin-x": (ele) => {
+          width = ele.outerWidth();
+          return -width
+        },
+        "text-margin-y": -2,
+      }
+    }
+    ,
+    {
+      selector: "node:parent.top-right",
+      style: {
+        "text-halign": "left",
+        "text-valign": "top",
+        "text-margin-x": (ele) => {
+          width = ele.outerWidth();
+          return width
+        },
+        "text-margin-y": -2,
+      },
+    },
+    {
+      selector: "node:parent.bottom-center",
+      style: {
+        "text-halign": "center",
+        "text-valign": "bottom",
+        "text-margin-y": 2,
+      }
+    },
+    {
+      selector: "node:parent.bottom-left",
+      style: {
+        "text-halign": "right",
+        "text-valign": "bottom",
+        "text-margin-x": (ele) => {
+          width = ele.outerWidth();
+          return -width
+        },
+        "text-margin-y": 2,
+      }
+    },
+    {
+      selector: "node:parent.bottom-right",
+      style: {
+        "text-halign": "left",
+        "text-valign": "bottom",
+        "text-margin-x": (ele) => {
+          width = ele.outerWidth();
+          return width
+        },
+        "text-margin-y": 2,
       }
     },
     {
@@ -3475,6 +3557,17 @@ function loadCytoStyle(cy) {
         "border-color": "#AD0000"
       }
     },
+
+
+
+    {
+      "selector": "node[topoViewerRole=\"dummyChild\"]",
+      "style": {
+        "width": "14",
+        "height": "14",
+      }
+    },
+
     {
       "selector": "node[topoViewerRole=\"router\"]",
       "style": {
@@ -4115,10 +4208,30 @@ async function viewportButtonsSaveTopo(cy) {
         nodeJson.parent = node.parent().id(); // Update parent property
         // Check if extraData and labels exist before modifying
         if (nodeJson.data?.extraData?.labels) {
-
           if (nodeJson.parent) {
             nodeJson.data.extraData.labels["graph-group"] = nodeJson.parent.split(":")[0]
             nodeJson.data.extraData.labels["graph-level"] = nodeJson.parent.split(":")[1];
+
+            console.log("### nodeJson.parent", cy.getElementById(nodeJson.parent).classes())
+            const validLabelClasses = [
+              "top-center",
+              "top-left",
+              "top-right",
+              "bottom-center",
+              "bottom-left",
+              "bottom-right"
+            ];
+
+            // Get the parent's classes as array.
+            const parentClasses = cy.getElementById(nodeJson.parent).classes();
+
+            // Filter the classes so that only valid entries remain.
+            const validParentClasses = parentClasses.filter(cls => validLabelClasses.includes(cls));
+
+            // Assign only the first valid class, or an empty string if none exists.
+            // nodeJson.data.extraData.labels["graph-groupLabelPos"] = validParentClasses.length > 0 ? validParentClasses[0] : '';
+            nodeJson.data.groupLabelPos = validParentClasses.length > 0 ? validParentClasses[0] : '';
+
           }
         }
 
