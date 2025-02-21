@@ -38,6 +38,7 @@ function sendMessageToVscodeEndpointPost(endpoint, payload) {
             requestId: requestId,
             endpointName: endpoint,
             payload: JSON.stringify(payload) // Explicit serialization of the payload.
+
         });
     });
 }

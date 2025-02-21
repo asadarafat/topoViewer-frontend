@@ -33,6 +33,14 @@ return `
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="${cssUri}/cytoscape-leaflet.css?ver=1" />
 
+  <!-- Quill CSS (Snow theme) -->
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"> -->
+  <link rel="stylesheet" href="${cssUri}/quill.css?ver=1" />
+
+
+  <!-- highlight.js style -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
   <!-- JS Assets -->
   <script src="${jsUri}/library/fontawesome-6-7-2.min.js?ver=1"></script>
   <script src="${jsUri}/library/bulma-slider.min.js?ver=1"></script>
@@ -44,9 +52,16 @@ return `
   <nav class="level m-0 px-3 py-1 has-background-4a">
 
     <div class="is-flex is-justify-content-flex-start">
-      <div class="pt-1 pr-2">
+      <!-- <div class="pt-1 pr-2">
         <img id="nokia-logo-img" src="${imagesUri}/containerlab.svg" alt="Containerlab Logo" class="logo-image">
+      </div> -->
+
+      <div class="pt-1 pr-2">
+        <a href="https://containerlab.dev/" target="_blank" rel="noopener noreferrer">
+          <img id="nokia-logo-img" src="${imagesUri}/containerlab.svg" alt="Containerlab Logo" class="logo-image">
+        </a>
       </div>
+
       <div class="p-0 is-flex is-justify-content-space-evenly is-flex-direction-column">
         <p class="title    m-0 px-1 py-0   is-4 is-unselectable has-text-weight-normal has-text-white"> containerlab</p>
         <p class="subtitle m-0 px-1 py-0   is-6                 has-text-weight-light  has-text-white"
@@ -189,6 +204,15 @@ return `
                 -->
 
         <p class="control p-0">
+          <a id="viewport-reload-topo" href="Add Group" onclick="viewportButtonsAddGroup()"
+            class="button px-4 py-4 is-smallest-element" style="outline: none;">
+            <span class="icon is-small">
+              <i class="fa-solid fa-notes-medical"></i>
+            </span>
+          </a>
+        </p>
+
+        <p class="control p-0">
           <a id="viewport-reload-topo" href="Reload TopoViewer" onclick="viewportButtonsReloadTopo()"
             class="button px-4 py-4 is-smallest-element" style="outline: none;">
             <span class="icon is-small">
@@ -205,6 +229,15 @@ return `
             </span>
           </a>
         </p>
+
+        <!-- <p class="control p-0">
+          <a id="viewport-add-node-texbox" href="Add Texbox" onclick="viewportButtonsAddNodeTextbox(cy)"
+            class="button px-4 py-4 is-smallest-element" style="outline: none;">
+            <span class="icon is-small">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </span>
+          </a>
+        </p> -->
 
 
         <!-- <p class="control p-0">
@@ -717,6 +750,10 @@ return `
                             class="dropdown-item label has-text-weight-normal is-small py-0"
                             id="panel-node-action-ssh-web-based">View Logs
                           </a>
+                          <a onclick="nodeActionRemoveFromParent(event);"
+                            class="dropdown-item label has-text-weight-normal is-small py-0"
+                            id="panel-node-action-ssh-web-based">Release From Group
+                          </a>
 
                           <!--   aarafat-tag: vs-code
 
@@ -832,6 +869,139 @@ return `
                   <div class="column is-8 p-1 pl-3"><label
                       class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
                       id="panel-node-topoviewerrole">node-topoviewerrole-placeholder</label></div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- End .columns -->
+        </div> <!-- End .panel-block -->
+      </div> <!-- End .panel-tabContainer -->
+    </section>
+
+
+
+    <!-- Node Parent Properties Editor Panel with Improved Semantic Markup & Responsive Design -->
+    <section class="panel panel-overlay is-link" id="panel-node-editor-parent" aria-labelledby="node-panel-heading"
+      style="display: none;">
+      <header class="panel-heading is-size-7" id="node-panel-heading">
+        Group Properties
+      </header>
+      <div class="panel-tabContainer">
+        <div class="panel-block p-0">
+          <div class="column px-0">
+            <!-- Group Id -->
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">Id</label>
+                  </div>
+                  <div class="column is-8 p-1 pl-3"><label
+                      class="label is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-node-editor-parent-graph-group-id">group-id-placeholder</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- End .columns -->
+        </div> <!-- End .panel-block -->
+
+        <div class="panel-block p-0">
+          <div class="column px-0">
+            <!-- Label Position -->
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline">
+                  <div class="column is-4 p-1">
+                    <label class="label is-size-7 has-text-right has-text-weight-medium px-auto">
+                      Label Position
+                    </label>
+                  </div>
+                  <div class="column is-8 p-1 pl-3">
+                    <!-- Dropdown Markup -->
+                    <div class="dropdown" id="panel-node-editor-parent-label-dropdown">
+                      <div class="dropdown-trigger">
+                        <button class="button is-size-7 is-fullwidth" aria-haspopup="true"
+                          aria-controls="panel-node-editor-parent-label-dropdown-menu"
+                          onclick="panelNodeEditorParentToggleDropdown()">
+                          <span id="panel-node-editor-parent-label-dropdown-button-text">Select Position</span>
+                          <span class="icon is-small">
+                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                          </span>
+                        </button>
+                      </div>
+                      <div class="dropdown-menu is-fullwidth" id="panel-node-editor-parent-label-dropdown-menu"
+                        role="menu">
+                        <div class="dropdown-content" style="max-height: 5rem; overflow-y: auto;">
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">top-center</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">top-left</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">top-right</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">bottom-center</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">bottom-left</a>
+                          <a href="#" class="dropdown-item label has-text-weight-normal is-small py-0">bottom-right</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Graph Group -->
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">Graph Group</label>
+                  </div>
+                  <div class="column is-8 p-1 pl-3">
+                    <input
+                      class="input is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-node-editor-parent-graph-group">
+                    </input>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Graph Level -->
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns is-mobile is-multiline py-auto">
+                  <div class="column is-4 p-1"><label
+                      class="label is-size-7 has-text-right has-text-weight-medium px-auto">Graph Level</label>
+                  </div>
+                  <div class="column is-8 p-1 pl-3">
+                    <input
+                      class="input is-size-7 has-text-left link-impairment-widht has-text-weight-normal mr-0 is-max-content"
+                      id="panel-node-editor-parent-graph-level">
+                    </input>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          </div> <!-- End .columns -->
+        </div> <!-- End .panel-block -->
+
+        <div class="panel-block p-0">
+          <div class="column px-0">
+            <div class="column my-auto is-11">
+              <div class="panel-content">
+                <div class="columns py-auto">
+                  <div class="column is-4 p-1"></div>
+                  <div class="column is-8 p-1 pl-3">
+                    <div class="field is-grouped is-grouped-right">
+                      <div class="control">
+                        <input type="file" id="panel-clab-editor-file-input" class="file-input">
+                        <!-- <button class="button is-link is-outlined is-small" id="panel-node-editor-parent-close-button"
+                          onclick="nodeParentPropertiesUpdateClose()">Close
+                        </button> -->
+                        <button class="button is-link is-outlined is-small"
+                          onclick="nodeParentPropertiesUpdate()">Update
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1410,15 +1580,28 @@ return `
                 </p>
                 <ul>
                   <li>Click on nodes and links to explore your network.</li>
-                  <li>Use the settings menu to show/hide link endpoint labels.</li>
+                  <li>Navigate the viewport menu to fine-tune your topology view.</li>
+                  <li>Modifier key combinations and node behavior:</li>
+                  <ul>
+                    <li><strong>Ctrl + Click:</strong> Connects the user to the node via SSH.</li>
+                    <li><strong>Shift + Click:</strong> Creates a new group and reassigns the clickednode to
+                      this group.</li>
+                    <li><strong>Alt + Click:</strong> Release node from its group and potentially removes an empty
+                      group.</li>
+                    <li><strong>Assign Node to Group:</strong> Drag the node into the desired group.</li>
+                  </ul>
+
+
                   <li>
-                    Visit GitHub repository for more details
-                    <a href="https://github.com/asadarafat/topoViewer">https://github.com/asadarafat/topoViewer</a>.
+                    Visit the GitHub repository for more details:
+                    <a href="https://github.com/asadarafat/topoViewer"
+                      target="_blank">https://github.com/asadarafat/topoViewer</a>
                   </li>
+
                 </ul>
-                <p>
-                  We hope you find TopoViewer a valuable tool for your network needs. If you have any questions or
-                  feedback, please don't hesitate to reach out to me.
+
+                We hope you find TopoViewer a valuable tool for your network needs. If you have any questions or
+                feedback, please don't hesitate to reach out to me.
                 </p>
                 <p>
                   Special Thanks:
@@ -1545,6 +1728,11 @@ return `
 
     <script src="https://unpkg.com/leaflet@1.7.1"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- 3) Quill (v2 beta) -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+
     <script src="${jsUri}/library/lodash.min.js?ver=1"></script>
 
     <script src="${jsUri}/library/cola.min.js?ver=1"></script>
@@ -1559,6 +1747,13 @@ return `
     <script src="${jsUri}/library/cytoscape-grid-guide.min.js?ver=1"></script>
     <script src="${jsUri}/library/cytoscape-edgehandles.min.js?ver=1"></script>
     <script src="${jsUri}/library/cytoscape-expand-collapse.min.js"></script>
+
+    <!-- custom textbox with rich text editor -->
+
+    <script src="${jsUri}/library/highlight-11-9-0.min.js"></script>
+    <script src="${jsUri}/library/quill-2-0-3.min.js"></script>
+    <script src="${jsUri}/managerCyTextBox.js?ver=1"></script>
+
     <script src="${jsUri}/library/socket.io.min.js?ver=1"></script>
 
     <script src="https://unpkg.com/@floating-ui/core@1.5.0"></script>
@@ -1586,17 +1781,23 @@ return `
     <!-- Inject allowedHostname number as a global variable -->
     <script> window.socketAssignedPort = "${socketAssignedPort}"; </script>
 
-    <script src="${jsUri}/common.js?ver=1"></script>
 
+
+
+    <script src="${jsUri}/common.js?ver=1"></script>
     <script src="${jsUri}/dev.js?ver=1"></script>
 
     <!-- clabTreeProviderData provided to below script using socket.io -->
     <script src="${jsUri}/managerOnChangeFramework.js?ver=1"></script>
     <script src="${jsUri}/managerSocketDataEnrichment.js?ver=1"></script>
 
+
     <script src="${jsUri}/managerVscodeWebview.js?ver=1"></script>
     <script src="${jsUri}/managerSvg.js?ver=1"></script>
     <script src="${jsUri}/managerLayoutAlgo.js?ver=1"></script>
+    <script src="${jsUri}/managerGroupManagement.js?ver=1"></script>
+
+
 
     <script src="${jsUri}/backupRestore.js?ver=1"></script>
     <script src="${jsUri}/managerClabEditor.js?ver=1"></script>
