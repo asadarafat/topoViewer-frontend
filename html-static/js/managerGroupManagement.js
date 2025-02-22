@@ -108,7 +108,13 @@ function createNewParent({ nodeToReparent = null, createDummyChild = false } = {
 }
 
 
-
+/**
+ * Toggles the panel node editor parent dropdown.
+ *
+ * This function toggles the dropdown's active state. If the click event listeners
+ * on the dropdown items haven't been attached yet, it binds them so that when an item
+ * is clicked, its text is used to update the dropdown button and the dropdown is closed.
+ */
 function panelNodeEditorParentToggleDropdown() {
   // Grab the dropdown container
   const dropdown = document.getElementById('panel-node-editor-parent-label-dropdown');
@@ -139,135 +145,6 @@ function panelNodeEditorParentToggleDropdown() {
   // Finally, toggle the dropdown open/closed
   dropdown.classList.toggle('is-active');
 }
-
-
-// /**
-//  * Updates the parent node by creating a new parent node with a new custom identifier,
-//  * reassigning its child nodes to the new parent using `eles.move()`, and removing the old parent node.
-//  *
-//  * @async
-//  * @function nodeParentPropertiesUpdate
-//  * @throws {Error} If required UI elements or nodes are not found or if input validation fails.
-//  */
-// async function nodeParentPropertiesUpdate() {
-//   try {
-
-//     // Retrieve required UI elements
-//     const parentIdEl = document.getElementById("panel-node-editor-parent-graph-group-id");
-//     const groupInputEl = document.getElementById("panel-node-editor-parent-graph-group");
-//     const levelInputEl = document.getElementById("panel-node-editor-parent-graph-level");
-
-//     // Validate that the required elements exist
-//     if (!parentIdEl || !groupInputEl || !levelInputEl) {
-
-//       console.log("#############", vsCode)
-
-//       acquireVsCodeApi().window.showWarningMessage("One or more required UI elements were not found.");
-
-//       throw new Error("One or more required UI elements were not found.");
-//     }
-
-//     // Get the current parent's built-in id from the UI element and trim whitespace
-//     const parentNodeId = parentIdEl.textContent.trim();
-//     if (!parentNodeId) {
-//       throw new Error("The parent node ID is empty.");
-//     }
-
-//     // Retrieve the Cytoscape node object for the old parent node
-//     const oldParentNode = cy.getElementById(parentNodeId);
-//     if (oldParentNode.empty()) {
-//       throw new Error(`Parent node with ID "${parentNodeId}" not found in the Cytoscape instance.`);
-//     }
-
-//     // Retrieve new values from the input fields and trim any extra whitespace
-//     const graphGroup = groupInputEl.value.trim();
-//     const graphLevel = levelInputEl.value.trim();
-
-//     // Validate that new values are provided
-//     if (!graphGroup || !graphLevel) {
-//       // display an error message to the user (e.g., using an alert or UI notification)
-//       await sendMessageToVscodeEndpointPost('clab-show-vscode-message', {
-//         type: 'warning',
-//         message: 'Graph group or graph level input is empty.'
-//       });
-
-//       throw new Error("Graph group or graph level input is empty.");
-//     }
-
-//     // Construct the new parent id (custom identifier) using the format: "graphGroup:graphLevel"
-//     const newParentId = `${graphGroup}:${graphLevel}`;
-
-//     // Prepare extra data object with additional metadata
-//     const extraData = {
-//       clabServerUsername: "asad",
-//       weight: "2",
-//       name: "",
-//       topoViewerGroup: graphGroup,
-//       topoViewerGroupLevel: graphLevel
-//     };
-
-//     // Check if a node with the new parent id already exists to prevent duplicate nodes
-//     if (!cy.getElementById(newParentId).empty()) {
-//       throw new Error(`A node with the new parent ID "${newParentId}" already exists.`);
-//     }
-
-//     // Create a new parent node with the new custom identifier.
-//     // We use the built-in "id" for proper compound relationships.
-//     cy.add({
-//       group: 'nodes',
-//       data: {
-//         id: newParentId,       // Built-in id used for compound relationships
-//         name: graphGroup,
-//         topoViewerRole: "group",
-//         extraData: extraData
-//       }
-//       // Optionally add styling or position properties here.
-//     });
-
-//     // Retrieve the newly created parent node for verification (optional)
-//     const newParentNode = cy.getElementById(newParentId);
-//     if (newParentNode.empty()) {
-//       throw new Error(`New parent node with ID "${newParentId}" could not be created.`);
-//     }
-
-//     // Retrieve all child nodes of the old parent node
-//     const childNodes = oldParentNode.children();
-
-//     // Loop through each child node and reassign it to the new parent
-//     childNodes.forEach(childNode => {
-//       // Update the "parent" data attribute to reflect the new parent's built-in id
-//       childNode.data('parent', newParentId);
-//       // Use Cytoscape's move() method to update the compound relationship in-place
-//       childNode.move({ parent: newParentId });
-//       // Log the updated child node data for debugging purposes
-//       console.log('Updated child node data:', childNode.data());
-//     });
-
-//     // Remove the old parent node from the Cytoscape instance
-//     oldParentNode.remove();
-
-//     // Update the UI element to display the new parent's identifier
-//     parentIdEl.textContent = newParentId;
-
-
-//     var groupLabelPosition = document.getElementById('panel-node-editor-parent-label-dropdown-button-text').textContent.trim().toLowerCase();
-
-//     if (groupLabelPosition){
-//       if (groupLabelPosition != "Select Position"){
-//         console.log ("groupLabelPosition: ", groupLabelPosition)
-//         newParentNode.addClass(groupLabelPosition);
-//       }
-//     }
-
-//     // Log a success message
-//     console.log(`Parent node updated successfully. New parent ID: ${newParentId}`);
-//   } catch (error) {
-//     // Log any errors that occur during the update process
-//     console.error("Error in nodeParentPropertiesUpdate:", error);
-//     // Optionally, display an error message to the user (e.g., using an alert or UI notification)
-//     // alert(`Error updating parent node: ${error.message}`);
-//   }
-// }
 
 
 async function nodeParentPropertiesUpdate() {
@@ -313,7 +190,7 @@ async function nodeParentPropertiesUpdate() {
 
     // Get and normalize the label position from the UI
     let groupLabelPosition = labelPositionEl.textContent.trim().toLowerCase();
-    
+
     // Define the list of valid label position classes (adjust if needed)
     const validLabelClasses = [
       "top-center",
@@ -407,14 +284,107 @@ async function nodeParentPropertiesUpdate() {
 
 
 /**
-* Closes the parent properties panel by hiding its UI element.
-*/
+ * Closes the parent properties panel by hiding its UI element.
+ *
+ * This function attempts to find the DOM element representing the node editor parent panel
+ * (with the ID "panel-node-editor-parent"). If found, it sets the element's display style to "none",
+ * effectively closing the panel. If the element is not found or an error occurs, it logs an appropriate
+ * message to the console.
+ *
+ * @returns {boolean} Returns true if the panel was successfully closed, false otherwise.
+ */
 function nodeParentPropertiesUpdateClose() {
-  const nodeEditorParentPanel = document.getElementById("panel-node-editor-parent");
-  if (nodeEditorParentPanel) {
-    nodeEditorParentPanel.style.display = "none";
-  } else {
-    console.warn("Node editor parent panel element not found.");
+  try {
+    const nodeEditorParentPanel = document.getElementById("panel-node-editor-parent");
+    if (nodeEditorParentPanel) {
+      nodeEditorParentPanel.style.display = "none";
+      console.info("Node editor parent panel closed successfully.");
+      return true;
+    } else {
+      console.warn("Node editor parent panel element not found.");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error closing node editor parent panel:", error);
+    return false;
   }
 }
 
+
+
+/**
+ * Removes a compound (parent) node from the Cytoscape instance while preserving its child nodes.
+ *
+ * <p>
+ * The function performs the following operations:
+ * <ol>
+ *   <li>Retrieves the parent's ID from a specified DOM element.</li>
+ *   <li>Validates the presence of the Cytoscape instance and the parent node.</li>
+ *   <li>Reparents all child nodes to the top level (by setting their parent to null).</li>
+ *   <li>Removes the parent node from Cytoscape.</li>
+ *   <li>Hides the node editor parent panel if it exists.</li>
+ * </ol>
+ * </p>
+ *
+ * @returns {boolean} Returns true if the parent node is successfully removed and false if an error occurs.
+ *
+ * @throws {Error} Throws an error if:
+ *  - The Cytoscape instance (`cy`) is not available.
+ *  - The parent ID DOM element is not found.
+ *  - The parent node ID is empty.
+ *  - The parent node is not found in the Cytoscape instance.
+ */
+function nodeParentRemoval() {
+  try {
+    // Verify that the Cytoscape instance is available
+    if (typeof cy === "undefined" || typeof cy.getElementById !== "function") {
+      throw new Error("Cytoscape instance 'cy' is not available.");
+    }
+
+    // Retrieve the UI element containing the parent's ID
+    const parentIdEl = document.getElementById("panel-node-editor-parent-graph-group-id");
+    if (!parentIdEl) {
+      throw new Error("Parent ID element 'panel-node-editor-parent-graph-group-id' not found.");
+    }
+
+    // Get the parent's ID and trim any whitespace
+    const parentNodeId = parentIdEl.textContent.trim();
+    if (!parentNodeId) {
+      throw new Error("The parent node ID is empty.");
+    }
+
+    // Retrieve the parent node from Cytoscape
+    const parentNode = cy.getElementById(parentNodeId);
+    if (!parentNode || parentNode.empty()) {
+      throw new Error(`No parent node found with id "${parentNodeId}".`);
+    }
+
+    // Get all child nodes of the parent
+    const children = parentNode.children();
+    if (!children) {
+      console.warn(`Parent node with id "${parentNodeId}" has no children collection.`);
+    }
+
+    // Reparent each child node by setting its parent to null
+    children.forEach(child => {
+      child.move({ parent: null });
+    });
+
+    // Remove the parent node
+    parentNode.remove();
+    console.info(`Parent node "${parentNodeId}" removed successfully along with reparenting its children.`);
+
+    // Hide the node editor parent panel if it exists
+    const nodeEditorParentPanel = document.getElementById("panel-node-editor-parent");
+    if (nodeEditorParentPanel) {
+      nodeEditorParentPanel.style.display = "none";
+    } else {
+      console.warn("Node editor parent panel element 'panel-node-editor-parent' not found.");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error in nodeParentRemoval:", error);
+    return false;
+  }
+}

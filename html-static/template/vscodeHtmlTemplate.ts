@@ -993,6 +993,9 @@ return `
                     <div class="field is-grouped is-grouped-right">
                       <div class="control">
                         <input type="file" id="panel-clab-editor-file-input" class="file-input">
+                        <button class="button is-link is-outlined is-small" id="panel-node-editor-parent-delete-button"
+                          onclick="nodeParentRemoval()">Remove
+                        </button>
                         <!-- <button class="button is-link is-outlined is-small" id="panel-node-editor-parent-close-button"
                           onclick="nodeParentPropertiesUpdateClose()">Close
                         </button> -->
