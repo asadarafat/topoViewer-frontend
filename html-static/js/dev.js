@@ -392,6 +392,17 @@ document.addEventListener("DOMContentLoaded", async function () {
           }
         }
       }
+
+      // Select all parent nodes where data.topoViewerRole equals "group"
+      var parentNodes = cy.nodes('[topoViewerRole = "group"]');
+
+      // Iterate over each matching parent node and remove it if it has no children
+      parentNodes.forEach(function (parentNode) {
+        if (parentNode.children().empty()) { // Checks if there are no child nodes
+          parentNode.remove();
+        }
+      });
+
       // To release the node from the parent, alt + shift + click on the node.
     }
   });
