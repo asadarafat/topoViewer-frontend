@@ -366,6 +366,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
       });
 
+      // console.log(`assignedParent id: ${assignedParent.id()}, assignedParentChildren: ${assignedParent.children()}` )
+      
+
       if (assignedParent) {
         // If dragged inside a parent, reassign the node to that parent
         draggedNode.move({
@@ -374,7 +377,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info(`${draggedNode.id()} became a child of ${assignedParent.id()}`);
 
         // Get the dummy child node using your naming convention
-        const dummyChild = cy.getElementById(`${assignedParent.id()}:dummyChild`);
+        // const dummyChild = cy.getElementById(`${assignedParent.id()}:dummyChild`);
+
+        // Get the dummy child node using topoViewerRole
+        const dummyChild = assignedParent.children('[topoViewerRole = "dummyChild"]');
+
+        console.log(`assignedParent id: ${assignedParent.id()}, assignedParentChildren: ${assignedParent.children()}, assignedParentDoummyChild: ${dummyChild.id()}` )
 
         // Only proceed if the dummy child exists
         if (dummyChild.length > 0) {
@@ -405,6 +413,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       // To release the node from the parent, alt + shift + click on the node.
     }
+
+    // console.log(`AFTER assignedParent id: ${assignedParent.id()}, assignedParentChildren: ${assignedParent.children()}` )
+
   });
 
 
